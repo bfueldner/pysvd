@@ -1,0 +1,18 @@
+<cpu>
+
+	<name>CM7</name>
+    <revision>r0p0</revision>
+    <endian>little</endian>
+    <mpuPresent>true</mpuPresent>
+    <!-- has double precision FPU -->
+    <fpuPresent>true</fpuPresent>
+    <fpuDP>true</fpuDP>
+    <!-- has instruction and data cache -->
+    <icachePresent>true</icachePresent>
+    <dcachePresent>true</dcachePresent>
+    <!-- has no instruction nor data tighly coupled memory -->
+    <itcmPresent>false</itcmPresent>
+    <dtcmPresent>false</dtcmPresent>
+    <nvicPrioBits>4</nvicPrioBits>
+    <vendorSystickConfig>false</vendorSystickConfig> 
+</cpu>

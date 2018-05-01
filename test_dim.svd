@@ -1,0 +1,6 @@
+<test>
+    <dim>6</dim>
+    <dimIncrement>4</dimIncrement>
+    <dimIndex>A,B,C,D,E,Z</dimIndex>
+    <name>GPIO_%s_CTRL</name>
+</test>
