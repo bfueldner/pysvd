@@ -3,6 +3,9 @@ import sys
 import datetime
 import xml.etree.ElementTree as ET
 
+from type import _get_text,_get_int, _get_enum, access_type
+
+
 from enum import Enum
 
 # https://www.python-course.eu/python3_inheritance.php
@@ -50,6 +53,7 @@ usageType = [
     'reserved'
 ]
 
+x='''
 accessType = [
     'read-only',
     'write-only',
@@ -57,7 +61,7 @@ accessType = [
     'writeOnce',
     'read-writeOnce',
 ]
-
+'''
 protectionStringType = [
     's',
     'n',
@@ -117,32 +121,29 @@ class register(base):
         derived_from = node.get('derivedFrom')
         if derived_from is not None:
             base_class = parent.find(derived_from)
-            print("Gefunden! {}".format(base_class.name))
+        #    print("Gefunden! {}".format(base_class.name))
             self.__dict__ = dict(base_class.__dict__)
 
         base.__init__(self, parent)
 
-        print("__dict__!")
-        for a in self.__dict__:
-            print("{}".format(a))
-
     #    Assign only of not None
+        attr = {}
 
         # Mandatory attributes for derived registers
-        self.name = _get_text(node, 'name', True)
-        self.description = _get_text(node, 'description', False)
-        self.address_offset = _get_int(node, 'addressOffset', True)
-
-    #       var1 = 4 if var1 is None else var1
+        attr['name'] = _get_text(node, 'name', True)
+        attr['description'] = _get_text(node, 'description', False)
+        attr['address_offset'] = _get_int(node, 'addressOffset', True)
 
         # Other attributes
-        self.size = _get_int(node, 'size', False)
-        self.access = _get_enum(node, 'access', accessType, False)
-        self.protection = _get_enum(node, 'protection', protectionStringType, False)
-        self.reset_value = _get_int(node, 'resetValue', False)
-        self.reset_mask = _get_int(node, 'resetMask', False)
+        attr['size'] = _get_int(node, 'size', False)
+        attr['access'] = access_type(node, 'access', False)
+        attr['protection'] = _get_enum(node, 'protection', protectionStringType, False)
+        attr['reset_value'] = _get_int(node, 'resetValue', False)
+        attr['reset_mask'] = _get_int(node, 'resetMask', False)
 
-        print("Clear None elements")
+        # Merge attr into class
+        self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
+    #   print(self.__dict__)
 
 class registers(base):
 

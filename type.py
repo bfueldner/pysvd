@@ -101,6 +101,17 @@ def _get_enum(node, tag, enum, mandatory = False, default = None):
         return text_value
     raise Exception("Value not allowed in enum type")
 
+def _get_new_enum(enum, node, tag, mandatory = False, default = None):
+    text_value = _get_text(node, tag, mandatory, default)
+    if text_value is None and not mandatory:
+        return default
+
+    for pair in enum:
+        if pair.value == text_value:
+            return pair
+
+    raise Exception("Value not allowed in enum type")
+
 def _get_boolean(node, tag, mandatory = False, default = None):
     int_value = _get_int(node, tag, mandatory, default)
     if int_value == 0:
@@ -112,6 +123,9 @@ def _get_boolean(node, tag, mandatory = False, default = None):
 
 def scaled_non_negative_integer(node, tag, mandatory = False, default = None):
     return _get_int(node, tag, mandatory, default)
+
+def access_type(node, tag, mandatory = False, default = None):
+    return _get_new_enum(accessType, node, tag, mandatory, default)
 
 if __name__ == "__main__":
     print(Color)

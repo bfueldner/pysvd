@@ -3,6 +3,8 @@ import unittest
 from model import register
 from model import registers
 
+from type import accessType
+
 import xml.etree.ElementTree as ET
 
 svd = '''
@@ -11,6 +13,7 @@ svd = '''
         <name>TimerCtrl0</name>
         <description>Timer Control Register</description>
         <addressOffset>0x0</addressOffset>
+
         <access>read-write</access>
         <resetValue>0x00008001</resetValue>
         <resetMask>0x0000ffff</resetMask>
@@ -33,24 +36,33 @@ class test_register_derive(unittest.TestCase):
         regs = registers(None, self.node)
         self.assertEqual(len(regs.register), 2)
 
-    def test_register_names(self):
+    def test_register_timer_ctrl0(self):
         regs = registers(None, self.node)
         self.assertEqual(regs.register[0].name, "TimerCtrl0")
-        self.assertEqual(regs.register[1].name, "TimerCtrl1")
+        self.assertEqual(regs.register[0].description, "Timer Control Register")
+        self.assertEqual(regs.register[0].address_offset, 0x00)
 
-    def test_register_address_offset(self):
-        regs = registers(None, self.node)
-        self.assertNotEqual(regs.register[0].address_offset, regs.register[1].address_offset)
-
-    def test_register_size(self):
-        regs = registers(None, self.node)
+        self.assertEqual(regs.register[0].access, accessType.read_write)
+        self.assertEqual(regs.register[0].reset_value, 0x00008001)
+        self.assertEqual(regs.register[0].reset_mask, 0x0000ffff)
         self.assertEqual(regs.register[0].size, 32)
+
+        with self.assertRaises(AttributeError):
+            x = regs.register[0].data_type
+
+    def test_register_timer_ctrl1(self):
+        regs = registers(None, self.node)
+        self.assertEqual(regs.register[1].name, "TimerCtrl1")
+        self.assertEqual(regs.register[1].description, "Derived Timer")
+        self.assertEqual(regs.register[1].address_offset, 0x04)
+
+        self.assertEqual(regs.register[1].access, accessType.read_write)
+        self.assertEqual(regs.register[1].reset_value, 0x00008001)
+        self.assertEqual(regs.register[1].reset_mask, 0x0000ffff)
         self.assertEqual(regs.register[1].size, 32)
 
-    def test_register_none(self):
-        regs = registers(None, self.node)
-        self.assertIsNone(regs.register[0].data_type)
-        self.assertIsNone(regs.register[1].data_type)
+        with self.assertRaises(AttributeError):
+            x = regs.register[1].data_type
 
 if __name__ == "__main__":
     unittest.main()
