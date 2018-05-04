@@ -1,0 +1,19 @@
+<enumeratedValues>
+    <name>TimerIntSelect</name>
+    <usage>read-write</usage>
+    <enumeratedValue>
+        <name>disabled</name>
+        <description>The clock source clk0 is turned off.</description>
+        <value>0</value>
+    </enumeratedValue>
+    <enumeratedValue>
+        <name>enabled</name>
+        <description>The clock source clk1 is running.</description>
+        <value>1</value>
+    </enumeratedValue>
+    <enumeratedValue>
+        <name>reserved</name>
+        <description>Reserved values. Do not use.</description>
+        <isDefault>true</isDefault>
+    </enumeratedValue>
+</enumeratedValues>

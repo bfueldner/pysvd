@@ -19,27 +19,35 @@ def integer(node, tag, mandatory = False, default = None):
     try:
         value = value.strip().lower()
 
-        # Hexadecimal
+        # Hexadecimal '0x'
         if value.startswith('0x'):
             return int(value[2:], 16)
-        # Binary
+        # Binary '0b'
         elif value.startswith('0b'):
             value = value.replace('x', '0')[2:]
             return int(value, 2)
-        # Binary (Freeescale special)
+        # Binary '#'
         elif value.startswith('#'):
             value = value.replace('x', '0')[1:]
-            is_bin = all(x in '01' for x in value)
-            return int(value, 2) if is_bin else int(value)  # binary
-        # Bool true
-        elif value.startswith('true'):
-            return 1
-        # Bool false
-        elif value.startswith('false'):
-            return 0
+            return int(value, 2)
         # Decimal
         else:
             return int(value)
+    except:
+        if mandatory:
+            raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
+    return None
+
+def boolean(node, tag, mandatory = False, default = None):
+    value = text(node, tag, mandatory, default)
+    try:
+        value = value.strip().lower()
+        if value == 'false' or value == '0':
+            return False
+        elif value == 'true' or value == '1':
+            return True
+        else:
+            raise Exception("Can not convert value '{}' to boolean".format(value))
     except:
         if mandatory:
             raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))

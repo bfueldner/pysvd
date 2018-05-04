@@ -50,6 +50,8 @@ class derived_from(base):
 
         base.__init__(self, parent)
 
+        # TODO Test type on derivedFrom search and support paths! http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
+
 class address_block(base):
 
     def __init__(self, parent, node):
@@ -69,14 +71,44 @@ class interrupt(base):
         self.description = _get_text(node, 'description', False)
         self.value = _get_int(node, 'value', True)
 
-class register(derived_from):
+class enumerated_value(base):
+    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
+
+    def __init__(self, parent, node):
+        base.__init__(self, parent)
+
+        attr = {}
+        attr['name'] = parser.text(node, 'name', False)
+        attr['description'] = parser.text(node, 'description', False)
+        attr['value'] = parser.integer(node, 'value', False)
+        attr['is_default'] = parser.boolean(node, 'isDefault', False)
+        if attr['value'] is None and attr['is_default'] is None:
+            raise Exception("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
+        self.add_attributes(attr)
+
+class enumerated_values(derived_from):
+    '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
 
     def __init__(self, parent, node):
         derived_from.__init__(self, parent, node)
 
         attr = {}
+        attr['name'] = parser.text(node, 'name', False)
+        attr['header_enum_name'] = parser.text(node, 'headerEnumName', False)
+        attr['usage'] = parser.enum(type.enum_usage, node, 'usage', False, type.enum_usage.read_write)
+        self.add_attributes(attr)
+
+        self.enumerated_value = []
+        for child in node.findall('./enumeratedValue'):
+            self.enumerated_value.append(enumerated_value(self, child))
+
+class register(derived_from):
+
+    def __init__(self, parent, node):
+        derived_from.__init__(self, parent, node)
 
         # Mandatory attributes for derived registers
+        attr = {}
         attr['name'] = parser.text(node, 'name', True)
         attr['description'] = parser.text(node, 'description', False)
         attr['address_offset'] = parser.integer(node, 'addressOffset', True)
@@ -87,8 +119,7 @@ class register(derived_from):
         attr['protection'] = parser.enum(type.protection, node, 'protection', False)
         attr['reset_value'] = parser.integer(node, 'resetValue', False)
         attr['reset_mask'] = parser.integer(node, 'resetMask', False)
-
-        add_attributes(attr)
+        self.add_attributes(attr)
 
 class registers(base):
 

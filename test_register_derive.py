@@ -1,5 +1,4 @@
 import unittest
-import os
 import xml.etree.ElementTree as ET
 
 from model import register
@@ -9,7 +8,7 @@ import type
 class test_register_derive(unittest.TestCase):
 
     def setUp(self):
-        self.node = ET.parse("res/" + os.path.splitext(os.path.basename(__file__))[0] + ".svd").getroot()
+        self.node = ET.parse("res/" + __name__ + ".svd").getroot()
 
     def test_register_count(self):
         regs = registers(None, self.node)

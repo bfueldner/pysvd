@@ -12,6 +12,10 @@ class protection(Enum):
     non_secure = 'n'
     privileged = 'p'
 
+class enum_usage(Enum):
+    read = 'read'
+    write = 'write'
+    read_write = 'read-write'
 
 old = '''
 cpuNameType = [
@@ -72,13 +76,6 @@ class readActionType(Enum):
     set = 'set'
     modify = 'modify'
     modify_external = 'modifyExternal'
-
-class enumUsageType(Enum):
-    read = 'read'
-    write = 'write'
-    read_write = 'read-write'
-
-
 
 
 def _get_enum(node, tag, enum, mandatory = False, default = None):
