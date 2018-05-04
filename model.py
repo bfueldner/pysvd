@@ -1,72 +1,15 @@
-import argparse
-import sys
-import datetime
-import xml.etree.ElementTree as ET
+#import argparse
+#import sys
+#import datetime
+#import xml.etree.ElementTree as ET
 
-from type import _get_text,_get_int, _get_enum, access_type
-
-
-from enum import Enum
+import parser
+import type
 
 # https://www.python-course.eu/python3_inheritance.php
 # https://docs.python.org/3/library/enum.html
 
-class Color(Enum):
-    RED = 1
-    GREEN = 2
-    BLUE = 3
 
-cpuNameType = [
-    'CM0',
-    'CM0PLUS',
-    'CM0+',
-    'CM1',
-    'SC000',
-    'CM23',
-    'CM3',
-    'CM33',
-    'SC300',
-    'CM4',
-    'CM7',
-    'CA5',
-    'CA7',
-    'CA8',
-    'CA9',
-    'CA15',
-    'CA17',
-    'CA53',
-    'CA57',
-    'CA72',
-    'other',
-]
-
-endianType = [
-    'little',
-    'big',
-    'selectable',
-    'other',
-]
-
-usageType = [
-    'registers',
-    'buffer',
-    'reserved'
-]
-
-x='''
-accessType = [
-    'read-only',
-    'write-only',
-    'read-write',
-    'writeOnce',
-    'read-writeOnce',
-]
-'''
-protectionStringType = [
-    's',
-    'n',
-    'p'
-]
 
 
 
@@ -89,6 +32,24 @@ class base(object):
 #        return None
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
 
+    def add_attributes(self, attr):
+        """Merge not None attr into class"""
+        self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
+
+class derived_from(base):
+    """Base for deriveable classes"""
+
+    def __init__(self, parent, node):
+        # If derived, search class, copy its attributes and call base constructor
+        value = node.get('derivedFrom')
+        if value is not None:
+            _class = parent.find(value)
+            if _class is None:
+                raise Exception("Child '{}' not found on parent '{}' to derive from".format(value, parent.name))
+            self.__dict__ = dict(_class.__dict__)
+
+        base.__init__(self, parent)
+
 class address_block(base):
 
     def __init__(self, parent, node):
@@ -108,42 +69,26 @@ class interrupt(base):
         self.description = _get_text(node, 'description', False)
         self.value = _get_int(node, 'value', True)
 
-class register(base):
-
-    forward = [
-        'size',
-        'access',
-        'reset_value'
-        'reset_mask'
-    ]
+class register(derived_from):
 
     def __init__(self, parent, node):
-        derived_from = node.get('derivedFrom')
-        if derived_from is not None:
-            base_class = parent.find(derived_from)
-        #    print("Gefunden! {}".format(base_class.name))
-            self.__dict__ = dict(base_class.__dict__)
+        derived_from.__init__(self, parent, node)
 
-        base.__init__(self, parent)
-
-    #    Assign only of not None
         attr = {}
 
         # Mandatory attributes for derived registers
-        attr['name'] = _get_text(node, 'name', True)
-        attr['description'] = _get_text(node, 'description', False)
-        attr['address_offset'] = _get_int(node, 'addressOffset', True)
+        attr['name'] = parser.text(node, 'name', True)
+        attr['description'] = parser.text(node, 'description', False)
+        attr['address_offset'] = parser.integer(node, 'addressOffset', True)
 
         # Other attributes
-        attr['size'] = _get_int(node, 'size', False)
-        attr['access'] = access_type(node, 'access', False)
-        attr['protection'] = _get_enum(node, 'protection', protectionStringType, False)
-        attr['reset_value'] = _get_int(node, 'resetValue', False)
-        attr['reset_mask'] = _get_int(node, 'resetMask', False)
+        attr['size'] = parser.integer(node, 'size', False)
+        attr['access'] = parser.enum(type.access, node, 'access', False)
+        attr['protection'] = parser.enum(type.protection, node, 'protection', False)
+        attr['reset_value'] = parser.integer(node, 'resetValue', False)
+        attr['reset_mask'] = parser.integer(node, 'resetMask', False)
 
-        # Merge attr into class
-        self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
-    #   print(self.__dict__)
+        add_attributes(attr)
 
 class registers(base):
 

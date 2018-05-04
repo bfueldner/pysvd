@@ -1,9 +1,11 @@
-import argparse
-import sys
-import datetime
-import xml.etree.ElementTree as ET
+#import argparse
+#import sys
+#import datetime
+#import xml.etree.ElementTree as ET
 
-def _get_text(node, tag, mandatory = False, default = None):
+import type
+
+def text(node, tag, mandatory = False, default = None):
     """Get the text for the provided tag from the provided node"""
     try:
         return node.find(tag).text
@@ -12,45 +14,51 @@ def _get_text(node, tag, mandatory = False, default = None):
             raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
         return default
 
-
-def _get_int(node, tag, mandatory = False, default = None):
-    text_value = _get_text(node, tag, mandatory, default)
+def integer(node, tag, mandatory = False, default = None):
+    value = text(node, tag, mandatory, default)
     try:
-        text_value = text_value.strip().lower()
+        value = value.strip().lower()
 
         # Hexadecimal
-        if text_value.startswith('0x'):
-            return int(text_value[2:], 16)
+        if value.startswith('0x'):
+            return int(value[2:], 16)
         # Binary
-        elif text_value.startswith('0b'):
-            text_value = text_value.replace('x', '0')[2:]
-            return int(text_value, 2)
+        elif value.startswith('0b'):
+            value = value.replace('x', '0')[2:]
+            return int(value, 2)
         # Binary (Freeescale special)
-        elif text_value.startswith('#'):
-            # TODO(posborne): Deal with strange #1xx case better
-            #
-            # Freescale will sometimes provide values that look like this:
-            #   #1xx
-            # In this case, there are a number of values which all mean the
-            # same thing as the field is a "don't care".  For now, we just
-            # replace those bits with zeros.
-            text_value = text_value.replace('x', '0')[1:]
-            is_bin = all(x in '01' for x in text_value)
-            return int(text_value, 2) if is_bin else int(text_value)  # binary
+        elif value.startswith('#'):
+            value = value.replace('x', '0')[1:]
+            is_bin = all(x in '01' for x in value)
+            return int(value, 2) if is_bin else int(value)  # binary
         # Bool true
-        elif text_value.startswith('true'):
+        elif value.startswith('true'):
             return 1
         # Bool false
-        elif text_value.startswith('false'):
+        elif value.startswith('false'):
             return 0
         # Decimal
         else:
-            return int(text_value)
+            return int(value)
     except:
         if mandatory:
             raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
     return None
 
+def enum(enum, node, tag, mandatory = False, default = None):
+    value = text(node, tag, mandatory, default)
+    if value is None and not mandatory:
+        return default
+
+    for pair in enum:
+        if pair.value == value:
+            return pair
+
+    raise Exception("Value '{}' not contained in enum type".format(value))
+
+
+
+old ='''
 class SVDdim(object):
 
     def __init__(self, parent, node):
@@ -123,3 +131,4 @@ if __name__ == "__main__":
 
 #    for person in tree.people:
 #        print("{} ({} - {}) {}".format(person.name, person.birth.timestamp.value, person.death.timestamp.value, person.age))
+'''
