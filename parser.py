@@ -8,7 +8,7 @@ import type
 def text(node, tag, mandatory = False, default = None):
     """Get the text for the provided tag from the provided node"""
     try:
-        return node.find(tag).text
+        return node.find(tag).text.strip()
     except AttributeError:
         if mandatory:
             raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
@@ -17,7 +17,7 @@ def text(node, tag, mandatory = False, default = None):
 def integer(node, tag, mandatory = False, default = None):
     value = text(node, tag, mandatory, default)
     try:
-        value = value.strip().lower()
+        value = value.lower()
 
         # Hexadecimal '0x'
         if value.startswith('0x'):
@@ -41,7 +41,7 @@ def integer(node, tag, mandatory = False, default = None):
 def boolean(node, tag, mandatory = False, default = None):
     value = text(node, tag, mandatory, default)
     try:
-        value = value.strip().lower()
+        value = value.lower()
         if value == 'false' or value == '0':
             return False
         elif value == 'true' or value == '1':

@@ -7,15 +7,32 @@ class access(Enum):
     write_once = 'writeOnce'
     read_write_once = 'read-writeOnce'
 
+class enum_usage(Enum):
+    read = 'read'
+    write = 'write'
+    read_write = 'read-write'
+
+class modified_write_values(Enum):
+    one_to_clear = 'oneToClear'
+    one_to_set = 'oneToSet'
+    one_to_toggle = 'oneToToggle'
+    zero_to_clear = 'zeroToClear'
+    zero_to_set = 'zeroToSet'
+    zero_to_toggle = 'zeroToToggle'
+    clear = 'clear'
+    set = 'set'
+    modify = 'modify'
+
 class protection(Enum):
     secure = 's'
     non_secure = 'n'
     privileged = 'p'
 
-class enum_usage(Enum):
-    read = 'read'
-    write = 'write'
-    read_write = 'read-write'
+class read_action(Enum):
+    clear = 'clear'
+    set = 'set'
+    modify = 'modify'
+    modify_external = 'modifyExternal'
 
 old = '''
 cpuNameType = [
@@ -55,52 +72,7 @@ usageType = [
     'reserved'
 ]
 
-
 class sauAccessType(Enum):
     callable_ = 'c'
     non_secure = 'n'
-
-class modifiedWriteValuesType(Enum):
-    one_to_clear = 'oneToClear'
-    one_to_set = 'oneToSet'
-    one_to_toggle = 'oneToToggle'
-    zero_to_clear = 'zeroToClear'
-    zero_to_set = 'zeroToSet'
-    zero_to_toggle = 'zeroToToggle'
-    clear = 'clear'
-    set = 'set'
-    modify = 'modify'
-
-class readActionType(Enum):
-    clear = 'clear'
-    set = 'set'
-    modify = 'modify'
-    modify_external = 'modifyExternal'
-
-
-def _get_enum(node, tag, enum, mandatory = False, default = None):
-    text_value = _get_text(node, tag, mandatory, default)
-    if text_value is None and not mandatory:
-        return default
-
-    if text_value in enum:
-        return text_value
-    raise Exception("Value not allowed in enum type")
-
-
-def _get_boolean(node, tag, mandatory = False, default = None):
-    int_value = _get_int(node, tag, mandatory, default)
-    if int_value == 0:
-        return False
-    elif int_value == 1:
-        return True
-    else:
-        raise Exception("Value is no boolean type")
-
-def scaled_non_negative_integer(node, tag, mandatory = False, default = None):
-    return _get_int(node, tag, mandatory, default)
-
-def access_type(node, tag, mandatory = False, default = None):
-    return _get_new_enum(accessType, node, tag, mandatory, default)
-
 '''

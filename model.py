@@ -2,16 +2,13 @@
 #import sys
 #import datetime
 #import xml.etree.ElementTree as ET
+import re
 
 import parser
 import type
 
 # https://www.python-course.eu/python3_inheritance.php
 # https://docs.python.org/3/library/enum.html
-
-
-
-
 
 class base(object):
     """Base class for all SVD elements"""
@@ -101,6 +98,60 @@ class enumerated_values(derived_from):
         self.enumerated_value = []
         for child in node.findall('./enumeratedValue'):
             self.enumerated_value.append(enumerated_value(self, child))
+
+class field(derived_from):
+
+    def __init__(self, parent, node):
+        derived_from.__init__(self, parent, node)
+
+        attr = {}
+        attr['name'] = parser.text(node, 'name', True)
+        attr['description'] = parser.text(node, 'description', False)
+
+        # bitRangeOffsetWidthStyle
+        bit_offset = parser.integer(node, 'bitOffset', False)
+        bit_width = parser.integer(node, 'bitWidth', False)
+        if bit_offset is not None:
+            # If bitWidth is not set, default is 1
+            bit_width = 1 if bit_width is None else bit_width
+        else:
+            # bitRangeLsbMsbStyle
+            lsb = parser.integer(node, 'lsb', False)
+            msb = parser.integer(node, 'msb', False)
+            if lsb is None or msb is None:
+                bit_range = parser.text(node, 'bitRange', False)
+                if bit_range is None:
+                    raise ValueError("Field '{}' has no valid bit-range".format(attr['name']))
+
+                match = re.search('\[([0-9]+):([0-9]+)\]', bit_range)
+                lsb = int(match.group(2))
+                msb = int(match.group(1))
+
+            bit_offset = lsb
+            bit_width = (msb - lsb) + 1
+
+        attr['bit_offset'] = bit_offset
+        attr['bit_width'] = bit_width
+
+        attr['access'] = parser.enum(type.access, node, 'access', False)
+        attr['modified_write_values'] = parser.enum(type.modified_write_values, node, 'modifiedWriteValues', False)
+    #   write_constraint
+        attr['read_action'] = parser.enum(type.read_action, node, 'readAction', False)
+        self.add_attributes(attr)
+
+        node = node.find('enumerated_values')
+        if node is not None:
+            self.enumerated_values = enumerated_values(self, node)
+
+class fields(base):
+    '''List of field'''
+
+    def __init__(self, parent, node):
+        base.__init__(self, parent)
+
+        self.field = []
+        for child in node.findall('./field'):
+            self.field.append(field(self, child))
 
 class register(derived_from):
 
