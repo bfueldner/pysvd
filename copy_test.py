@@ -6,38 +6,46 @@ class parent(object):
 
 class register(object):
 
-    def __init__(self, parent, name, list):
+    def __init__(self, parent, name):
+        print("ctor", parent, name)
         self.parent = parent
         self.name = name
-        self.index = 0
 
-        index = 1
-        for dim in list:
-            dimname = self.name + dim
-            self.instantiate(dimname, index)
-            index += 1
-
-    def instantiate(self, name, index):
-        print("Name = {}, Index = {}".format(name, index))
-        self.parent.list.append(name)
-
-
-class reg(object):
+#    def instantiate(self, name, index):
+#        print("Name = {}, Index = {}".format(name, index))
+#        self.parent.list.append(name)
 
     @classmethod
-    def for_node(cls, path, remove_reserved=False):
-        return cls(ET.parse(path), remove_reserved)
+    def from_node(cls, parent, name, list):
+        index = 1
+        arr = []
+        for dim in list:
+            dimname = name + dim
+            parent.list.append(register(parent, dimname))
+        #    arr.append(register(parent, name))
+        #    self.instantiate(dimname, index)
+            index += 1
+        return arr
 
+class reg(object):
     def __init__(self, tree, remove_reserved=False):
         self.remove_reserved = remove_reserved
         self._tree = tree
         self._root = self._tree.getroot()
 
+    @classmethod
+    def copy(cls):
+        return cls()
+
+    @classmethod
+    def for_node(cls, path, remove_reserved=False):
+        return cls(ET.parse(path), remove_reserved)
+
 if __name__ == "__main__":
     my_parent = parent()
-    my_register = register(my_parent, "name_", ['A', 'B', 'C', 'D'])
+    my_register = register.from_node(my_parent, "name_", ['A', 'B', 'C', 'D'])
 
-    regx = reg.from_node(node)
+#    regx = reg.from_node(node)
 
     for reg in my_parent.list:
-        print(reg)
+        print(reg.name)
