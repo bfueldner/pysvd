@@ -11,7 +11,7 @@ def text(node, tag, mandatory = False, default = None):
         return node.find(tag).text.strip()
     except AttributeError:
         if mandatory:
-            raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
+            raise SyntaxError("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
         return default
 
 def integer(node, tag, mandatory = False, default = None):
@@ -35,7 +35,7 @@ def integer(node, tag, mandatory = False, default = None):
             return int(value)
     except:
         if mandatory:
-            raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
+            raise SyntaxError("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
     return None
 
 def boolean(node, tag, mandatory = False, default = None):
@@ -47,10 +47,10 @@ def boolean(node, tag, mandatory = False, default = None):
         elif value == 'true' or value == '1':
             return True
         else:
-            raise Exception("Can not convert value '{}' to boolean".format(value))
+            raise ValueError("Can not convert value '{}' to boolean".format(value))
     except:
         if mandatory:
-            raise Exception("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
+            raise SyntaxError("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
     return None
 
 def enum(enum, node, tag, mandatory = False, default = None):
@@ -62,7 +62,7 @@ def enum(enum, node, tag, mandatory = False, default = None):
         if pair.value == value:
             return pair
 
-    raise Exception("Value '{}' not contained in enum type".format(value))
+    raise KeyError("Value '{}' not contained in enum type".format(value))
 
 
 

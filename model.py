@@ -13,28 +13,31 @@ import type
 class base(object):
     """Base class for all SVD elements"""
 
-#    def __init__(self):
-#        self.parent = None
-
-    def __init__(self, parent):
+    def __init__(self, parent = None):
         self.parent = parent
-
-#   @classmethod
-#   def from_points(cls, point_from, point_to):
-
-    def __getattr__(self, attr):
-        if self.parent is not None:
-            return self.parent.__getattribute__(attr)
-#        print("Has no attribute '{}'".format(attr))
-#        return None
-        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
 
     def add_attributes(self, attr):
         """Merge not None attr into class"""
         self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
 
-class derived_from(base):
+class group(base):
+    '''Base class for elements with registerPropertiesGroup'''
+
+    attributes = ['size', 'access', 'protection', 'reset_value', 'reset_mask']
+#   elements = ['device', 'peripheral', 'register', 'cluster', 'field', 'sauRegionsConfig', 'addressBlock']
+
+    def __init__(self, parent = None):
+        base.__init__(self, parent)
+
+    def __getattr__(self, attr):
+        if attr in group.attributes and self.parent is not None:
+            return self.parent.__getattribute__(attr)
+        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
+
+class derived_from(group):
     """Base for deriveable classes"""
+
+#   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
 
     def __init__(self, parent, node):
         # If derived, search class, copy its attributes and call base constructor
@@ -48,6 +51,79 @@ class derived_from(base):
         base.__init__(self, parent)
 
         # TODO Test type on derivedFrom search and support paths! http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
+
+# Base elements
+class enumerated_value(base):
+    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
+
+    def __init__(self, parent, node):
+        base.__init__(self, parent)
+
+        attr = {}
+        attr['name'] = parser.text(node, 'name', False)
+        attr['description'] = parser.text(node, 'description', False)
+        attr['value'] = parser.integer(node, 'value', False)
+        attr['is_default'] = parser.boolean(node, 'isDefault', False)
+        if attr['value'] is None and attr['is_default'] is None:
+            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
+        self.add_attributes(attr)
+
+
+
+
+
+class cpu(base):
+
+    def __init__(self, parent, node):
+        base.__init__(self, parent)
+
+#       Parse all elements by list, use same type names as in dts, use enum!
+
+    #    self.name = _get_enum(node, 'name', cpuNameType, True)
+    #    self.revision = _get_text(node, 'revision', True)
+    #    self.endian = _get_enum(node, 'endian', endianType, True)
+    #    self.mpu_present = _get_boolean(node, 'mpuPresent', True)
+    #    self.fpu_present = _get_boolean(node, 'fpuPresent', True)
+
+        attr = {}
+        attr['name'] = parser.enum(type.cpu_name, node, 'name', True)
+        attr['revision'] = parser.text(node, 'revision', True)
+        attr['endian'] = parser.enum(type.endian, node, 'endian', True)
+        attr['mpu_present'] = parser.boolean(node, 'mpuPresent', True)
+        attr['fpu_present'] = parser.boolean(node, 'fpuPresent', True)
+
+        attr['fpu_dp'] = parser.boolean(node, 'fpuDP', False)
+        attr['icache_present'] = parser.boolean(node, 'icachePresent', False)
+        attr['dcache_present'] = parser.boolean(node, 'dcachePresent', False)
+        attr['itcm_present'] = parser.boolean(node, 'itcmPresent', False)
+        attr['dtcm_present'] = parser.boolean(node, 'dtcmPresent', False)
+        attr['vtor_present'] = parser.boolean(node, 'vtorPresent', False, True)
+
+        attr['nvic_prio_bits'] = parser.integer(node, 'nvicPrioBits', True)
+        attr['vendor_systick_config'] = parser.boolean(node, 'vendorSystickConfig', True)
+
+        attr['device_num_interrupts'] = parser.integer(node, 'deviceNumInterrupts', False)
+        attr['sau_num_regions'] = parser.integer(node, 'sauNumRegions', False)
+    #    attr['sau_num_regions'] = parser.integer(node, 'sauRegionsConfig', False)
+        self.add_attributes(attr)
+
+# Deriveable elements
+class enumerated_values(derived_from):
+    '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
+
+    def __init__(self, parent, node):
+        derived_from.__init__(self, parent, node)
+
+        attr = {}
+        attr['name'] = parser.text(node, 'name', False)
+        attr['header_enum_name'] = parser.text(node, 'headerEnumName', False)
+        attr['usage'] = parser.enum(type.enum_usage, node, 'usage', False, type.enum_usage.read_write)
+        self.add_attributes(attr)
+
+        self.enumerated_value = []
+        for child in node.findall('./enumeratedValue'):
+            self.enumerated_value.append(enumerated_value(self, child))
+
 
 class address_block(base):
 
@@ -68,36 +144,7 @@ class interrupt(base):
         self.description = _get_text(node, 'description', False)
         self.value = _get_int(node, 'value', True)
 
-class enumerated_value(base):
-    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
 
-    def __init__(self, parent, node):
-        base.__init__(self, parent)
-
-        attr = {}
-        attr['name'] = parser.text(node, 'name', False)
-        attr['description'] = parser.text(node, 'description', False)
-        attr['value'] = parser.integer(node, 'value', False)
-        attr['is_default'] = parser.boolean(node, 'isDefault', False)
-        if attr['value'] is None and attr['is_default'] is None:
-            raise Exception("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
-        self.add_attributes(attr)
-
-class enumerated_values(derived_from):
-    '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
-
-    def __init__(self, parent, node):
-        derived_from.__init__(self, parent, node)
-
-        attr = {}
-        attr['name'] = parser.text(node, 'name', False)
-        attr['header_enum_name'] = parser.text(node, 'headerEnumName', False)
-        attr['usage'] = parser.enum(type.enum_usage, node, 'usage', False, type.enum_usage.read_write)
-        self.add_attributes(attr)
-
-        self.enumerated_value = []
-        for child in node.findall('./enumeratedValue'):
-            self.enumerated_value.append(enumerated_value(self, child))
 
 class field(derived_from):
 
@@ -187,38 +234,12 @@ class registers(base):
                 return register
         return None
 
-class cpu(base):
 
-    def __init__(self, parent, node):
-       base.__init__(self, parent)
 
-#      Parse all elements by list, use same type names as in dts, use enum!
+class device(base):
 
-       self.name = _get_enum(node, 'name', cpuNameType, True)
-       self.revision = _get_text(node, 'revision', True)
-       self.endian = _get_enum(node, 'endian', endianType, True)
-       self.mpu_present = _get_boolean(node, 'mpuPresent', True)
-       self.fpu_present = _get_boolean(node, 'fpuPresent', True)
-
-class test1(base):
-
-#    def __init__(self):
-#       base.__init__(self)
-
-    def __init__(self, parent):
-        base.__init__(self)
-        self.parent = parent
-        self.name = "Name"
-
-class test2(base):
-
-#    def __init__(self):
-#       base.__init__(self)
-
-    def __init__(self, parent):
-        base.__init__(self)
-        self.parent = parent
-        self.value = "Value"
+    def __init__(self, node):
+        base.__init__(self, None)
 
 class SVDdim(object):
 

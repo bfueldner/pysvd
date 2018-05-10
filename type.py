@@ -7,6 +7,35 @@ class access(Enum):
     write_once = 'writeOnce'
     read_write_once = 'read-writeOnce'
 
+class cpu_name(Enum):
+    cm0 = 'CM0'
+    cm0plus = 'CM0PLUS'
+#   cm0+ = 'CM0+'
+    cm1 = 'CM1'
+    sc000 = 'SC000'
+    cm23 = 'CM23'
+    cm3 = 'CM3'
+    cm33 = 'CM33'
+    sc300 = 'SC300'
+    cm4 = 'CM4'
+    cm7 = 'CM7'
+    ca5 = 'CA5'
+    ca7 = 'CA7'
+    ca8 = 'CA8'
+    ca9 = 'CA9'
+    ca15 = 'CA15'
+    ca17 = 'CA17'
+    ca53 = 'CA53'
+    ca57 = 'CA57'
+    ca72 = 'CA72'
+    other = 'other'
+
+class endian(Enum):
+    little = 'little'
+    big = 'big'
+    selectable = 'selectable'
+    other = 'other'
+
 class enum_usage(Enum):
     read = 'read'
     write = 'write'
@@ -35,37 +64,6 @@ class read_action(Enum):
     modify_external = 'modifyExternal'
 
 old = '''
-cpuNameType = [
-    'CM0',
-    'CM0PLUS',
-    'CM0+',
-    'CM1',
-    'SC000',
-    'CM23',
-    'CM3',
-    'CM33',
-    'SC300',
-    'CM4',
-    'CM7',
-    'CA5',
-    'CA7',
-    'CA8',
-    'CA9',
-    'CA15',
-    'CA17',
-    'CA53',
-    'CA57',
-    'CA72',
-    'other',
-]
-
-endianType = [
-    'little',
-    'big',
-    'selectable',
-    'other',
-]
-
 usageType = [
     'registers',
     'buffer',
