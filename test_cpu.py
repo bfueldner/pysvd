@@ -49,6 +49,8 @@ class test_cpu(unittest.TestCase):
         self.assertEqual(test.nvic_prio_bits, 4)
         self.assertFalse(test.vendor_systick_config)
 
+        self.assertTrue(test.vtor_present)
+
         with self.assertRaises(AttributeError):
             self.assertIsNotNone(test.sau_num_regions)
 

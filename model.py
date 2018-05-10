@@ -77,14 +77,6 @@ class cpu(base):
     def __init__(self, parent, node):
         base.__init__(self, parent)
 
-#       Parse all elements by list, use same type names as in dts, use enum!
-
-    #    self.name = _get_enum(node, 'name', cpuNameType, True)
-    #    self.revision = _get_text(node, 'revision', True)
-    #    self.endian = _get_enum(node, 'endian', endianType, True)
-    #    self.mpu_present = _get_boolean(node, 'mpuPresent', True)
-    #    self.fpu_present = _get_boolean(node, 'fpuPresent', True)
-
         attr = {}
         attr['name'] = parser.enum(type.cpu_name, node, 'name', True)
         attr['revision'] = parser.text(node, 'revision', True)

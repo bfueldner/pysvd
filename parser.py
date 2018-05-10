@@ -36,7 +36,7 @@ def integer(node, tag, mandatory = False, default = None):
     except:
         if mandatory:
             raise SyntaxError("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
-    return None
+    return default
 
 def boolean(node, tag, mandatory = False, default = None):
     value = text(node, tag, mandatory, default)
@@ -51,7 +51,7 @@ def boolean(node, tag, mandatory = False, default = None):
     except:
         if mandatory:
             raise SyntaxError("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
-    return None
+    return default
 
 def enum(enum, node, tag, mandatory = False, default = None):
     value = text(node, tag, mandatory, default)
