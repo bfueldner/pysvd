@@ -10,15 +10,26 @@ import type
 # https://www.python-course.eu/python3_inheritance.php
 # https://docs.python.org/3/library/enum.html
 
+# Base classes
 class base(object):
     """Base class for all SVD elements"""
 
-    def __init__(self, parent = None):
-        self.parent = parent
+    def __init__(self):
+        pass
+
+    @classmethod
+    def parse(cls, parent, node):
+        return cls(parent, node)
 
     def add_attributes(self, attr):
         """Merge not None attr into class"""
         self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
+
+class parent(base):
+    '''Base class for parents'''
+
+    def __init__(self, parent):
+        self.parent = parent
 
 class group(base):
     '''Base class for elements with registerPropertiesGroup'''
@@ -30,19 +41,21 @@ class group(base):
         base.__init__(self, parent)
 
     def __getattr__(self, attr):
-        if attr in group.attributes and self.parent is not None:
+        if attr in self.attributes and self.parent:
             return self.parent.__getattribute__(attr)
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
 
-class derived_from(group):
-    """Base for deriveable classes"""
+class derive(group):
+    '''Base for deriveable classes'''
 
 #   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
 
     def __init__(self, parent, node):
+        self.derived = False
+
         # If derived, search class, copy its attributes and call base constructor
         value = node.get('derivedFrom')
-        if value is not None:
+        if value:
             _class = parent.find(value)
             if _class is None:
                 raise Exception("Child '{}' not found on parent '{}' to derive from".format(value, parent.name))
@@ -52,29 +65,45 @@ class derived_from(group):
 
         # TODO Test type on derivedFrom search and support paths! http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
 
+class dim(derive):
+    '''Base for dimable elements'''
+
+    def __init__(self, parent, node):
+
+        try:
+            dim = parser.integer(node, 'dim', True)
+            dim_increment = parser.integer(node, 'dimIncrement', True)
+            dim_index = parser.text(node, 'dimIndex', False)
+            dim_name = parser.text(node, 'dimName', False)
+            if dim_index is not None:
+                if ',' in dim_index:
+                    dim_indices = dim_index.split(',')
+                elif '-' in dim_index:
+                    match = re.search('([0-9]+)\-([0-9]+)', dim_index)
+                    dim_indices = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                else:
+                    raise ValueError("Unexpected value in 'dim_index': {}".format(dim_index))
+
+                if len(dim_indices) != dim:
+                    raise AttributeError("'dim' size does not match elements in 'dim_index' ({} != {})".format(dim, len(dim_index)))
+            else:
+                dim_indices = dim
+        except:
+            print("Not dimable")
+
+    @classmethod
+    def from_node(cls, parent, list):
+        for name in list:
+            parent.append(cls(parent, name))
+
+
 # Base elements
-class enumerated_value(base):
-    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
-
-    def __init__(self, parent, node):
-        base.__init__(self, parent)
-
-        attr = {}
-        attr['name'] = parser.text(node, 'name', False)
-        attr['description'] = parser.text(node, 'description', False)
-        attr['value'] = parser.integer(node, 'value', False)
-        attr['is_default'] = parser.boolean(node, 'isDefault', False)
-        if attr['value'] is None and attr['is_default'] is None:
-            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
-        self.add_attributes(attr)
-
-
-
-
-
 class cpu(base):
+    '''The CPU section describes the processor included in the microcontroller device.'''
 
     def __init__(self, parent, node):
+        if not isinstance(parent, device):
+            raise TypeError("Only parent 'device' allowed")
         base.__init__(self, parent)
 
         attr = {}
@@ -99,12 +128,126 @@ class cpu(base):
     #    attr['sau_num_regions'] = parser.integer(node, 'sauRegionsConfig', False)
         self.add_attributes(attr)
 
+class device(object):
+    '''The element <device> provides the outermost frame of the description.'''
+
+    def __init__(self, node):
+
+        attr = {}
+        attr['vendor'] = parser.text(node, 'vendor', False)
+        attr['vendor_id'] = parser.text(node, 'vendorID', False)
+        attr['name'] = parser.text(node, 'name', True)
+        attr['series'] = parser.text(node, 'series', False)
+        attr['version'] = parser.text(node, 'version', True)
+        attr['description'] = parser.text(node, 'description', True)
+        attr['license_text'] = parser.text(node, 'licenseText', False)
+        attr['header_system_filename'] = parser.text(node, 'headerSystemFilename', False)
+        attr['header_definitions_prefix'] = parser.text(node, 'headerDefinitionsPrefix', False)
+        attr['address_unit_bits'] = parser.integer(node, 'addressUnitBits', True)
+        attr['width'] = parser.integer(node, 'width', True)
+
+        # property group
+        attr['size'] = parser.integer(node, 'size', False, 32)
+        attr['access'] = parser.enum(type.access, node, 'access', False, type.access.read_write)
+        attr['protection'] = parser.enum(type.protection, node, 'protection', False, type.protection.none)
+        attr['reset_value'] = parser.integer(node, 'resetValue', False, 0x00000000)
+        attr['reset_mask'] = parser.integer(node, 'resetMask', False, 0xFFFFFFFF)
+
+        x = '''
+        node_cpu = node.find('./cpu')
+        if node_cpu:
+            attr['cpu'] = None
+
+        self.field = []
+        for child in node.findall('./peripherals/peripheral'):
+            self.field.append(field(self, child))
+
+        attr['peripherals'] = None
+        '''
+        self.add_attributes(attr)
+
+        cpu.parse(self, node.find('./cpu'))
+        for child in node.findall('./peripherals/peripheral'):
+            peripheral.parse(self, child)
+
+    @classmethod
+    def parse(cls, node):
+        return cls(node)
+
+class enumerated_value(base):
+    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
+
+    def __init__(self, parent, node):
+        if not (isinstance(parent, enumerated_values) or isinstance(parent, dim_array_index)):
+            raise TypeError("Only parent 'enumerated_values' and 'dim_array_index' allowed")
+        base.__init__(self, parent)
+
+        attr = {}
+        attr['name'] = parser.text(node, 'name', False)
+        attr['description'] = parser.text(node, 'description', False)
+        attr['value'] = parser.integer(node, 'value', False)
+        attr['is_default'] = parser.boolean(node, 'isDefault', False)
+        if attr['value'] is None and attr['is_default'] is None:
+            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
+        self.add_attributes(attr)
+
+class region(base):
+    '''Define the regions of the Secure Attribution Unit (SAU)'''
+
+    def __init__(self, parent, node):
+        if not isinstance(parent, ):
+            raise TypeError("Only parent '' and '' allowed")
+        base.__init__(self, parent)
+
+        attr = {}
+        attr['base'] = parser.integer(node, 'base', True)
+        attr['limit'] = parser.integer(node, 'limit', True)
+    #   attr['access'] = parser.text(node, 'access', True)
+        attr['access'] = parser.enum(type.protection, node, 'access', True)
+
+        # FIXME: No clean type handling yet!
+        attr['name'] = node.get('name')
+        attr['enabled'] = node.get('enabled')
+        self.add_attributes(attr)
+
+
+
+
+
+
+
+
+
+# Property group elements
+
+class sau_region_config(group):
+
+    attributes = ['protection']
+
+    def __init__(self, parent, node):
+        group.__init__(self, parent)
+
+class address_block(group):
+
+    attributes = ['protection']
+
+    def __init__(self, parent, node):
+        group.__init__(self, parent)
+
+        self.offset = scaled_non_negative_integer(node, 'offset', True)
+        self.size = scaled_non_negative_integer(node, 'size', True)
+        self.usage = _get_enum(node, 'usage', usageType, True)
+        self.protection = None
+
+
 # Deriveable elements
-class enumerated_values(derived_from):
+class enumerated_values(derive):
     '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
 
     def __init__(self, parent, node):
-        derived_from.__init__(self, parent, node)
+        if not isinstance(parent, field):
+            raise TypeError("Only parent 'field' allowed")
+        derive.__init__(self, parent, node)
 
         attr = {}
         attr['name'] = parser.text(node, 'name', False)
@@ -117,16 +260,6 @@ class enumerated_values(derived_from):
             self.enumerated_value.append(enumerated_value(self, child))
 
 
-class address_block(base):
-
-    def __init__(self, parent, node):
-        base.__init__(self, parent)
-
-        self.offset = scaled_non_negative_integer(node, 'offset', True)
-        self.size = scaled_non_negative_integer(node, 'size', True)
-        self.usage = _get_enum(node, 'usage', usageType, True)
-        self.protection = None
-
 class interrupt(base):
 
     def __init__(self, parent, node):
@@ -138,10 +271,12 @@ class interrupt(base):
 
 
 
-class field(derived_from):
+class field(derive):
+
+    attributes = ['access']
 
     def __init__(self, parent, node):
-        derived_from.__init__(self, parent, node)
+        derive.__init__(self, parent, node)
 
         attr = {}
         attr['name'] = parser.text(node, 'name', True)
@@ -150,7 +285,7 @@ class field(derived_from):
         # bitRangeOffsetWidthStyle
         bit_offset = parser.integer(node, 'bitOffset', False)
         bit_width = parser.integer(node, 'bitWidth', False)
-        if bit_offset is not None:
+        if bit_offset:
             # If bitWidth is not set, default is 1
             bit_width = 1 if bit_width is None else bit_width
         else:
@@ -179,7 +314,7 @@ class field(derived_from):
         self.add_attributes(attr)
 
         node = node.find('enumerated_values')
-        if node is not None:
+        if node:
             self.enumerated_values = enumerated_values(self, node)
 
 class fields(base):
@@ -192,10 +327,10 @@ class fields(base):
         for child in node.findall('./field'):
             self.field.append(field(self, child))
 
-class register(derived_from):
+class register(dim):
 
     def __init__(self, parent, node):
-        derived_from.__init__(self, parent, node)
+        dim.__init__(self, parent, node)
 
         # Mandatory attributes for derived registers
         attr = {}
@@ -210,6 +345,10 @@ class register(derived_from):
         attr['reset_value'] = parser.integer(node, 'resetValue', False)
         attr['reset_mask'] = parser.integer(node, 'resetMask', False)
         self.add_attributes(attr)
+
+    @classmethod
+    def parse(cls, parent, node):
+        pass
 
 class registers(base):
 
@@ -226,12 +365,10 @@ class registers(base):
                 return register
         return None
 
+    @classmethod
+    def parse(cls, parent, node):
+        pass
 
-
-class device(base):
-
-    def __init__(self, node):
-        base.__init__(self, None)
 
 class SVDdim(object):
 

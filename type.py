@@ -53,9 +53,10 @@ class modified_write_values(Enum):
     modify = 'modify'
 
 class protection(Enum):
-    secure = 's'
+    secure_callable = 's'
     non_secure = 'n'
     privileged = 'p'
+    none = ''
 
 class read_action(Enum):
     clear = 'clear'

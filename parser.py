@@ -54,7 +54,7 @@ def boolean(node, tag, mandatory = False, default = None):
     return default
 
 def enum(enum, node, tag, mandatory = False, default = None):
-    value = text(node, tag, mandatory, default)
+    value = text(node, tag, False, None)
     if value is None and not mandatory:
         return default
 
