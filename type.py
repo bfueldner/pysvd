@@ -63,15 +63,3 @@ class read_action(Enum):
     set = 'set'
     modify = 'modify'
     modify_external = 'modifyExternal'
-
-old = '''
-usageType = [
-    'registers',
-    'buffer',
-    'reserved'
-]
-
-class sauAccessType(Enum):
-    callable_ = 'c'
-    non_secure = 'n'
-'''
