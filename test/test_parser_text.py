@@ -1,7 +1,8 @@
 import unittest
 import xml.etree.ElementTree as ET
 
-import parser
+# https://stackoverflow.com/questions/8951255/import-script-from-a-parent-directory
+from svdgen2 import parser
 
 class test_parser_text(unittest.TestCase):
     xml = '''
