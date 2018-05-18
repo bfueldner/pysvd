@@ -3,6 +3,7 @@ import unittest
 import test.parser.text
 import test.parser.integer
 import test.parser.boolean
+import test.parser.enum
 
 if __name__ == '__main__':
     parser_text = unittest.TestLoader().loadTestsFromTestCase(test.parser.text.value)
@@ -16,6 +17,8 @@ if __name__ == '__main__':
     parser_boolean_true_integer = unittest.TestLoader().loadTestsFromTestCase(test.parser.boolean.true_integer)
     parser_boolean_true_text = unittest.TestLoader().loadTestsFromTestCase(test.parser.boolean.true_text)
     parser_boolean_exception = unittest.TestLoader().loadTestsFromTestCase(test.parser.boolean.exception)
+    parser_enum_value = unittest.TestLoader().loadTestsFromTestCase(test.parser.enum.value)
+    parser_enum_exception = unittest.TestLoader().loadTestsFromTestCase(test.parser.enum.exception)
 
     test_suites = [
         parser_text,
@@ -28,7 +31,9 @@ if __name__ == '__main__':
         parser_boolean_false_text,
         parser_boolean_true_integer,
         parser_boolean_true_text,
-        parser_boolean_exception
+        parser_boolean_exception,
+        parser_enum_value,
+        parser_enum_exception,
     ]
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)
