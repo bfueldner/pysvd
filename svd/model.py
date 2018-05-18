@@ -4,8 +4,8 @@
 #import xml.etree.ElementTree as ET
 import re
 
-import parser
-import type
+import svd.parser
+import svd.type
 
 # https://www.python-course.eu/python3_inheritance.php
 # https://docs.python.org/3/library/enum.html
