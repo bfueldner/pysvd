@@ -3,15 +3,11 @@
 #import datetime
 #import xml.etree.ElementTree as ET
 
-adafafswd
-
 import type
 
 def text(node, tag, mandatory = False, default = None):
     """Get the text for the provided tag from the provided node"""
     try:
-        print(node, tag)
-as
         return node.find(tag).text.strip()
     except AttributeError:
         if mandatory:

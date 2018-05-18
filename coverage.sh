@@ -1,4 +1,4 @@
 #!/bin/sh
 
-coverage run $(ls test_*.py)
+coverage run --omit=test* test.py
 coverage html
