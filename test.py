@@ -5,6 +5,11 @@ import test.parser.integer
 import test.parser.boolean
 import test.parser.enum
 
+import test.classes.base
+import test.classes.parent
+import test.classes.group
+import test.classes.derive
+
 if __name__ == '__main__':
     parser_text = unittest.TestLoader().loadTestsFromTestCase(test.parser.text.value)
     parser_integer_decimal = unittest.TestLoader().loadTestsFromTestCase(test.parser.integer.decimal)
@@ -20,6 +25,11 @@ if __name__ == '__main__':
     parser_enum_value = unittest.TestLoader().loadTestsFromTestCase(test.parser.enum.value)
     parser_enum_exception = unittest.TestLoader().loadTestsFromTestCase(test.parser.enum.exception)
 
+    class_base_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.base.case)
+    class_parent_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.parent.case)
+    class_group_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.group.case)
+    class_derive_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.derive.case)
+
     test_suites = [
         parser_text,
         parser_integer_decimal,
@@ -34,6 +44,11 @@ if __name__ == '__main__':
         parser_boolean_exception,
         parser_enum_value,
         parser_enum_exception,
+
+        class_base_case,
+        class_parent_case,
+        class_group_case,
+        class_derive_case,
     ]
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)

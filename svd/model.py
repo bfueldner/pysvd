@@ -11,59 +11,6 @@ import svd.type
 # https://docs.python.org/3/library/enum.html
 
 # Base classes
-class base(object):
-    """Base class for all SVD elements"""
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def parse(cls, parent, node):
-        return cls(parent, node)
-
-    def add_attributes(self, attr):
-        """Merge not None attr into class"""
-        self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
-
-class parent(base):
-    '''Base class for parents'''
-
-    def __init__(self, parent):
-        self.parent = parent
-
-class group(base):
-    '''Base class for elements with registerPropertiesGroup'''
-
-    attributes = ['size', 'access', 'protection', 'reset_value', 'reset_mask']
-#   elements = ['device', 'peripheral', 'register', 'cluster', 'field', 'sauRegionsConfig', 'addressBlock']
-
-    def __init__(self, parent = None):
-        base.__init__(self, parent)
-
-    def __getattr__(self, attr):
-        if attr in self.attributes and self.parent:
-            return self.parent.__getattribute__(attr)
-        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
-
-class derive(group):
-    '''Base for deriveable classes'''
-
-#   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
-
-    def __init__(self, parent, node):
-        self.derived = False
-
-        # If derived, search class, copy its attributes and call base constructor
-        value = node.get('derivedFrom')
-        if value:
-            _class = parent.find(value)
-            if _class is None:
-                raise Exception("Child '{}' not found on parent '{}' to derive from".format(value, parent.name))
-            self.__dict__ = dict(_class.__dict__)
-
-        base.__init__(self, parent)
-
-        # TODO Test type on derivedFrom search and support paths! http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
 
 class dim(derive):
     '''Base for dimable elements'''
