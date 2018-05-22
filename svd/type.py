@@ -58,6 +58,11 @@ class protection(Enum):
     privileged = 'p'
     none = ''
 
+class region_access(Enum):
+    secure_callable = 'c'
+    non_secure = 'n'
+    none = ''
+
 class read_action(Enum):
     clear = 'clear'
     set = 'set'

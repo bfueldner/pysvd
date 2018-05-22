@@ -4,6 +4,7 @@
 #import xml.etree.ElementTree as ET
 import re
 
+import svd.classes
 import svd.parser
 import svd.type
 
@@ -11,7 +12,36 @@ import svd.type
 # https://docs.python.org/3/library/enum.html
 
 # Base classes
+class sau_regions_config_region(svd.classes.parent):
+    '''Define the regions of the Secure Attribution Unit (SAU)'''
 
+    def __init__(self, parent, node):
+    #    if not isinstance(parent, ):
+    #        raise TypeError("Only parent '' and '' allowed")
+        svd.classes.parent.__init__(self, parent)
+
+        attr = {}
+        attr['base'] = svd.parser.integer(node.findtext('base'), True)
+        attr['limit'] = svd.parser.integer(node.findtext('limit'), True)
+        attr['access'] = svd.parser.enum(svd.type.region_access, node.findtext('access'), True)
+
+        attr['name'] = svd.parser.text(node.get('name'))
+        attr['enabled'] = svd.parser.boolean(node.get('enabled'), False, True)
+        self.add_attributes(attr)
+
+class sau_region_config(svd.classes.group):
+
+    attributes = ['protection']
+
+    def __init__(self, parent, node):
+        svd.classes.group.__init__(self, parent)
+
+        # FIXME: No clean type handling yet!
+        attr['name'] = node.get('name')
+        attr['enabled'] = node.get('enabled')
+        self.add_attributes(attr)
+
+x = """
 class dim(derive):
     '''Base for dimable elements'''
 
@@ -138,24 +168,7 @@ class enumerated_value(base):
             raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
         self.add_attributes(attr)
 
-class region(base):
-    '''Define the regions of the Secure Attribution Unit (SAU)'''
 
-    def __init__(self, parent, node):
-        if not isinstance(parent, ):
-            raise TypeError("Only parent '' and '' allowed")
-        base.__init__(self, parent)
-
-        attr = {}
-        attr['base'] = parser.integer(node, 'base', True)
-        attr['limit'] = parser.integer(node, 'limit', True)
-    #   attr['access'] = parser.text(node, 'access', True)
-        attr['access'] = parser.enum(type.protection, node, 'access', True)
-
-        # FIXME: No clean type handling yet!
-        attr['name'] = node.get('name')
-        attr['enabled'] = node.get('enabled')
-        self.add_attributes(attr)
 
 
 
@@ -166,13 +179,6 @@ class region(base):
 
 
 # Property group elements
-
-class sau_region_config(group):
-
-    attributes = ['protection']
-
-    def __init__(self, parent, node):
-        group.__init__(self, parent)
 
 class address_block(group):
 
@@ -340,3 +346,4 @@ class SVDdim(object):
             self.index += 1
             return self.index
         raise StopIteration
+"""

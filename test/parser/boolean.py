@@ -11,30 +11,30 @@ class false_integer(unittest.TestCase):
 
     def test_no_param(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean')
+        test = svd.parser.boolean(node.findtext('boolean'))
 
         self.assertEqual(test, False)
 
     def test_mandatory_present(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean', True)
+        test = svd.parser.boolean(node.findtext('boolean'), True)
 
         self.assertEqual(test, False)
 
     def test_mandatory_exception(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(SyntaxError):
-            svd.parser.boolean(node, 'unknown', True)
+            svd.parser.boolean(node.findtext('unknown'), True)
 
     def test_default_none(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False)
+        test = svd.parser.boolean(node.findtext('unknown'), False)
 
         self.assertIsNone(test)
 
     def test_default_value(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False, False)
+        test = svd.parser.boolean(node.findtext('unknown'), False, False)
 
         self.assertEqual(test, False)
 
@@ -46,30 +46,30 @@ class false_text(unittest.TestCase):
 
     def test_no_param(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean')
+        test = svd.parser.boolean(node.findtext('boolean'))
 
         self.assertEqual(test, False)
 
     def test_mandatory_present(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean', True)
+        test = svd.parser.boolean(node.findtext('boolean'), True)
 
         self.assertEqual(test, False)
 
     def test_mandatory_exception(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(SyntaxError):
-            svd.parser.boolean(node, 'unknown', True)
+            svd.parser.boolean(node.findtext('unknown'), True)
 
     def test_default_none(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False)
+        test = svd.parser.boolean(node.findtext('unknown'), False)
 
         self.assertIsNone(test)
 
     def test_default_value(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False, False)
+        test = svd.parser.boolean(node.findtext('unknown'), False, False)
 
         self.assertEqual(test, False)
 
@@ -81,30 +81,30 @@ class true_integer(unittest.TestCase):
 
     def test_no_param(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean')
+        test = svd.parser.boolean(node.findtext('boolean'))
 
         self.assertEqual(test, True)
 
     def test_mandatory_present(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean', True)
+        test = svd.parser.boolean(node.findtext('boolean'), True)
 
         self.assertEqual(test, True)
 
     def test_mandatory_exception(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(SyntaxError):
-            svd.parser.boolean(node, 'unknown', True)
+            svd.parser.boolean(node.findtext('unknown'), True)
 
     def test_default_none(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False)
+        test = svd.parser.boolean(node.findtext('unknown'), False)
 
         self.assertIsNone(test)
 
     def test_default_value(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False, True)
+        test = svd.parser.boolean(node.findtext('unknown'), False, True)
 
         self.assertEqual(test, True)
 
@@ -116,30 +116,30 @@ class true_text(unittest.TestCase):
 
     def test_no_param(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean')
+        test = svd.parser.boolean(node.findtext('boolean'))
 
         self.assertEqual(test, True)
 
     def test_mandatory_present(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'boolean', True)
+        test = svd.parser.boolean(node.findtext('boolean'), True)
 
         self.assertEqual(test, True)
 
     def test_mandatory_exception(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(SyntaxError):
-            svd.parser.boolean(node, 'unknown', True)
+            svd.parser.boolean(node.findtext('unknown'), True)
 
     def test_default_none(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False)
+        test = svd.parser.boolean(node.findtext('unknown'), False)
 
         self.assertIsNone(test)
 
     def test_default_value(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False, True)
+        test = svd.parser.boolean(node.findtext('unknown'), False, True)
 
         self.assertEqual(test, True)
 
@@ -152,26 +152,26 @@ class exception(unittest.TestCase):
     def test_no_param(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(ValueError):
-            test = svd.parser.boolean(node, 'boolean')
+            test = svd.parser.boolean(node.findtext('boolean'))
 
     def test_mandatory_present(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(ValueError):
-            test = svd.parser.boolean(node, 'boolean', True)
+            test = svd.parser.boolean(node.findtext('boolean'), True)
 
     def test_mandatory_exception(self):
         node = ET.fromstring(self.xml)
         with self.assertRaises(SyntaxError):
-            svd.parser.boolean(node, 'unknown', True)
+            svd.parser.boolean(node.findtext('unknown'), True)
 
     def test_default_none(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False)
+        test = svd.parser.boolean(node.findtext('unknown'), False)
 
         self.assertIsNone(test)
 
     def test_default_value(self):
         node = ET.fromstring(self.xml)
-        test = svd.parser.boolean(node, 'unknown', False, True)
+        test = svd.parser.boolean(node.findtext('unknown'), False, True)
 
         self.assertEqual(test, True)
