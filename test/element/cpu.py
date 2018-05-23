@@ -1,18 +1,19 @@
 import unittest
 import xml.etree.ElementTree as ET
 
-from model import cpu
-import type
+import svd.element
+import svd.type
 
-class test_cpu(unittest.TestCase):
+class case(unittest.TestCase):
+
     def test_exception(self):
-        svd = '''<cpu />'''
-        node = ET.fromstring(svd)
+        xml = '''<cpu />'''
+        node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
-            test = cpu(None, node)
+            test = svd.element.cpu(None, node)
 
-    def test_attributes_default(self):
-        svd = '''
+    def test_attributes(self):
+        xml = '''
         <cpu>
             <name>CM7</name>
             <revision>r0p0</revision>
@@ -33,12 +34,12 @@ class test_cpu(unittest.TestCase):
             <nvicPrioBits>4</nvicPrioBits>
             <vendorSystickConfig>false</vendorSystickConfig>
         </cpu>'''
-        node = ET.fromstring(svd)
-        test = cpu(None, node)
+        node = ET.fromstring(xml)
+        test = svd.element.cpu(None, node)
 
-        self.assertEqual(test.name, type.cpu_name.cm7)
+        self.assertEqual(test.name, svd.type.cpu_name.cm7)
         self.assertEqual(test.revision, "r0p0")
-        self.assertEqual(test.endian, type.endian.little)
+        self.assertEqual(test.endian, svd.type.endian.little)
         self.assertTrue(test.mpu_present)
         self.assertTrue(test.fpu_present)
         self.assertTrue(test.fpu_dp)
@@ -53,6 +54,3 @@ class test_cpu(unittest.TestCase):
 
         with self.assertRaises(AttributeError):
             self.assertIsNotNone(test.sau_num_regions)
-
-if __name__ == "__main__":
-    unittest.main()

@@ -43,6 +43,7 @@ class group(parent):
 #        return cls(parent)
 
     def __getattr__(self, attr):
+        # TODO: Also recursive until parent = None!
         if attr in self.attributes and self.parent:
             return self.parent.__getattribute__(attr)
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))

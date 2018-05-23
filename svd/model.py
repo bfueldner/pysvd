@@ -8,38 +8,9 @@ import svd.classes
 import svd.parser
 import svd.type
 
-# https://www.python-course.eu/python3_inheritance.php
-# https://docs.python.org/3/library/enum.html
 
-# Base classes
-class sau_regions_config_region(svd.classes.parent):
-    '''Define the regions of the Secure Attribution Unit (SAU)'''
 
-    def __init__(self, parent, node):
-    #    if not isinstance(parent, ):
-    #        raise TypeError("Only parent '' and '' allowed")
-        svd.classes.parent.__init__(self, parent)
 
-        attr = {}
-        attr['base'] = svd.parser.integer(node.findtext('base'), True)
-        attr['limit'] = svd.parser.integer(node.findtext('limit'), True)
-        attr['access'] = svd.parser.enum(svd.type.region_access, node.findtext('access'), True)
-
-        attr['name'] = svd.parser.text(node.get('name'))
-        attr['enabled'] = svd.parser.boolean(node.get('enabled'), False, True)
-        self.add_attributes(attr)
-
-class sau_region_config(svd.classes.group):
-
-    attributes = ['protection']
-
-    def __init__(self, parent, node):
-        svd.classes.group.__init__(self, parent)
-
-        # FIXME: No clean type handling yet!
-        attr['name'] = node.get('name')
-        attr['enabled'] = node.get('enabled')
-        self.add_attributes(attr)
 
 x = """
 class dim(derive):
@@ -75,35 +46,7 @@ class dim(derive):
 
 
 # Base elements
-class cpu(base):
-    '''The CPU section describes the processor included in the microcontroller device.'''
 
-    def __init__(self, parent, node):
-        if not isinstance(parent, device):
-            raise TypeError("Only parent 'device' allowed")
-        base.__init__(self, parent)
-
-        attr = {}
-        attr['name'] = parser.enum(type.cpu_name, node, 'name', True)
-        attr['revision'] = parser.text(node, 'revision', True)
-        attr['endian'] = parser.enum(type.endian, node, 'endian', True)
-        attr['mpu_present'] = parser.boolean(node, 'mpuPresent', True)
-        attr['fpu_present'] = parser.boolean(node, 'fpuPresent', True)
-
-        attr['fpu_dp'] = parser.boolean(node, 'fpuDP', False)
-        attr['icache_present'] = parser.boolean(node, 'icachePresent', False)
-        attr['dcache_present'] = parser.boolean(node, 'dcachePresent', False)
-        attr['itcm_present'] = parser.boolean(node, 'itcmPresent', False)
-        attr['dtcm_present'] = parser.boolean(node, 'dtcmPresent', False)
-        attr['vtor_present'] = parser.boolean(node, 'vtorPresent', False, True)
-
-        attr['nvic_prio_bits'] = parser.integer(node, 'nvicPrioBits', True)
-        attr['vendor_systick_config'] = parser.boolean(node, 'vendorSystickConfig', True)
-
-        attr['device_num_interrupts'] = parser.integer(node, 'deviceNumInterrupts', False)
-        attr['sau_num_regions'] = parser.integer(node, 'sauNumRegions', False)
-    #    attr['sau_num_regions'] = parser.integer(node, 'sauRegionsConfig', False)
-        self.add_attributes(attr)
 
 class device(object):
     '''The element <device> provides the outermost frame of the description.'''

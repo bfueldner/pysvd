@@ -1,17 +1,13 @@
-import svd.type
+def text(value, default = None):
+    '''Get the text for the provided tag from the provided node'''
 
-def text(value, mandatory = False, default = None):
-    """Get the text for the provided tag from the provided node"""
-    try:
-        return value.strip()
-    except AttributeError:
-        if mandatory:
-            raise SyntaxError("Tag '{}.{}' is mandatory, but not present!".format(node.tag, tag))
+    if value is None:
         return default
+    else:
+        return value
 
-def integer(value, mandatory = False, default = None):
-    value = text(value, mandatory, default)
-    if value == default:
+def integer(value, default = None):
+    if value is None:
         return default
 
     value = value.lower()
@@ -31,9 +27,8 @@ def integer(value, mandatory = False, default = None):
     else:
         return int(value)
 
-def boolean(value, mandatory = False, default = None):
-    value = text(value, mandatory, default)
-    if value == default:
+def boolean(value, default = None):
+    if value is None:
         return default
 
     value = value.lower()
@@ -44,9 +39,8 @@ def boolean(value, mandatory = False, default = None):
     else:
         raise ValueError("Can not convert value '{}' to boolean".format(value))
 
-def enum(enum, value, mandatory = False, default = None):
-    value = text(value, mandatory, default)
-    if value == default:
+def enum(enum, value, default = None):
+    if value is None:
         return default
 
     for pair in enum:
