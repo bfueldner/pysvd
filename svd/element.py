@@ -3,45 +3,7 @@ import svd.parser
 import svd.classes
 import svd.type
 
-# https://www.python-course.eu/python3_inheritance.php
-# https://docs.python.org/3/library/enum.html
-
-# Base classes
-class sau_regions_config_region(svd.classes.parent):
-    '''Define the regions of the Secure Attribution Unit (SAU)'''
-
-    def __init__(self, parent, node):
-    #    if not isinstance(parent, sau_region_config):
-    #        raise TypeError("Only parent 'sau_region_config' allowed")
-        svd.classes.parent.__init__(self, parent)
-
-        attr = {}
-        attr['enabled'] = svd.parser.boolean(svd.node.attribute(node, 'enabled'), True)
-        attr['name'] = svd.parser.text(svd.node.attribute(node, 'name'))
-
-        attr['base'] = svd.parser.integer(svd.node.element(node, 'base', True))
-        attr['limit'] = svd.parser.integer(svd.node.element(node, 'limit', True))
-        attr['access'] = svd.parser.enum(svd.type.region_access, svd.node.element(node, 'access', True))
-        self.add_attributes(attr)
-
-class sau_region_config(svd.classes.group):
-    '''Set the configuration for the Secure Attribution Unit (SAU) when they are preconfigured by HW or Firmware.'''
-
-    attributes = ['protection']
-
-    def __init__(self, parent, node):
-    #    if not isinstance(parent, cpu):
-    #        raise TypeError("Only parent 'cpu' allowed")
-        svd.classes.group.__init__(self, parent)
-
-        attr = {}
-        attr['enabled'] = svd.parser.boolean(svd.node.attribute(node, 'enabled'))
-        attr['protection'] = svd.parser.enum(svd.type.protection, svd.node.element(node, 'protectionWhenDisabled'))
-        self.add_attributes(attr)
-
-        self.region = []
-        for child in node.findall('region'):
-            self.region.append( sau_regions_config_region(self, child) )
+# /device/cpu
 
 class cpu(svd.classes.parent):
     '''The CPU section describes the processor included in the microcontroller device.'''
@@ -75,3 +37,68 @@ class cpu(svd.classes.parent):
         child = node.find('sauRegionsConfig')
         if child is not None:
             self.sau_regions_config = sau_region_config(self, child)
+
+class sau_region_config(svd.classes.group):
+    '''Set the configuration for the Secure Attribution Unit (SAU) when they are preconfigured by HW or Firmware.'''
+
+    attributes = ['protection']
+
+    def __init__(self, parent, node):
+    #    if not isinstance(parent, cpu):
+    #        raise TypeError("Only parent 'cpu' allowed")
+        svd.classes.group.__init__(self, parent)
+
+        attr = {}
+        attr['enabled'] = svd.parser.boolean(svd.node.attribute(node, 'enabled'))
+        attr['protection'] = svd.parser.enum(svd.type.protection, svd.node.element(node, 'protectionWhenDisabled'))
+        self.add_attributes(attr)
+
+        self.region = []
+        for child in node.findall('region'):
+            self.region.append( sau_regions_config_region(self, child) )
+
+class sau_regions_config_region(svd.classes.parent):
+    '''Define the regions of the Secure Attribution Unit (SAU)'''
+
+    def __init__(self, parent, node):
+    #    if not isinstance(parent, sau_region_config):
+    #        raise TypeError("Only parent 'sau_region_config' allowed")
+        svd.classes.parent.__init__(self, parent)
+
+        attr = {}
+        attr['enabled'] = svd.parser.boolean(svd.node.attribute(node, 'enabled'), True)
+        attr['name'] = svd.parser.text(svd.node.attribute(node, 'name'))
+
+        attr['base'] = svd.parser.integer(svd.node.element(node, 'base', True))
+        attr['limit'] = svd.parser.integer(svd.node.element(node, 'limit', True))
+        attr['access'] = svd.parser.enum(svd.type.region_access, svd.node.element(node, 'access', True))
+        self.add_attributes(attr)
+
+# /device/peripherals
+
+class address_block(svd.classes.group):
+    '''Specify an address range uniquely mapped to this peripheral'''
+
+    attributes = ['protection']
+
+    def __init__(self, parent, node):
+        svd.classes.group.__init__(self, parent)
+
+        attr = {}
+        attr['offset'] = svd.parser.integer(svd.node.element(node, 'offset', True))
+        attr['size'] = svd.parser.integer(svd.node.element(node, 'size', True))
+        attr['usage'] = svd.parser.enum(svd.type.usage, svd.node.element(node, 'usage', True))
+        attr['protection'] = svd.parser.enum(svd.type.protection, svd.node.element(node, 'protection'))
+        self.add_attributes(attr)
+
+class interrupt(svd.classes.parent):
+    '''A peripheral can have multiple interrupts'''
+
+    def __init__(self, parent, node):
+        svd.classes.parent.__init__(self, parent)
+
+        attr = {}
+        attr['name'] = svd.parser.text(svd.node.element(node, 'name', True))
+        attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
+        attr['value'] = svd.parser.integer(svd.node.element(node, 'value', True))
+        self.add_attributes(attr)

@@ -68,3 +68,8 @@ class read_action(Enum):
     set = 'set'
     modify = 'modify'
     modify_external = 'modifyExternal'
+
+class usage(Enum):
+    registers = 'registers'
+    buffer = 'buffer'
+    reserved = 'reserved'

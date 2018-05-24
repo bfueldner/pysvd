@@ -6,7 +6,7 @@ import svd.type
 
 class case(unittest.TestCase):
 
-    def test_exception(self):
+    def test_empty(self):
         xml = '''<sauRegionsConfig />'''
         node = ET.fromstring(xml)
         test = svd.element.sau_region_config(None, node)

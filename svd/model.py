@@ -123,17 +123,7 @@ class enumerated_value(base):
 
 # Property group elements
 
-class address_block(group):
 
-    attributes = ['protection']
-
-    def __init__(self, parent, node):
-        group.__init__(self, parent)
-
-        self.offset = scaled_non_negative_integer(node, 'offset', True)
-        self.size = scaled_non_negative_integer(node, 'size', True)
-        self.usage = _get_enum(node, 'usage', usageType, True)
-        self.protection = None
 
 
 # Deriveable elements
@@ -154,17 +144,6 @@ class enumerated_values(derive):
         self.enumerated_value = []
         for child in node.findall('./enumeratedValue'):
             self.enumerated_value.append(enumerated_value(self, child))
-
-
-class interrupt(base):
-
-    def __init__(self, parent, node):
-        base.__init__(self, parent)
-
-        self.name = _get_text(node, 'name', True)
-        self.description = _get_text(node, 'description', False)
-        self.value = _get_int(node, 'value', True)
-
 
 
 class field(derive):

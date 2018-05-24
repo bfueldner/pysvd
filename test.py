@@ -13,9 +13,12 @@ import test.classes.parent
 import test.classes.group
 #import test.classes.derive
 
-import test.element.sau_regions_config_region
-import test.element.sau_regions_config
 import test.element.cpu
+import test.element.sau_regions_config
+import test.element.sau_regions_config_region
+
+import test.element.address_block
+import test.element.interrupt
 
 if __name__ == '__main__':
     node_element = unittest.TestLoader().loadTestsFromTestCase(test.node.element.case)
@@ -31,9 +34,12 @@ if __name__ == '__main__':
     class_group_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.group.case)
 #    class_derive_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.derive.case)
 
-    element_sau_regions_config_region = unittest.TestLoader().loadTestsFromTestCase(test.element.sau_regions_config_region.case)
-    element_sau_regions_config = unittest.TestLoader().loadTestsFromTestCase(test.element.sau_regions_config.case)
     element_cpu = unittest.TestLoader().loadTestsFromTestCase(test.element.cpu.case)
+    element_sau_regions_config = unittest.TestLoader().loadTestsFromTestCase(test.element.sau_regions_config.case)
+    element_sau_regions_config_region = unittest.TestLoader().loadTestsFromTestCase(test.element.sau_regions_config_region.case)
+
+    element_address_block = unittest.TestLoader().loadTestsFromTestCase(test.element.address_block.case)
+    element_interrupt = unittest.TestLoader().loadTestsFromTestCase(test.element.interrupt.case)
 
     test_suites = [
         node_element,
@@ -49,9 +55,12 @@ if __name__ == '__main__':
         class_group_case,
     #    class_derive_case,
 
-        element_sau_regions_config_region,
-        element_sau_regions_config,
         element_cpu,
+        element_sau_regions_config,
+        element_sau_regions_config_region,
+
+        element_address_block,
+        element_interrupt,
     ]
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)
