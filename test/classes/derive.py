@@ -43,6 +43,7 @@ class case(unittest.TestCase):
         '''
         node = ET.fromstring(xml)
 
+        xxx = '''
         root = base_class()
         root.name = 'root'
         branch = parent_class(root)
@@ -64,3 +65,4 @@ class case(unittest.TestCase):
 
     #    self.assertUnequal()
     #    self.assertEqual(type(test), svd.classes.base)
+        '''

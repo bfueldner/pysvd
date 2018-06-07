@@ -5,17 +5,12 @@ import svd.classes
 class case(unittest.TestCase):
 
     def test_ctor(self):
-        test = svd.classes.base()
+        test = svd.classes.base(None)
 
         self.assertEqual(type(test), svd.classes.base)
 
-#    def test_create(self):
-#        test = svd.classes.base.create()
-
-#        self.assertEqual(type(test), svd.classes.base)
-
     def test_attributes(self):
-        test = svd.classes.base()
+        test = svd.classes.base(None)
 
         attr = {}
         attr['name'] = 'test'

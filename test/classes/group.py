@@ -5,15 +5,15 @@ import svd.classes
 class case(unittest.TestCase):
 
     def test_ctor(self):
-        test = svd.classes.group(None)
-        child = svd.classes.group(test)
+        test = svd.classes.group(None, None)
+        child = svd.classes.group(test, None)
 
         self.assertEqual(type(test), svd.classes.group)
         self.assertIsNone(test.parent)
         self.assertEqual(child.parent, test)
 
     def test_attributes(self):
-        test = svd.classes.group(None)
+        test = svd.classes.group(None, None)
 
         attr = {}
         attr['name'] = 'test'
@@ -39,9 +39,9 @@ class case(unittest.TestCase):
             'size': 16,
         }
 
-        test = svd.classes.group(None)
+        test = svd.classes.group(None, None)
         test.add_attributes(test_attr)
-        child = svd.classes.group(test)
+        child = svd.classes.group(test, None)
         child.add_attributes(child_attr)
 
         self.assertEqual(type(test), svd.classes.group)

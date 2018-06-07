@@ -1,52 +1,11 @@
-#import argparse
-#import sys
-#import datetime
-#import xml.etree.ElementTree as ET
 import re
 
 import svd.classes
 import svd.parser
 import svd.type
 
-
-
-
-
 x = """
-class dim(derive):
-    '''Base for dimable elements'''
-
-    def __init__(self, parent, node):
-
-        try:
-            dim = parser.integer(node, 'dim', True)
-            dim_increment = parser.integer(node, 'dimIncrement', True)
-            dim_index = parser.text(node, 'dimIndex', False)
-            dim_name = parser.text(node, 'dimName', False)
-            if dim_index is not None:
-                if ',' in dim_index:
-                    dim_indices = dim_index.split(',')
-                elif '-' in dim_index:
-                    match = re.search('([0-9]+)\-([0-9]+)', dim_index)
-                    dim_indices = list(range(int(match.group(1)), int(match.group(2)) + 1))
-                else:
-                    raise ValueError("Unexpected value in 'dim_index': {}".format(dim_index))
-
-                if len(dim_indices) != dim:
-                    raise AttributeError("'dim' size does not match elements in 'dim_index' ({} != {})".format(dim, len(dim_index)))
-            else:
-                dim_indices = dim
-        except:
-            print("Not dimable")
-
-    @classmethod
-    def from_node(cls, parent, list):
-        for name in list:
-            parent.append(cls(parent, name))
-
-
 # Base elements
-
 
 class device(object):
     '''The element <device> provides the outermost frame of the description.'''
@@ -145,33 +104,4 @@ class registers(base):
             if register.name == name:
                 return register
         return None
-
-    @classmethod
-    def parse(cls, parent, node):
-        pass
-
-
-class SVDdim(object):
-
-    def __init__(self, parent, node):
-        self.parent = parent
-
-        self.index = 0
-        self.end = 5
-
-        self.dim = _get_int(node, 'dim', True)
-        self.dim_increment = _get_int(node, 'dimIncrement', True)
-        self.dim_text = _get_text(node, 'dimIndex', False, 0)
-        self.dim_name = _get_text(node, 'dimName', False, 0)
-
-    def __iter__(self):
-        self.index = 0
-        print("iterator?")
-        return self
-
-    def __next__(self):
-        if self.index < self.end:
-            self.index += 1
-            return self.index
-        raise StopIteration
 """

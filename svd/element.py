@@ -1,7 +1,5 @@
-import svd.node
-import svd.parser
-import svd.classes
 import svd.type
+import svd.classes
 
 # /device/cpu
 
