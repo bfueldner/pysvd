@@ -54,7 +54,6 @@ class derive(group):
 #   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
 
     def __init__(self, parent_, node):
-        print("DEBUG")
 
         # If derived, search class, copy its attributes and call base constructor
         path = node.get('derivedFrom')
@@ -90,3 +89,8 @@ class derive(group):
         group.__init__(self, parent)
 
         # TODO Test type on derivedFrom search and support paths! http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
+
+class dim(derive):
+
+    def __init__(self, parent, node):
+        derive.__init__(self, parent, node)

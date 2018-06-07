@@ -20,6 +20,10 @@ import test.element.sau_regions_config_region
 import test.element.address_block
 import test.element.interrupt
 
+import test.element.write_constraint
+import test.element.enumerated_value
+import test.element.enumerated_values
+
 if __name__ == '__main__':
     node_element = unittest.TestLoader().loadTestsFromTestCase(test.node.element.case)
     node_attribute = unittest.TestLoader().loadTestsFromTestCase(test.node.attribute.case)
@@ -41,6 +45,10 @@ if __name__ == '__main__':
     element_address_block = unittest.TestLoader().loadTestsFromTestCase(test.element.address_block.case)
     element_interrupt = unittest.TestLoader().loadTestsFromTestCase(test.element.interrupt.case)
 
+    element_write_constraint = unittest.TestLoader().loadTestsFromTestCase(test.element.write_constraint.case)
+    element_enumerated_value = unittest.TestLoader().loadTestsFromTestCase(test.element.enumerated_value.case)
+    element_enumerated_values = unittest.TestLoader().loadTestsFromTestCase(test.element.enumerated_values.case)
+
     test_suites = [
         node_element,
         node_attribute,
@@ -61,6 +69,10 @@ if __name__ == '__main__':
 
         element_address_block,
         element_interrupt,
+
+        element_write_constraint,
+        element_enumerated_value,
+        element_enumerated_values,
     ]
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)

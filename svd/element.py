@@ -102,3 +102,134 @@ class interrupt(svd.classes.parent):
         attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
         attr['value'] = svd.parser.integer(svd.node.element(node, 'value', True))
         self.add_attributes(attr)
+
+# /device/peripherals/registers
+
+class write_constraint(svd.classes.parent):
+    '''Define constraints for writing values to a field. You can choose between three options, which are mutualy exclusive.'''
+
+    def __init__(self, parent, node):
+    #    if not (isinstance(parent, register) or isinstance(parent, field)):
+    #        raise TypeError("Only parent 'register' and 'field' allowed")
+        svd.classes.parent.__init__(self, parent)
+
+        attr = {}
+        write_as_read = svd.node.element(node, 'writeAsRead')
+        use_enumerated_values = svd.node.element(node, 'useEnumeratedValues')
+        range_node = node.find("./range")
+        if write_as_read is not None:
+            attr['write_as_read'] = svd.parser.boolean(write_as_read)
+        elif use_enumerated_values is not None:
+            attr['use_enumerated_values'] = svd.parser.boolean(use_enumerated_values)
+        else:
+            range_minimum = None
+            range_maximum = None
+            if range_node is not None:
+                range_minimum = svd.node.element(range_node, 'minimum')
+                range_maximum = svd.node.element(range_node, 'maximum')
+
+            if range_minimum is None or range_maximum is None:
+                raise SyntaxError("Either 'writeAsRead', 'useEnumeratedValues' or 'range' is mandatory in 'writeConstraint'")
+
+            attr['range_minimum'] = svd.parser.integer(range_minimum)
+            attr['range_maximum'] = svd.parser.integer(range_maximum)
+
+        self.add_attributes(attr)
+
+class fields(svd.classes.parent):
+    '''Grouping element to define bit-field properties of a register.'''
+
+    def __init__(self, parent, node):
+    #    if not (isinstance(parent, register)):
+    #        raise TypeError("Only parent 'register' allowed")
+        svd.classes.parent.__init__(self, parent, node)
+
+class field(svd.classes.dim):
+    '''All fields of a register are enclosed between the <fields> opening and closing tags.'''
+
+    attributes = ['access']
+
+    def __init__(self, parent, node):
+    #    if not (isinstance(parent, fields)):
+    #        raise TypeError("Only parent 'fields' allowed")
+        svd.classes.dim.__init__(self, parent, node)
+
+        attr = {}
+        attr['name'] = svd.parser.text(svd.node.elememnt(node, 'name', True))
+        attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
+
+        # bitRangeOffsetWidthStyle
+        bit_offset = svd.parser.integer(svd.node.element(node, 'bitOffset'))
+        bit_width = svd.parser.integer(svd.node.element(node, 'bitWidth'))
+        if bit_offset is not None:
+            # If bitWidth is not set, default is 1
+            bit_width = 1 if bit_width is None else bit_width
+        else:
+            # bitRangeLsbMsbStyle
+            lsb = svd.parser.integer(svd.node.element(node, 'lsb'))
+            msb = svd.parser.integer(svd.node.element(node, 'msb'))
+            if lsb is None or msb is None:
+                bit_range = svd.parser.text(svd.node.element(node, 'bitRange'))
+                if bit_range is None:
+                    raise ValueError("Field '{}' has no valid bit-range".format(attr['name']))
+
+                match = re.search('\[([0-9]+):([0-9]+)\]', bit_range)
+                lsb = int(match.group(2))
+                msb = int(match.group(1))
+
+            bit_offset = lsb
+            bit_width = (msb - lsb) + 1
+
+        attr['bit_offset'] = bit_offset
+        attr['bit_width'] = bit_width
+
+        attr['access'] = svd.parser.enum(svd.type.access, svd.node.element(node, 'access'))
+        attr['modified_write_values'] = svd.parser.enum(svd.type.modified_write_values, svd.node.element(node, 'modifiedWriteValues'))
+        attr['read_action'] = svd.parser.enum(svd.type.read_action, svd.node.element(node, 'readAction'))
+        self.add_attributes(attr)
+
+        write_constraint_node = node.find('./writeConstraint')
+        if write_constraint_node is not None:
+            self.write_constraint = write_constraint(self, write_constraint_node)
+
+        enumerated_values_node = node.find('./enumerated_values')
+        if enumerated_values_node is not None:
+            self.enumerated_values = enumerated_values(self, enumerated_values_node)
+
+class enumerated_values(svd.classes.parent):
+    '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
+
+    def __init__(self, parent, node):
+    #    if not isinstance(parent, field):
+    #        raise TypeError("Only parent 'field' allowed")
+        svd.classes.parent.__init__(self, parent, node)
+
+        attr = {}
+        attr['name'] = svd.parser.text(svd.node.element(node, 'name'))
+        attr['header_enum_name'] = svd.parser.text(svd.node.element(node, 'headerEnumName'))
+        attr['usage'] = svd.parser.enum(svd.type.enum_usage, svd.node.element(node, 'usage'), svd.type.enum_usage.read_write)
+        self.add_attributes(attr)
+
+        self.enumerated_value = []
+        for child in node.findall('./enumeratedValue'):
+            self.enumerated_value.append(enumerated_value(self, child))
+
+        if len(self.enumerated_value) == 0:
+            raise SyntaxError("At least one element of enumeratedValue is needed in enumeratedValues '{}'".format(attr['name']))
+
+class enumerated_value(svd.classes.parent):
+    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
+
+    def __init__(self, parent, node):
+    #    if not (isinstance(parent, enumerated_values) or isinstance(parent, dim_array_index)):
+    #        raise TypeError("Only parent 'enumerated_values' and 'dim_array_index' allowed")
+        svd.classes.parent.__init__(self, parent)
+
+        attr = {}
+        attr['name'] = svd.parser.text(svd.node.element(node, 'name'))
+        attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
+        attr['value'] = svd.parser.integer(svd.node.element(node, 'value'))
+        attr['is_default'] = svd.parser.boolean(svd.node.element(node, 'isDefault'))
+        if attr['value'] is None and attr['is_default'] is None:
+            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
+        self.add_attributes(attr)
