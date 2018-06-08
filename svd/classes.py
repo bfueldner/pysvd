@@ -8,6 +8,7 @@ class base(object):
 
     def __init__(self, node):
         self.node = node
+        self.parent = None
 
     def add_attributes(self, attr):
         '''Add not 'None' entries as class attributes'''
@@ -41,9 +42,14 @@ class group(parent):
         parent.__init__(self, parent_, node)
 
     def __getattr__(self, attr):
-        # TODO: Also recursive until parent = None!
-        if attr in self.attributes and self.parent:
-            return self.parent.__getattribute__(attr)
+        if attr in self.attributes:
+            parent = self.parent
+            while parent is not None:
+                try:
+                    return parent.__getattribute__(attr)
+                except:
+                    parent = parent.parent
+
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
 
 class derive(group):

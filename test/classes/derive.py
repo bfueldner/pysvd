@@ -29,6 +29,26 @@ class register(svd.classes.derive):
 
 class case(unittest.TestCase):
 
+    def test_exception(self):
+        xml = '''
+        <registers>
+            <register>
+                <name>TimerCtrl0</name>
+                <description>Timer Control Register</description>
+            </register>
+            <register derivedFrom="UartCtrl0">
+                <name>TimerCtrl1</name>
+                <description>Derived Timer</description>
+            </register>
+        </registers>
+        '''
+        node = ET.fromstring(xml)
+        test = root(None)
+        test.name = "root"
+
+        with self.assertRaises(KeyError):
+            register.add_elements(test, test.register, node, 'register')
+
     def test_one_level(self):
         xml = '''
         <registers>
