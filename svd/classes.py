@@ -1,5 +1,4 @@
 import re
-import copy
 
 import svd.node
 import svd.parser
@@ -15,17 +14,14 @@ class base(object):
         self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
 
     @classmethod
-    def add_elements(cls, parent, node, name):
-        '''Parse node elements and return a list with constucted elements'''
-        print("base.add_elements")
+    def add_elements(cls, parent, elements, node, name):
+        '''Parse node elements and add them to elements list'''
 
-        elements = []
         for subnode in node.findall(name):
             elements.append(cls(parent, subnode))
-        return elements
 
-    '''Find child with name'''
     def find(self, name):
+        '''Find child by name. Has to be overwritten by each node level.'''
         return None
 
 class parent(base):
@@ -58,9 +54,11 @@ class derive(group):
     def __init__(self, parent, node):
 
         # If derived, search class, copy its attributes and call base constructor
-        path = node.get('derivedFrom')
-        if path:
-            parts = path.split('.')
+        derived_from = svd.node.attribute(node, 'derivedFrom')
+        if derived_from is not None:
+            print("derived_from", derived_from)
+
+            parts = derived_from.split('.')
             print(parts)
 
             count = len(parts) - 1
@@ -69,21 +67,22 @@ class derive(group):
                 node = node.parent
                 count -= 1
 
-            print("node_name", node.name)
+            print("root node for derive search:", node.name)
 
         #    while issubclass(type(root), parent):
         #        print(type(root), root, base)
         #        root = root.parent
 
             for name in parts:
+                print("Search", name)
                 res = node.find(name)
                 if res is None:
-                    raise KeyError("Can not find path element '{}' of '{}' in node '{}'".format(name, path, node.name))
+                    raise KeyError("Can not find path element '{}' of path '{}' in node '{}'".format(name, derived_from, node.name))
                 node = res
 
-            print("node_name", node.name)
-            self = copy.copy(node)
-        #    self.__dict__ = dict(node.__dict__)
+            print("node name found to derive from", node.name)
+        #    self = copy.deepcopy(node)
+            self.__dict__ = dict(node.__dict__)
             self.derived = True
         else:
             self.derived = False
@@ -109,10 +108,9 @@ class dim(derive):
                 self.dim_name %= (name)
 
     @classmethod
-    def add_elements(cls, parent, node, name):
+    def add_elements(cls, parent, elements, node, name):
         '''Parse node elements with respect to dim entries and return a list with constucted elements'''
 
-        elements = []
         for subnode in node.findall(name):
             dim = svd.parser.integer(svd.node.element(subnode, 'dim'))
             if dim is not None:
@@ -138,4 +136,3 @@ class dim(derive):
                     offset += dim_increment
             else:
                 elements.append(cls(parent, subnode))
-        return elements

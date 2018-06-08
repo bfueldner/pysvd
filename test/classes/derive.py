@@ -3,66 +3,68 @@ import xml.etree.ElementTree as ET
 
 import svd.classes
 
-def peripheral_key(peripheral):
-    return peripheral.name
+class root(svd.classes.base):
 
-class base_class(svd.classes.base):
-
-    def __init__(self):
-        svd.classes.base.__init__(self)
-        self.children = []
-
-    def add(self, obj):
-        self.children.append(obj)
+    def __init__(self, node):
+        svd.classes.base.__init__(self, node)
+        self.register = []
 
     def find(self, name):
-        print("base_class.find")
-        return next((x for x in self.children if x.name == name), None)
+        for register in self.register:
+            if register.name == name:
+                return register
+        return None
 
-class parent_class(svd.classes.parent):
+class register(svd.classes.derive):
 
-    def __init__(self, parent):
-        svd.classes.parent.__init__(self, parent)
-        self.children = []
+    def __init__(self, parent, node):
+        svd.classes.derive.__init__(self, parent, node)
 
-    def add(self, obj):
-        self.children.append(obj)
-
-    def find(self, name):
-        print("parent_class.find")
-        return next((x for x in self.children if x.name == name), None)
-
-    def copy(self):
-        return parent_class()
+        attr = {}
+        attr['name'] = svd.parser.text(svd.node.element(node, 'name', True))
+        attr['description'] = svd.parser.text(svd.node.element(node, 'description', True))
+        attr['address_offset'] = svd.parser.integer(svd.node.element(node, 'addressOffset'))
+        attr['size'] = svd.parser.integer(svd.node.element(node, 'size'))
+        self.add_attributes(attr)
 
 class case(unittest.TestCase):
 
-    def test_ctor(self):
+    def test_one_level(self):
         xml = '''
-        <node derivedFrom="branch.leaf" />
+        <registers>
+            <register>
+                <name>TimerCtrl0</name>
+                <description>Timer Control Register</description>
+                <addressOffset>0x0</addressOffset>
+                <access>read-write</access>
+                <resetValue>0x00008001</resetValue>
+                <resetMask>0x0000ffff</resetMask>
+                <size>32</size>
+            </register>
+            <register derivedFrom="TimerCtrl0">
+                <name>TimerCtrl1</name>
+                <description>Derived Timer</description>
+                <addressOffset>0x4</addressOffset>
+            </register>
+        </registers>
         '''
         node = ET.fromstring(xml)
+        test = root(None)
+        test.name = "root"
+        register.add_elements(test, test.register, node, 'register')
 
-        xxx = '''
-        root = base_class()
-        root.name = 'root'
-        branch = parent_class(root)
-        branch.name = 'branch'
-        root.add(branch)
-        leaf = parent_class(branch)
-        leaf.name = 'leaf'
-        branch.add(leaf)
+        self.assertEqual(len(test.register), 2)
 
-        test = svd.classes.derive(branch, node)
-        print(type(test), type(leaf))
-    #    print(type(test.parent), type(leaf.parent))
-        print(test, leaf)
-    #    print(test.parent, leaf.parent)
-        print(test.__dict__)
-        print(leaf.__dict__)
+        self.assertEqual(type(test.register[0]), register)
+        self.assertEqual(test.register[0].name, "TimerCtrl0")
+        self.assertEqual(test.register[0].description, "Timer Control Register")
+        self.assertEqual(test.register[0].address_offset, 0)
+        self.assertEqual(test.register[0].size, 32)
+        self.assertFalse(test.register[0].derived)
 
-        self.assertEqual(test.parent, leaf.parent)
-
-    #    self.assertUnequal()
-    #    self.assertEqual(type(test), svd.classes.base)
-        '''
+        self.assertEqual(type(test.register[1]), register)
+        self.assertEqual(test.register[1].name, "TimerCtrl1")
+        self.assertEqual(test.register[1].description, "Derived Timer")
+        self.assertEqual(test.register[1].address_offset, 4)
+        self.assertEqual(test.register[1].size, 32)
+        self.assertTrue(test.register[1].derived)

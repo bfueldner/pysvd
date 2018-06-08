@@ -14,7 +14,8 @@ class case(unittest.TestCase):
         </root>'''
 
         node = ET.fromstring(xml)
-        test = svd.classes.dim.add_elements(None, node, 'register')
+        test = []
+        svd.classes.dim.add_elements(None, test, node, 'register')
         self.assertEqual(len(test), 1)
 
         self.assertEqual(test[0].name, "Name")
@@ -29,7 +30,7 @@ class case(unittest.TestCase):
 
         node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
-            svd.classes.dim.add_elements(None, node, 'register')
+            svd.classes.dim.add_elements(None, None, node, 'register')
 
     def test_index_fix(self):
         xml = '''
@@ -42,7 +43,8 @@ class case(unittest.TestCase):
         </root>'''
 
         node = ET.fromstring(xml)
-        test = svd.classes.dim.add_elements(None, node, 'register')
+        test = []
+        svd.classes.dim.add_elements(None, test, node, 'register')
         self.assertEqual(len(test), 1)
 
         self.assertEqual(test[0].name, "MyArr[4]")
@@ -60,7 +62,8 @@ class case(unittest.TestCase):
         </root>'''
 
         node = ET.fromstring(xml)
-        test = svd.classes.dim.add_elements(None, node, 'register')
+        test = []
+        svd.classes.dim.add_elements(None, test, node, 'register')
         self.assertEqual(len(test), 6)
 
         self.assertEqual(test[0].name, "GPIO_A_CTRL")
@@ -89,7 +92,8 @@ class case(unittest.TestCase):
         </root>'''
 
         node = ET.fromstring(xml)
-        test = svd.classes.dim.add_elements(None, node, 'register')
+        test = []
+        svd.classes.dim.add_elements(None, test, node, 'register')
         self.assertEqual(len(test), 4)
 
         self.assertEqual(test[0].name, "IRQ3")
@@ -113,7 +117,7 @@ class case(unittest.TestCase):
 
         node = ET.fromstring(xml)
         with self.assertRaises(ValueError):
-            svd.classes.dim.add_elements(None, node, 'register')
+            svd.classes.dim.add_elements(None, None, node, 'register')
 
     def test_length_exception(self):
         xml = '''
@@ -127,4 +131,4 @@ class case(unittest.TestCase):
 
         node = ET.fromstring(xml)
         with self.assertRaises(AttributeError):
-            svd.classes.dim.add_elements(None, node, 'register')
+            svd.classes.dim.add_elements(None, None, node, 'register')
