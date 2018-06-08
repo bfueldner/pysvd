@@ -2,10 +2,12 @@ import unittest
 
 import svd.classes
 
-class derived(svd.classes.group):
+class group_attributes(svd.classes.group):
+
+    attributes = ['extra']
 
     def __init__(self, parent, node):
-        pass
+        svd.classes.group.__init__(self, parent, node)
 
 class case(unittest.TestCase):
 
@@ -50,6 +52,8 @@ class case(unittest.TestCase):
         child.add_attributes(child_attr)
 
         self.assertEqual(type(test), svd.classes.group)
+        self.assertEqual(type(child), svd.classes.group)
+
         self.assertIsNone(test.parent)
         self.assertEqual(child.parent, test)
 
@@ -89,8 +93,12 @@ class case(unittest.TestCase):
         subchild.add_attributes(subchild_attr)
 
         self.assertEqual(type(test), svd.classes.group)
+        self.assertEqual(type(child), svd.classes.group)
+        self.assertEqual(type(subchild), svd.classes.group)
+
         self.assertIsNone(test.parent)
         self.assertEqual(child.parent, test)
+        self.assertEqual(subchild.parent, child)
 
         self.assertEqual(test.name, 'test')
         self.assertEqual(test.size, 8)
@@ -109,5 +117,38 @@ class case(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertIsNone(subchild.extra)
 
-    def test_group_derived(self):
-        pass
+    def test_group_attributes(self):
+        test_attr = {
+            'name': 'test',
+            'size': 8,
+            'reset_value': 0xFFFF,
+            'extra': 'xxx',
+        }
+
+        child_attr = {
+            'name': 'child',
+            'size': 16,
+        }
+
+        test = svd.classes.group(None, None)
+        test.add_attributes(test_attr)
+        child = group_attributes(test, None)
+        child.add_attributes(child_attr)
+
+        self.assertEqual(type(test), svd.classes.group)
+        self.assertEqual(type(child), group_attributes)
+
+        self.assertIsNone(test.parent)
+        self.assertEqual(child.parent, test)
+
+        self.assertEqual(test.name, 'test')
+        self.assertEqual(test.size, 8)
+        self.assertEqual(test.reset_value, 0xFFFF)
+        self.assertEqual(test.extra, 'xxx')
+
+        self.assertEqual(child.name, 'child')
+        self.assertEqual(child.size, 16)
+        self.assertEqual(child.extra, 'xxx')
+
+        with self.assertRaises(AttributeError):
+            self.assertIsNone(child.reset_value)
