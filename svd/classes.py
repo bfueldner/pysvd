@@ -62,40 +62,25 @@ class derive(group):
         # If derived, search class, copy its attributes and call base constructor
         derived_from = svd.node.attribute(node, 'derivedFrom')
         if derived_from is not None:
-            print("derived_from", derived_from)
-
             parts = derived_from.split('.')
-            print(parts)
-
             count = len(parts) - 1
             node = parent
             while count:
                 node = node.parent
                 count -= 1
 
-            print("root node for derive search:", node.name)
-
-        #    while issubclass(type(root), parent):
-        #        print(type(root), root, base)
-        #        root = root.parent
-
             for name in parts:
-                print("Search", name)
                 res = node.find(name)
                 if res is None:
                     raise KeyError("Can not find path element '{}' of path '{}' in node '{}'".format(name, derived_from, node.name))
                 node = res
 
-            print("node name found to derive from", node.name)
-        #    self = copy.deepcopy(node)
             self.__dict__ = dict(node.__dict__)
             self.derived = True
         else:
             self.derived = False
 
         group.__init__(self, parent, node)
-
-        # TODO Test type on derivedFrom search and support paths! http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
 
 class dim(derive):
 
