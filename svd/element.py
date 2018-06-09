@@ -9,7 +9,7 @@ class cpu(svd.classes.parent):
     def __init__(self, parent, node):
     #    if not isinstance(parent, device):
     #        raise TypeError("Only parent 'device' allowed")
-        svd.classes.parent.__init__(self, parent)
+        svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
         attr['name'] = svd.parser.enum(svd.type.cpu_name, svd.node.element(node, 'name', True))
@@ -44,7 +44,7 @@ class sau_region_config(svd.classes.group):
     def __init__(self, parent, node):
     #    if not isinstance(parent, cpu):
     #        raise TypeError("Only parent 'cpu' allowed")
-        svd.classes.group.__init__(self, parent)
+        svd.classes.group.__init__(self, parent, node)
 
         attr = {}
         attr['enabled'] = svd.parser.boolean(svd.node.attribute(node, 'enabled'))
@@ -61,7 +61,7 @@ class sau_regions_config_region(svd.classes.parent):
     def __init__(self, parent, node):
     #    if not isinstance(parent, sau_region_config):
     #        raise TypeError("Only parent 'sau_region_config' allowed")
-        svd.classes.parent.__init__(self, parent)
+        svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
         attr['enabled'] = svd.parser.boolean(svd.node.attribute(node, 'enabled'), True)
@@ -80,7 +80,7 @@ class address_block(svd.classes.group):
     attributes = ['protection']
 
     def __init__(self, parent, node):
-        svd.classes.group.__init__(self, parent)
+        svd.classes.group.__init__(self, parent, node)
 
         attr = {}
         attr['offset'] = svd.parser.integer(svd.node.element(node, 'offset', True))
@@ -93,7 +93,7 @@ class interrupt(svd.classes.parent):
     '''A peripheral can have multiple interrupts'''
 
     def __init__(self, parent, node):
-        svd.classes.parent.__init__(self, parent)
+        svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
         attr['name'] = svd.parser.text(svd.node.element(node, 'name', True))
@@ -109,7 +109,7 @@ class write_constraint(svd.classes.parent):
     def __init__(self, parent, node):
     #    if not (isinstance(parent, register) or isinstance(parent, field)):
     #        raise TypeError("Only parent 'register' and 'field' allowed")
-        svd.classes.parent.__init__(self, parent)
+        svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
         write_as_read = svd.node.element(node, 'writeAsRead')
@@ -221,7 +221,7 @@ class enumerated_value(svd.classes.parent):
     def __init__(self, parent, node):
     #    if not (isinstance(parent, enumerated_values) or isinstance(parent, dim_array_index)):
     #        raise TypeError("Only parent 'enumerated_values' and 'dim_array_index' allowed")
-        svd.classes.parent.__init__(self, parent)
+        svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
         attr['name'] = svd.parser.text(svd.node.element(node, 'name'))

@@ -65,8 +65,7 @@ if __name__ == '__main__':
         class_group_case,
         class_derive_case,
         class_dim_case,
-    ]
-    x = '''
+
         element_cpu,
         element_sau_regions_config,
         element_sau_regions_config_region,
@@ -78,6 +77,5 @@ if __name__ == '__main__':
         element_enumerated_value,
         element_enumerated_values,
     ]
-'''
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)
