@@ -1,6 +1,40 @@
 import svd.type
 import svd.classes
 
+# /device
+# http://www.keil.com/pack/doc/cmsis/svd/html/elem_device.html
+
+class device(svd.classes.base):
+    '''The element <device> provides the outermost frame of the description.'''
+
+    def __init__(self, node):
+        svd.classes.base.__init__(self, node)
+
+        attr = {}
+        attr['schema_version'] = svd.parser.text(svd.node.attribute(node, 'schemaVersion', True))
+
+        attr['vendor'] = svd.parser.text(svd.node.element(node, 'vendor'))
+        attr['vendor_id'] = svd.parser.text(svd.node.element(node, 'vendorID'))
+        attr['name'] = svd.parser.text(svd.node.element(node, 'name', True))
+        attr['series'] = svd.parser.text(svd.node.element(node, 'series'))
+        attr['version'] = svd.parser.text(svd.node.element(node, 'version', True))
+        attr['description'] = svd.parser.text(svd.node.element(node, 'description', True))
+        attr['license_text'] = svd.parser.text(svd.node.element(node, 'licenseText'))
+        attr['header_system_filename'] = svd.parser.text(svd.node.element(node, 'headerSystemFilename'))
+        attr['header_definitions_prefix'] = svd.parser.text(svd.node.element(node, 'headerDefinitionsPrefix'))
+        attr['address_unit_bits'] = svd.parser.integer(svd.node.element(node, 'addressUnitBits', True))
+        attr['width'] = svd.parser.integer(svd.node.element(node, 'width', True))
+
+        # property group
+        attr['size'] = svd.parser.integer(svd.node.element(node, 'size'), 32)
+        attr['access'] = svd.parser.enum(svd.type.access, svd.node.element(node, 'access'), svd.type.access.read_write)
+        attr['protection'] = svd.parser.enum(svd.type.protection, svd.node.element(node, 'protection'), svd.type.protection.none)
+        attr['reset_value'] = svd.parser.integer(svd.node.element(node, 'resetValue'), 0x00000000)
+        attr['reset_mask'] = svd.parser.integer(svd.node.element(node, 'resetMask'), 0xFFFFFFFF)
+
+        attr['cpu'] = svd.parser.text(svd.node.element(node, 'licenseText'))
+        self.add_attributes(attr)
+
 # /device/cpu
 
 class cpu(svd.classes.parent):
@@ -147,14 +181,14 @@ class field(svd.classes.dim):
 
     attributes = ['access']
 
-    def __init__(self, parent, node):
+    def __init__(self, parent, node, name = None, offset = 0):
     #    if not (isinstance(parent, fields)):
     #        raise TypeError("Only parent 'fields' allowed")
-        svd.classes.dim.__init__(self, parent, node)
+        svd.classes.dim.__init__(self, parent, node, name, offset)
 
         attr = {}
-        attr['name'] = svd.parser.text(svd.node.elememnt(node, 'name', True))
-        attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
+    #    attr['name'] = svd.parser.text(svd.node.elememnt(node, 'name', True))
+    #    attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
 
         # bitRangeOffsetWidthStyle
         bit_offset = svd.parser.integer(svd.node.element(node, 'bitOffset'))
@@ -185,6 +219,8 @@ class field(svd.classes.dim):
         attr['modified_write_values'] = svd.parser.enum(svd.type.modified_write_values, svd.node.element(node, 'modifiedWriteValues'))
         attr['read_action'] = svd.parser.enum(svd.type.read_action, svd.node.element(node, 'readAction'))
         self.add_attributes(attr)
+
+    #    self.write_constraint_node = write_constraint.add_elements(self, write_constraint_node)
 
         write_constraint_node = node.find('./writeConstraint')
         if write_constraint_node is not None:

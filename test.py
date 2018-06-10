@@ -14,6 +14,8 @@ import test.classes.group
 import test.classes.derive
 import test.classes.dim
 
+import test.element.device
+
 import test.element.cpu
 import test.element.sau_regions_config
 import test.element.sau_regions_config_region
@@ -39,6 +41,8 @@ if __name__ == '__main__':
     class_group_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.group.case)
     class_derive_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.derive.case)
     class_dim_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.dim.case)
+
+    element_device = unittest.TestLoader().loadTestsFromTestCase(test.element.device.case)
 
     element_cpu = unittest.TestLoader().loadTestsFromTestCase(test.element.cpu.case)
     element_sau_regions_config = unittest.TestLoader().loadTestsFromTestCase(test.element.sau_regions_config.case)
@@ -66,6 +70,8 @@ if __name__ == '__main__':
         class_derive_case,
         class_dim_case,
 
+        element_device,
+
         element_cpu,
         element_sau_regions_config,
         element_sau_regions_config_region,
@@ -74,8 +80,8 @@ if __name__ == '__main__':
         element_interrupt,
 
         element_write_constraint,
-        element_enumerated_value,
         element_enumerated_values,
+        element_enumerated_value,
     ]
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)
