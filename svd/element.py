@@ -19,7 +19,7 @@ class device(svd.classes.base):
         attr['series'] = svd.parser.text(svd.node.element(node, 'series'))
         attr['version'] = svd.parser.text(svd.node.element(node, 'version', True))
         attr['description'] = svd.parser.text(svd.node.element(node, 'description', True))
-        attr['license_text'] = svd.parser.text(svd.node.element(node, 'licenseText'))
+        license_text = svd.parser.text(svd.node.element(node, 'licenseText'))
         attr['header_system_filename'] = svd.parser.text(svd.node.element(node, 'headerSystemFilename'))
         attr['header_definitions_prefix'] = svd.parser.text(svd.node.element(node, 'headerDefinitionsPrefix'))
         attr['address_unit_bits'] = svd.parser.integer(svd.node.element(node, 'addressUnitBits', True))
@@ -32,8 +32,25 @@ class device(svd.classes.base):
         attr['reset_value'] = svd.parser.integer(svd.node.element(node, 'resetValue'), 0x00000000)
         attr['reset_mask'] = svd.parser.integer(svd.node.element(node, 'resetMask'), 0xFFFFFFFF)
 
-        attr['cpu'] = svd.parser.text(svd.node.element(node, 'licenseText'))
+        # Clean up license text from whitespaces
+        result = ''
+        for line in license_text.splitlines():
+            line = line.strip()
+            if len(line):
+                result += line + '\n'
+        attr['license_text'] = result
         self.add_attributes(attr)
+
+        cpu = node.find('cpu')
+        if cpu is not None:
+            self.cpu = svd.element.cpu(self, cpu)
+
+        peripherals = node.find('peripherals')
+        if peripherals is None:
+            raise SyntaxError("No element 'peripherals' found in 'device'")
+
+        self.peripheral = []
+        peripheral.add_elements(self, self.peripheral, peripherals, 'peripheral')
 
 # /device/cpu
 
@@ -41,8 +58,8 @@ class cpu(svd.classes.parent):
     '''The CPU section describes the processor included in the microcontroller device.'''
 
     def __init__(self, parent, node):
-    #    if not isinstance(parent, device):
-    #        raise TypeError("Only parent 'device' allowed")
+        if parent is not None and not isinstance(parent, device):
+            raise TypeError("Only parent 'device' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
@@ -76,8 +93,8 @@ class sau_region_config(svd.classes.group):
     attributes = ['protection']
 
     def __init__(self, parent, node):
-    #    if not isinstance(parent, cpu):
-    #        raise TypeError("Only parent 'cpu' allowed")
+        if parent is not None and  not isinstance(parent, cpu):
+            raise TypeError("Only parent 'cpu' allowed")
         svd.classes.group.__init__(self, parent, node)
 
         attr = {}
@@ -93,8 +110,8 @@ class sau_regions_config_region(svd.classes.parent):
     '''Define the regions of the Secure Attribution Unit (SAU)'''
 
     def __init__(self, parent, node):
-    #    if not isinstance(parent, sau_region_config):
-    #        raise TypeError("Only parent 'sau_region_config' allowed")
+        if parent is not None and not isinstance(parent, sau_region_config):
+            raise TypeError("Only parent 'sau_region_config' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
@@ -107,6 +124,40 @@ class sau_regions_config_region(svd.classes.parent):
         self.add_attributes(attr)
 
 # /device/peripherals
+
+class peripherals(svd.classes.parent):
+    '''All peripherals of a device are enclosed within the tag <peripherals>.'''
+
+    def __init__(self, parent, node):
+        if parent is not None and not isinstance(parent, device):
+            raise TypeError("Only parent 'device' allowed")
+        svd.classes.parent.__init__(self, parent, node)
+
+        self.peripheral = []
+        peripheral.add_elements(self, self.peripheral, node, 'peripheral')
+
+        if len(self.peripheral) < 1:
+            raise SyntaxError("At least one element of 'peripheral' is mandatory in 'peripherals'")
+
+class peripheral(svd.classes.dim):
+    '''At least one peripheral has to be defined.'''
+
+    def __init__(self, parent, node, name = None, offset = 0):
+        if parent is not None and not isinstance(parent, device):
+            raise TypeError("Only parent 'device' allowed")
+        svd.classes.dim.__init__(self, parent, node, name, offset)
+
+        attr = {}
+        attr['version'] = svd.parser.text(svd.node.element(node, 'version'))
+        attr['alternate_peripheral'] = svd.parser.text(svd.node.element(node, 'alternatePeripheral'))
+        attr['group_name'] = svd.parser.text(svd.node.element(node, 'groupName'))
+        attr['prepend_to_name'] = svd.parser.text(svd.node.element(node, 'prependToName'))
+        attr['append_to_name'] = svd.parser.text(svd.node.element(node, 'appendToName'))
+        attr['header_struct_name'] = svd.parser.text(svd.node.element(node, 'headerStructName'))
+        attr['disable_condition'] = svd.parser.text(svd.node.element(node, 'disableCondition'))
+        attr['base_address'] = svd.parser.integer(svd.node.element(node, 'baseAddress', True))
+
+        self.add_attributes(attr)
 
 class address_block(svd.classes.group):
     '''Specify an address range uniquely mapped to this peripheral'''

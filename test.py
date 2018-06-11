@@ -27,6 +27,8 @@ import test.element.write_constraint
 import test.element.enumerated_value
 import test.element.enumerated_values
 
+import test.elements
+
 if __name__ == '__main__':
     node_element = unittest.TestLoader().loadTestsFromTestCase(test.node.element.case)
     node_attribute = unittest.TestLoader().loadTestsFromTestCase(test.node.attribute.case)
@@ -55,6 +57,8 @@ if __name__ == '__main__':
     element_enumerated_value = unittest.TestLoader().loadTestsFromTestCase(test.element.enumerated_value.case)
     element_enumerated_values = unittest.TestLoader().loadTestsFromTestCase(test.element.enumerated_values.case)
 
+    elements = unittest.TestLoader().loadTestsFromTestCase(test.elements.case)
+
     test_suites = [
         node_element,
         node_attribute,
@@ -82,6 +86,8 @@ if __name__ == '__main__':
         element_write_constraint,
         element_enumerated_values,
         element_enumerated_value,
+
+        elements,
     ]
     suite = unittest.TestSuite(test_suites)
     unittest.TextTestRunner(verbosity = 2).run(suite)

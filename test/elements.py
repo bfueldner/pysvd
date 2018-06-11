@@ -6,13 +6,7 @@ import svd.type
 
 class case(unittest.TestCase):
 
-    def test_exception(self):
-        xml = '''<device />'''
-        node = ET.fromstring(xml)
-        with self.assertRaises(SyntaxError):
-            test = svd.element.device(node)
-
-    def test_attributes(self):
+    def test_complete(self):
         xml = '''
         <device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
             <vendor>ARM Ltd.</vendor>
@@ -32,6 +26,37 @@ class case(unittest.TestCase):
                 ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR \n
                 CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
             </licenseText>
+
+            <cpu>
+                <name>CM7</name>
+                <revision>r0p0</revision>
+                <endian>little</endian>
+                <mpuPresent>true</mpuPresent>
+            <!-- has double precision FPU -->
+                <fpuPresent>true</fpuPresent>
+                <fpuDP>true</fpuDP>
+            <!-- has instruction and data cache -->
+                <icachePresent>true</icachePresent>
+                <dcachePresent>true</dcachePresent>
+            <!-- has no instruction nor data tighly coupled memory -->
+                <itcmPresent>false</itcmPresent>
+                <dtcmPresent>false</dtcmPresent>
+                <nvicPrioBits>4</nvicPrioBits>
+                <vendorSystickConfig>false</vendorSystickConfig>
+
+                <sauRegionsConfig>
+                    <region name="SAU1">
+                        <base>0x10001000</base>
+                        <limit>0x10005000</limit>
+                        <access>n</access>
+                    </region>
+                    <region enabled="false" name="SAU2">
+                        <base>0x10006000</base>
+                        <limit>0x10008000</limit>
+                        <access>c</access>
+                    </region>
+                </sauRegionsConfig>
+            </cpu>
 
             <headerSystemFilename>system_ARMCM4</headerSystemFilename>
             <headerDefinitionsPrefix>ARM_</headerDefinitionsPrefix>
@@ -56,6 +81,20 @@ class case(unittest.TestCase):
         self.assertEqual(test.series, 'ARMCM4')
         self.assertEqual(test.version, '0.1')
         self.assertEqual(test.description, 'Arm Cortex-M4 based Microcontroller demonstration device')
+
+        self.assertEqual(test.cpu.name, 'CM7')
+        self.assertEqual(test.cpu.revision, 'r0p0')
+        self.assertEqual(test.cpu.endian, svd.type.endian.little)
+        self.assertTrue(test.cpu.mpu_present)
+        self.assertTrue(test.cpu.fpu_present)
+        self.assertTrue(test.cpu.fpu_dp)
+        self.assertTrue(test.cpu.icache_present)
+        self.assertTrue(test.cpu.dcache_present)
+        self.assertFalse(test.cpu.itcm_present)
+        self.assertFalse(test.cpu.dtcm_present)
+        self.assertEqual(test.cpu.nvic_prio_bits, 4)
+        self.assertFalse(test.cpu.vendor_systick_config)
+
         self.assertEqual(test.header_system_filename, 'system_ARMCM4')
         self.assertEqual(test.header_definitions_prefix, 'ARM_')
         self.assertEqual(test.address_unit_bits, 8)
@@ -66,4 +105,4 @@ class case(unittest.TestCase):
         self.assertEqual(test.reset_value, 0)
         self.assertEqual(test.reset_mask, 0xffffffff)
 
-    #    self.assertEqual(len(test.peripheral), 0)
+        self.assertEqual(len(test.peripheral), 0)
