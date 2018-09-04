@@ -24,6 +24,8 @@ import test.element.address_block
 import test.element.interrupt
 
 import test.element.write_constraint
+#import test.element.fields
+import test.element.field
 import test.element.enumerated_value
 import test.element.enumerated_values
 
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     class_derive_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.derive.case)
     class_dim_case = unittest.TestLoader().loadTestsFromTestCase(test.classes.dim.case)
 
-    element_device = unittest.TestLoader().loadTestsFromTestCase(test.element.device.case)
+#    element_device = unittest.TestLoadber().loadTestsFromTestCase(test.element.device.case)
 
     element_cpu = unittest.TestLoader().loadTestsFromTestCase(test.element.cpu.case)
     element_sau_regions_config = unittest.TestLoader().loadTestsFromTestCase(test.element.sau_regions_config.case)
@@ -54,6 +56,8 @@ if __name__ == '__main__':
     element_interrupt = unittest.TestLoader().loadTestsFromTestCase(test.element.interrupt.case)
 
     element_write_constraint = unittest.TestLoader().loadTestsFromTestCase(test.element.write_constraint.case)
+#    element_fields = unittest.TestLoader().loadTestsFromTestCase(test.element.fields.case)
+    element_field = unittest.TestLoader().loadTestsFromTestCase(test.element.field.case)
     element_enumerated_value = unittest.TestLoader().loadTestsFromTestCase(test.element.enumerated_value.case)
     element_enumerated_values = unittest.TestLoader().loadTestsFromTestCase(test.element.enumerated_values.case)
 
@@ -74,7 +78,7 @@ if __name__ == '__main__':
         class_derive_case,
         class_dim_case,
 
-        element_device,
+    #    element_device,
 
         element_cpu,
         element_sau_regions_config,
@@ -84,6 +88,8 @@ if __name__ == '__main__':
         element_interrupt,
 
         element_write_constraint,
+    #    element_fields,
+        element_field,
         element_enumerated_values,
         element_enumerated_value,
 

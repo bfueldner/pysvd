@@ -1,3 +1,5 @@
+import re
+
 import svd.type
 import svd.classes
 
@@ -58,8 +60,6 @@ class cpu(svd.classes.parent):
     '''The CPU section describes the processor included in the microcontroller device.'''
 
     def __init__(self, parent, node):
-        if parent is not None and not isinstance(parent, device):
-            raise TypeError("Only parent 'device' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
@@ -93,8 +93,6 @@ class sau_region_config(svd.classes.group):
     attributes = ['protection']
 
     def __init__(self, parent, node):
-        if parent is not None and  not isinstance(parent, cpu):
-            raise TypeError("Only parent 'cpu' allowed")
         svd.classes.group.__init__(self, parent, node)
 
         attr = {}
@@ -110,8 +108,6 @@ class sau_regions_config_region(svd.classes.parent):
     '''Define the regions of the Secure Attribution Unit (SAU)'''
 
     def __init__(self, parent, node):
-        if parent is not None and not isinstance(parent, sau_region_config):
-            raise TypeError("Only parent 'sau_region_config' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
@@ -192,8 +188,6 @@ class write_constraint(svd.classes.parent):
     '''Define constraints for writing values to a field. You can choose between three options, which are mutualy exclusive.'''
 
     def __init__(self, parent, node):
-    #    if not (isinstance(parent, register) or isinstance(parent, field)):
-    #        raise TypeError("Only parent 'register' and 'field' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
@@ -233,8 +227,6 @@ class field(svd.classes.dim):
     attributes = ['access']
 
     def __init__(self, parent, node, name = None, offset = 0):
-    #    if not (isinstance(parent, fields)):
-    #        raise TypeError("Only parent 'fields' allowed")
         svd.classes.dim.__init__(self, parent, node, name, offset)
 
         attr = {}
@@ -285,8 +277,6 @@ class enumerated_values(svd.classes.parent):
     '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
 
     def __init__(self, parent, node):
-    #    if not isinstance(parent, field):
-    #        raise TypeError("Only parent 'field' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
@@ -306,8 +296,6 @@ class enumerated_value(svd.classes.parent):
     '''An enumeratedValue defines a map between an unsigned integer and a string.'''
 
     def __init__(self, parent, node):
-    #    if not (isinstance(parent, enumerated_values) or isinstance(parent, dim_array_index)):
-    #        raise TypeError("Only parent 'enumerated_values' and 'dim_array_index' allowed")
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}

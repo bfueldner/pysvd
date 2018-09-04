@@ -82,7 +82,7 @@ class case(unittest.TestCase):
         self.assertEqual(test.version, '0.1')
         self.assertEqual(test.description, 'Arm Cortex-M4 based Microcontroller demonstration device')
 
-        self.assertEqual(test.cpu.name, 'CM7')
+        self.assertEqual(test.cpu.name, svd.type.cpu_name.cm7)
         self.assertEqual(test.cpu.revision, 'r0p0')
         self.assertEqual(test.cpu.endian, svd.type.endian.little)
         self.assertTrue(test.cpu.mpu_present)
