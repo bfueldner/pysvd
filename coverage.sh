@@ -1,4 +1,4 @@
 #!/bin/sh
 
-coverage run --branch --omit=test*,svd/__init__.py test.py
-coverage html
+coverage3 run --branch --omit=test*,svd/__init__.py test.py
+coverage3 html

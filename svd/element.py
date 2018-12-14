@@ -63,7 +63,7 @@ class cpu(svd.classes.parent):
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
-        attr['name'] = svd.parser.enum(svd.type.cpu_name, svd.node.element(node, 'name', True))
+        attr['name'] = svd.parser.enum(svd.type.cpuName, svd.node.element(node, 'name', True).replace('+', 'PLUS'))
         attr['revision'] = svd.parser.text(svd.node.element(node, 'revision', True))
         attr['endian'] = svd.parser.enum(svd.type.endian, svd.node.element(node, 'endian', True))
         attr['mpu_present'] = svd.parser.boolean(svd.node.element(node, 'mpuPresent', True))
@@ -87,7 +87,7 @@ class cpu(svd.classes.parent):
         if child is not None:
             self.sau_regions_config = sau_region_config(self, child)
 
-class sau_region_config(svd.classes.group):
+class sauRegionConfig(svd.classes.group):
     '''Set the configuration for the Secure Attribution Unit (SAU) when they are preconfigured by HW or Firmware.'''
 
     attributes = ['protection']

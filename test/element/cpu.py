@@ -37,7 +37,7 @@ class case(unittest.TestCase):
         node = ET.fromstring(xml)
         test = svd.element.cpu(None, node)
 
-        self.assertEqual(test.name, svd.type.cpu_name.cm7)
+        self.assertEqual(test.name, svd.type.cpuName.CM7)
         self.assertEqual(test.revision, "r0p0")
         self.assertEqual(test.endian, svd.type.endian.little)
         self.assertTrue(test.mpu_present)

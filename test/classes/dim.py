@@ -5,7 +5,23 @@ import svd.classes
 
 class case(unittest.TestCase):
 
+    def test_no_name_exception(self):
+        '''Required name field is missing'''
+
+        xml = '''
+        <root>
+            <register>
+                <dim>4</dim>
+            </register>
+        </root>'''
+
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            svd.classes.dim.add_elements(None, None, node, 'register')
+
     def test_no_dim(self):
+        '''Normal generation if dim is missing'''
+
         xml = '''
         <root>
             <register>
@@ -20,19 +36,9 @@ class case(unittest.TestCase):
 
         self.assertEqual(test[0].name, "Name")
 
-    def test_exception(self):
-        xml = '''
-        <root>
-            <register>
-                <dim>4</dim>
-            </register>
-        </root>'''
-
-        node = ET.fromstring(xml)
-        with self.assertRaises(SyntaxError):
-            svd.classes.dim.add_elements(None, None, node, 'register')
-
     def test_index_fix(self):
+        '''Fixed array generation'''
+
         xml = '''
         <root>
             <register>
@@ -50,6 +56,8 @@ class case(unittest.TestCase):
         self.assertEqual(test[0].name, "MyArr[4]")
 
     def test_index_list(self):
+        '''Index generation by list'''
+
         xml = '''
         <root>
             <register>
@@ -80,6 +88,8 @@ class case(unittest.TestCase):
         self.assertEqual(test[5].description, "GPIO Controller Z")
 
     def test_index_range(self):
+        '''Index generation by range'''
+
         xml = '''
         <root>
             <register>
@@ -106,6 +116,8 @@ class case(unittest.TestCase):
         self.assertEqual(test[3].dim_name, "irq6_t")
 
     def test_index_exception(self):
+        '''dimIndex can not be interpreted as integer'''
+
         xml = '''
         <root>
             <register>
@@ -120,6 +132,8 @@ class case(unittest.TestCase):
             svd.classes.dim.add_elements(None, None, node, 'register')
 
     def test_length_exception(self):
+        '''dimIndex has less elements than dim requires'''
+
         xml = '''
         <root>
             <register>
