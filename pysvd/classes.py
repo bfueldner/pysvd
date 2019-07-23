@@ -3,40 +3,44 @@ import re
 import svd.node
 import svd.parser
 
+
 class base(object):
-    '''Base class for all SVD elements'''
+    """Base class for all SVD elements"""
 
     def __init__(self, node):
         self.node = node
         self.parent = None
 
     def add_attributes(self, attr):
-        '''Add not 'None' entries as class attributes'''
-        self.__dict__.update( {k: v for k, v in attr.items() if v is not None} )
+        """Add not 'None' entries as class attributes"""
+        self.__dict__.update({k: v for k, v in attr.items() if v is not None})
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
-        '''Parse node elements and add them to elements list'''
+        """Parse node elements and add them to elements list"""
 
         for subnode in node.findall(name):
             elements.append(cls(parent, subnode))
 
     def find(self, name):
-        '''Find child by name. Has to be overwritten by each node level.'''
+        """Find child by name. Has to be overwritten by each node level."""
         return None
 
+
 class parent(base):
-    '''Base class for parents'''
+    """Base class for parents"""
 
     def __init__(self, parent, node):
         base.__init__(self, node)
         self.parent = parent
 
+
 class group(parent):
-    '''Base class for elements with registerPropertiesGroup'''
+    """Base class for elements with registerPropertiesGroup"""
 
     attributes = ['size', 'access', 'protection', 'reset_value', 'reset_mask']
-#   elements = ['device', 'peripheral', 'register', 'cluster', 'field', 'sauRegionsConfig', 'addressBlock']
+#   elements = ['device', 'peripheral', 'register', 'cluster', 'field', \
+#               'sauRegionsConfig', 'addressBlock']
 
     def __init__(self, parent_, node):
         parent.__init__(self, parent_, node)
@@ -50,16 +54,18 @@ class group(parent):
                 except:
                     parent = parent.parent
 
-        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
+        raise AttributeError("'{}' object has no attribute '{}'".
+                             format(self.__class__.__name__, attr))
+
 
 class derive(group):
-    '''Base for deriveable classes'''
+    """Base for deriveable classes"""
 
 #   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
 
     def __init__(self, parent, node):
 
-        # If derived, search class, copy its attributes and call base constructor
+        # If derived, search class, copy its attributes and call base ctor
         derived_from = svd.node.attribute(node, 'derivedFrom')
         if derived_from is not None:
             parts = derived_from.split('.')
@@ -72,7 +78,9 @@ class derive(group):
             for name in parts:
                 res = node.find(name)
                 if res is None:
-                    raise KeyError("Can not find path element '{}' of path '{}' in node '{}'".format(name, derived_from, node.name))
+                    raise KeyError("Can not find path element '{}' of path \
+                                   '{}' in node '{}'".format(
+                                        name, derived_from, node.name))
                 node = res
 
             self.__dict__ = dict(node.__dict__)
@@ -82,9 +90,10 @@ class derive(group):
 
         group.__init__(self, parent, node)
 
+
 class dim(derive):
 
-    def __init__(self, parent, node, name = None, offset = 0):
+    def __init__(self, parent, node, name=None, offset=0):
         derive.__init__(self, parent, node)
 
         self.name = svd.parser.text(svd.node.element(node, 'name', True))
@@ -100,7 +109,7 @@ class dim(derive):
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
-        '''Parse node elements with respect to dim entries and return a list with constucted elements'''
+        """Parse node elements with respect to dim entries and return a list with constucted elements"""
 
         for subnode in node.findall(name):
             dim = svd.parser.integer(svd.node.element(subnode, 'dim'))

@@ -4,11 +4,11 @@ import svd.classes
 import svd.parser
 import svd.type
 
-x = """
+x = '''
 # Base elements
 
 class device(object):
-    '''The element <device> provides the outermost frame of the description.'''
+    """The element <device> provides the outermost frame of the description."""
 
     def __init__(self, node):
 
@@ -32,7 +32,7 @@ class device(object):
         attr['reset_value'] = parser.integer(node, 'resetValue', False, 0x00000000)
         attr['reset_mask'] = parser.integer(node, 'resetMask', False, 0xFFFFFFFF)
 
-        x = '''
+        x = """
         node_cpu = node.find('./cpu')
         if node_cpu:
             attr['cpu'] = None
@@ -42,7 +42,7 @@ class device(object):
             self.field.append(field(self, child))
 
         attr['peripherals'] = None
-        '''
+        """
         self.add_attributes(attr)
 
         cpu.parse(self, node.find('./cpu'))
@@ -58,7 +58,7 @@ class device(object):
 # Deriveable elements
 
 class fields(base):
-    '''List of field'''
+    """List of field"""
 
     def __init__(self, parent, node):
         base.__init__(self, parent)
@@ -104,4 +104,4 @@ class registers(base):
             if register.name == name:
                 return register
         return None
-"""
+'''

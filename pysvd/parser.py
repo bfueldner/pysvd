@@ -1,12 +1,17 @@
-def text(value, default = None):
-    '''Get the text for the provided tag from the provided node'''
+def Text(value, default=None):
+    """Get text from the provided value. If None, default is returned"""
 
     if value is None:
         return default
     else:
         return value
 
-def integer(value, default = None):
+
+def Integer(value, default=None):
+    """Get integer value from the provided value.
+    If None, default is returned
+    """
+
     if value is None:
         return default
 
@@ -27,7 +32,12 @@ def integer(value, default = None):
     else:
         return int(value)
 
-def boolean(value, default = None):
+
+def Boolean(value, default=None):
+    """Get boolean value from the provided value.
+    If None, default is returned
+    """
+
     if value is None:
         return default
 
@@ -37,9 +47,13 @@ def boolean(value, default = None):
     elif value == 'true' or value == '1':
         return True
     else:
-        raise ValueError("Can not convert value '{}' to boolean".format(value))
+        raise ValueError("Can not convert str '{}' to boolean".format(value))
 
-def enum(enum, value, default = None):
+
+def Enum(enum, value, default=None):
+    """Get enum value from the provided value looking up in EnumClass.
+    If None, default is returned
+    """
     if value is None:
         return default
 

@@ -5,17 +5,11 @@ Note: Type order taken from XSD file.
 
 from enum import Enum
 
-__author__ = "Thomas Bernard and Benjamin Füldner"
-__copyright__ = "Copyright 2018, The Cogent Project"
-__credits__ = ["Paul Osborne"]
-__license__ = "GPL"
-__version__ = "1.0.0"
-__maintainer__ = "Benjamin Füldner"
-__email__ = "benjamin@fueldner.net"
-__status__ = "Production"
 
 class cpuName(Enum):
-    '''Specifies a selection of Cortex-M and Secure-Cores. This list will get extended as new processors are released'''
+    """Specifies a selection of Cortex-M and Secure-Cores. This list will get
+    extended as new processors are released.
+    """
 
     CM0 = 'CM0'
     CM0PLUS = 'CM0PLUS'
@@ -40,19 +34,22 @@ class cpuName(Enum):
     CA72 = 'CA72'
     other = 'other'
 
+
 # revision
 # Specifies the CPU revision format as defined by ARM (rNpM)
 
+
 class endian(Enum):
-    '''Pre-defines the tokens for specifying the endianess of the device'''
+    """Pre-defines the tokens for specifying the endianess of the device"""
 
     little = 'little'
     big = 'big'
     selectable = 'selectable'
     other = 'other'
 
+
 class dateType(Enum):
-    '''Pre-defines the tokens in line with CMSIS data type definitions'''
+    """Pre-defines the tokens in line with CMSIS data type definitions"""
 
     uint8_t = 'uint8_t'
     uint16_t = 'uint16_t'
@@ -72,41 +69,58 @@ class dateType(Enum):
     int32_t_ptr = 'int32_t *'
     int64_t_ptr = 'int64_t *'
 
+
 # nvicPrioBits
-# Specifies the integer value range for the number of bits used in NVIC to encode priority levels
+# Specifies the integer value range for the number of bits used in NVIC to
+# encode priority levels
+
 
 # dimableIdentifier
-# Specifies the subset and sequence of characters used for specifying identifiers that may contain %s from dim. This is particularly important as these are used in ANSI C Structures during the device header file generation.
+# Specifies the subset and sequence of characters used for specifying
+# identifiers that may contain %s from dim. This is particularly important as
+# these are used in ANSI C Structures during the device header file generation.
+
 
 # identifier
-# Specifies the subset and sequence of characters used for specifying identifiers that must not contain %s from dim. This is particularly important as these are used in ANSI C Structures during the device header file generation.
+# Specifies the subset and sequence of characters used for specifying
+# identifiers that must not contain %s from dim. This is particularly
+# important as these are used in ANSI C Structures during the device header
+# file generation.
+
 
 class protection(Enum):
-    '''V1.3: Protection Access Attribute Strings'''
+    """V1.3: Protection Access Attribute Strings"""
 
     none = ''
     secure = 's'
     non_secure = 'n'
     privileged = 'p'
 
+
 class sauAccess(Enum):
-    '''V1.3: SAU Access Type'''
+    """V1.3: SAU Access Type"""
 
     none = ''
     non_secure_callable_secure = 'c'
     non_secure = 'n'
 
+
 # dimIndex
-# Specifies the subset and sequence of characters used for specifying the sequence of indices in register arrays
+# Specifies the subset and sequence of characters used for specifying the
+# sequence of indices in register arrays
+
 
 # scaledNonNegativeInteger
-# Specifies the format in which numbers are represented in hexadecimal or decimal format
+# Specifies the format in which numbers are represented in hexadecimal or
+# decimal format
+
 
 # enumeratedValueData
 # Specifies the number formats for the values in enumeratedValues
 
+
 class access(Enum):
-    '''Specfies the pre-defined tokens for the available accesses'''
+    """Specfies the pre-defined tokens for the available accesses"""
 
     read_only = 'read-only'
     write_only = 'write-only'
@@ -114,8 +128,9 @@ class access(Enum):
     writeOnce = 'writeOnce'
     read_writeOnce = 'read-writeOnce'
 
+
 class modifiedWriteValues(Enum):
-    '''Specifies the pre-defined tokens for the write side effects'''
+    """Specifies the pre-defined tokens for the write side effects"""
 
     oneToClear = 'oneToClear'
     oneToSet = 'oneToSet'
@@ -127,20 +142,25 @@ class modifiedWriteValues(Enum):
     set = 'set'
     modify = 'modify'
 
+
 class readAction(Enum):
-    '''Specifies the pre-defined tokens for read side effects'''
+    """Specifies the pre-defined tokens for read side effects"""
 
     clear = 'clear'
     set = 'set'
     modify = 'modify'
     modifyExternal = 'modifyExternal'
 
+
 class enumUsage(Enum):
-    '''Specifies the pre-defined tokens for selecting what access types an enumeratedValues set is associated with'''
+    """Specifies the pre-defined tokens for selecting what access types an
+    enumeratedValues set is associated with
+    """
 
     read = 'read'
     write = 'write'
     read_write = 'read-write'
+
 
 class usage(Enum):
     registers = 'registers'

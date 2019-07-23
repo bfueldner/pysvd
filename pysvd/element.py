@@ -3,11 +3,11 @@ import re
 import svd.type
 import svd.classes
 
+
 # /device
 # http://www.keil.com/pack/doc/cmsis/svd/html/elem_device.html
-
 class device(svd.classes.base):
-    '''The element <device> provides the outermost frame of the description.'''
+    """The element <device> provides the outermost frame of the description."""
 
     def __init__(self, node):
         svd.classes.base.__init__(self, node)
@@ -57,7 +57,7 @@ class device(svd.classes.base):
 # /device/cpu
 
 class cpu(svd.classes.parent):
-    '''The CPU section describes the processor included in the microcontroller device.'''
+    """The CPU section describes the processor included in the microcontroller device."""
 
     def __init__(self, parent, node):
         svd.classes.parent.__init__(self, parent, node)
@@ -88,7 +88,7 @@ class cpu(svd.classes.parent):
             self.sau_regions_config = sau_region_config(self, child)
 
 class sauRegionConfig(svd.classes.group):
-    '''Set the configuration for the Secure Attribution Unit (SAU) when they are preconfigured by HW or Firmware.'''
+    """Set the configuration for the Secure Attribution Unit (SAU) when they are preconfigured by HW or Firmware."""
 
     attributes = ['protection']
 
@@ -105,7 +105,7 @@ class sauRegionConfig(svd.classes.group):
             self.region.append( sau_regions_config_region(self, child) )
 
 class sau_regions_config_region(svd.classes.parent):
-    '''Define the regions of the Secure Attribution Unit (SAU)'''
+    """Define the regions of the Secure Attribution Unit (SAU)"""
 
     def __init__(self, parent, node):
         svd.classes.parent.__init__(self, parent, node)
@@ -122,7 +122,7 @@ class sau_regions_config_region(svd.classes.parent):
 # /device/peripherals
 
 class peripherals(svd.classes.parent):
-    '''All peripherals of a device are enclosed within the tag <peripherals>.'''
+    """All peripherals of a device are enclosed within the tag <peripherals>."""
 
     def __init__(self, parent, node):
         if parent is not None and not isinstance(parent, device):
@@ -136,7 +136,7 @@ class peripherals(svd.classes.parent):
             raise SyntaxError("At least one element of 'peripheral' is mandatory in 'peripherals'")
 
 class peripheral(svd.classes.dim):
-    '''At least one peripheral has to be defined.'''
+    """At least one peripheral has to be defined."""
 
     def __init__(self, parent, node, name = None, offset = 0):
         if parent is not None and not isinstance(parent, device):
@@ -156,7 +156,7 @@ class peripheral(svd.classes.dim):
         self.add_attributes(attr)
 
 class address_block(svd.classes.group):
-    '''Specify an address range uniquely mapped to this peripheral'''
+    """Specify an address range uniquely mapped to this peripheral"""
 
     attributes = ['protection']
 
@@ -171,7 +171,7 @@ class address_block(svd.classes.group):
         self.add_attributes(attr)
 
 class interrupt(svd.classes.parent):
-    '''A peripheral can have multiple interrupts'''
+    """A peripheral can have multiple interrupts"""
 
     def __init__(self, parent, node):
         svd.classes.parent.__init__(self, parent, node)
@@ -185,7 +185,7 @@ class interrupt(svd.classes.parent):
 # /device/peripherals/registers
 
 class write_constraint(svd.classes.parent):
-    '''Define constraints for writing values to a field. You can choose between three options, which are mutualy exclusive.'''
+    """Define constraints for writing values to a field. You can choose between three options, which are mutualy exclusive."""
 
     def __init__(self, parent, node):
         svd.classes.parent.__init__(self, parent, node)
@@ -214,7 +214,7 @@ class write_constraint(svd.classes.parent):
         self.add_attributes(attr)
 
 class fields(svd.classes.parent):
-    '''Grouping element to define bit-field properties of a register.'''
+    """Grouping element to define bit-field properties of a register."""
 
     def __init__(self, parent, node):
     #    if not (isinstance(parent, register)):
@@ -222,7 +222,7 @@ class fields(svd.classes.parent):
         svd.classes.parent.__init__(self, parent, node)
 
 class field(svd.classes.dim):
-    '''All fields of a register are enclosed between the <fields> opening and closing tags.'''
+    """All fields of a register are enclosed between the <fields> opening and closing tags."""
 
     attributes = ['access']
 
@@ -274,7 +274,7 @@ class field(svd.classes.dim):
             self.enumerated_values = enumerated_values(self, enumerated_values_node)
 
 class enumerated_values(svd.classes.parent):
-    '''The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map.'''
+    """The concept of enumerated values creates a map between unsigned integers and an identifier string. In addition, a description string can be associated with each entry in the map."""
 
     def __init__(self, parent, node):
         svd.classes.parent.__init__(self, parent, node)
@@ -290,19 +290,27 @@ class enumerated_values(svd.classes.parent):
             self.enumerated_value.append(enumerated_value(self, child))
 
         if len(self.enumerated_value) == 0:
-            raise SyntaxError("At least one element of enumeratedValue is needed in enumeratedValues '{}'".format(attr['name']))
+            raise SyntaxError("At least one element of enumeratedValue is \
+                               needed in enumeratedValues '{}'".
+                               format(attr['name']))
+
 
 class enumerated_value(svd.classes.parent):
-    '''An enumeratedValue defines a map between an unsigned integer and a string.'''
+    """An enumeratedValue defines a map between an unsigned integer and
+    a string.
+    """
 
     def __init__(self, parent, node):
         svd.classes.parent.__init__(self, parent, node)
 
         attr = {}
         attr['name'] = svd.parser.text(svd.node.element(node, 'name'))
-        attr['description'] = svd.parser.text(svd.node.element(node, 'description'))
+        attr['description'] = svd.parser.text(
+            svd.node.element(node, 'description'))
         attr['value'] = svd.parser.integer(svd.node.element(node, 'value'))
-        attr['is_default'] = svd.parser.boolean(svd.node.element(node, 'isDefault'))
+        attr['is_default'] = svd.parser.boolean(
+            svd.node.element(node, 'isDefault'))
         if attr['value'] is None and attr['is_default'] is None:
-            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
+            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in \
+                               enumeratedValue '{}'".format(attr['name']))
         self.add_attributes(attr)
