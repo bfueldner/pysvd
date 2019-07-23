@@ -1,9 +1,17 @@
+dist: xenial
 language: python
 python:
   - "3.3"
   - "3.4"
   - "3.5"
-  - "pypy"
-  - "pypy3"
-script: nosetests
-sudo: false
+  - "3.6"
+  - "3.7"
+  - "pypy3.5"
+install:
+  - pip install -e .
+before_script:
+  - pip install -r requirements.txt
+script:
+  - pytest --verbose --color=yes --cov-report xml --cov pysvd --pep8 pysvd test
+after_success:
+  - coveralls
