@@ -1,4 +1,4 @@
-def element(node, tag, mandatory=False):
+def Element(node, tag, mandatory=False):
     """Get the element text for the provided tag from the provided node"""
 
     value = node.findtext(tag)
@@ -11,7 +11,7 @@ def element(node, tag, mandatory=False):
         return value.strip()
 
 
-def attribute(node, tag, mandatory=False):
+def Attribute(node, tag, mandatory=False):
     """Get the attribute text for the provided tag from the provided node"""
 
     value = node.get(tag)

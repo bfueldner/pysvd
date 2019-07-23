@@ -6,7 +6,7 @@ import svd.classes
 class root(svd.classes.base):
 
     def __init__(self, node):
-        svd.classes.base.__init__(self, node)
+        super().__init__(node)
 
         self.name = "root"
         self.register = []
@@ -21,7 +21,7 @@ class root(svd.classes.base):
 class register(svd.classes.derive):
 
     def __init__(self, parent, node):
-        svd.classes.derive.__init__(self, parent, node)
+        super().__init__(parent, node)
 
         attr = {}
         attr['name'] = svd.parser.text(svd.node.element(node, 'name', True))
@@ -42,7 +42,7 @@ class register(svd.classes.derive):
 class field(svd.classes.derive):
 
     def __init__(self, parent, node):
-        svd.classes.derive.__init__(self, parent, node)
+        super().__init__(parent, node)
 
         attr = {}
         attr['name'] = svd.parser.text(svd.node.element(node, 'name', True))

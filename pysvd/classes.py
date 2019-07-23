@@ -1,10 +1,7 @@
 import re
 
-import svd.node
-import svd.parser
 
-
-class base(object):
+class Base(object):
     """Base class for all SVD elements"""
 
     def __init__(self, node):
@@ -27,15 +24,15 @@ class base(object):
         return None
 
 
-class parent(base):
+class Parent(Base):
     """Base class for parents"""
 
     def __init__(self, parent, node):
-        base.__init__(self, node)
+        super().__init__(node)
         self.parent = parent
 
 
-class group(parent):
+class Group(Parent):
     """Base class for elements with registerPropertiesGroup"""
 
     attributes = ['size', 'access', 'protection', 'reset_value', 'reset_mask']
@@ -43,7 +40,7 @@ class group(parent):
 #               'sauRegionsConfig', 'addressBlock']
 
     def __init__(self, parent_, node):
-        parent.__init__(self, parent_, node)
+        super().__init__(parent_, node)
 
     def __getattr__(self, attr):
         if attr in self.attributes:
@@ -58,7 +55,7 @@ class group(parent):
                              format(self.__class__.__name__, attr))
 
 
-class derive(group):
+class Derive(Group):
     """Base for deriveable classes"""
 
 #   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
@@ -88,13 +85,13 @@ class derive(group):
         else:
             self.derived = False
 
-        group.__init__(self, parent, node)
+        super().__init__(parent, node)
 
 
-class dim(derive):
+class Dim(Derive):
 
     def __init__(self, parent, node, name=None, offset=0):
-        derive.__init__(self, parent, node)
+        super().__init__(parent, node)
 
         self.name = svd.parser.text(svd.node.element(node, 'name', True))
         self.description = svd.parser.text(svd.node.element(node, 'description'))
