@@ -3,20 +3,7 @@ import xml.etree.ElementTree as ET
 
 import svd.classes
 
-class root(svd.classes.base):
 
-    def __init__(self, node):
-        super().__init__(node)
-
-        self.name = "root"
-        self.register = []
-        register.add_elements(self, self.register, node, 'register')
-
-    def find(self, name):
-        for register in self.register:
-            if register.name == name:
-                return register
-        return None
 
 class register(svd.classes.derive):
 

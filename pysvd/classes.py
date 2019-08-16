@@ -93,9 +93,9 @@ class Dim(Derive):
     def __init__(self, parent, node, name=None, offset=0):
         super().__init__(parent, node)
 
-        self.name = svd.parser.text(svd.node.element(node, 'name', True))
-        self.description = svd.parser.text(svd.node.element(node, 'description'))
-        self.dim_name = svd.parser.text(svd.node.element(node, 'dimName'))
+        self.name = parser.text(svd.node.element(node, 'name', True))
+        self.description = pysvd.parser.text(svd.node.element(node, 'description'))
+        self.dim_name = pysvd.parser.text(svd.node.element(node, 'dimName'))
         if name is not None:
             self.name %= (name)
             if self.description is not None:
@@ -109,7 +109,7 @@ class Dim(Derive):
         """Parse node elements with respect to dim entries and return a list with constucted elements"""
 
         for subnode in node.findall(name):
-            dim = svd.parser.integer(svd.node.element(subnode, 'dim'))
+            dim = pysvd.parser.integer(svd.node.element(subnode, 'dim'))
             if dim is not None:
                 dim_increment = svd.parser.integer(svd.node.element(subnode, 'dimIncrement', True))
                 dim_index = svd.parser.text(svd.node.element(subnode, 'dimIndex'))

@@ -2,6 +2,31 @@ import unittest
 import pysvd
 
 
+# Used in TestClassGroup.test_group_attributes
+class HelperClassGroupAttributes(pysvd.classes.Group):
+
+    attributes = ['extra']
+
+    def __init__(self, parent, node):
+        super().__init__(parent, node)
+
+
+class HelperClassDeriveRoot(pysvd.classes.Base):
+
+    def __init__(self, node):
+        super().__init__(node)
+
+        self.name = "root"
+        self.register = []
+        register.add_elements(self, self.register, node, 'register')
+
+    def find(self, name):
+        for register in self.register:
+            if register.name == name:
+                return register
+        return None
+
+
 class TestClassBase(unittest.TestCase):
 
     def test_ctor(self):
@@ -172,11 +197,11 @@ class TestClassGroup(unittest.TestCase):
 
         test = pysvd.classes.Group(None, None)
         test.add_attributes(test_attr)
-        child = group_attributes(test, None)
+        child = HelperClassGroupAttributes(test, None)
         child.add_attributes(child_attr)
 
         self.assertEqual(type(test), pysvd.classes.Group)
-        self.assertEqual(type(child), group_attributes)
+        self.assertEqual(type(child), HelperClassGroupAttributes)
 
         self.assertIsNone(test.parent)
         self.assertEqual(child.parent, test)
