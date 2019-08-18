@@ -64,7 +64,7 @@ class Derive(Group):
     def __init__(self, parent, node):
 
         # If derived, search class, copy its attributes and call base ctor
-        derived_from = pysvd.node.attribute(node, 'derivedFrom')
+        derived_from = pysvd.node.Attribute(node, 'derivedFrom')
         if derived_from is not None:
             parts = derived_from.split('.')
             count = len(parts) - 1
@@ -94,9 +94,9 @@ class Dim(Derive):
     def __init__(self, parent, node, name=None, offset=0):
         super().__init__(parent, node)
 
-        self.name = pysvd.parser.text(pysvd.node.element(node, 'name', True))
-        self.description = pysvd.parser.text(pysvd.node.element(node, 'description'))
-        self.dim_name = pysvd.parser.text(pysvd.node.element(node, 'dimName'))
+        self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
+        self.description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        self.dim_name = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'))
         if name is not None:
             self.name %= (name)
             if self.description is not None:
@@ -110,10 +110,10 @@ class Dim(Derive):
         """Parse node elements with respect to dim entries and return a list with constucted elements"""
 
         for subnode in node.findall(name):
-            dim = pysvd.parser.integer(pysvd.node.element(subnode, 'dim'))
+            dim = pysvd.parser.Integer(pysvd.node.Element(subnode, 'dim'))
             if dim is not None:
-                dim_increment = pysvd.parser.integer(pysvd.node.element(subnode, 'dimIncrement', True))
-                dim_index = pysvd.parser.text(pysvd.node.element(subnode, 'dimIndex'))
+                dim_increment = pysvd.parser.Integer(pysvd.node.Element(subnode, 'dimIncrement', True))
+                dim_index = pysvd.parser.Text(pysvd.node.Element(subnode, 'dimIndex'))
                 if dim_index is not None:
                     if ',' in dim_index:
                         dim_indices = dim_index.split(',')
