@@ -52,8 +52,7 @@ class Group(Parent):
                 except:
                     parent = parent.parent
 
-        raise AttributeError("'{}' object has no attribute '{}'".
-                             format(self.__class__.__name__, attr))
+        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
 
 
 class Derive(Group):
@@ -76,9 +75,7 @@ class Derive(Group):
             for name in parts:
                 res = node.find(name)
                 if res is None:
-                    raise KeyError("Can not find path element '{}' of path \
-                                   '{}' in node '{}'".format(
-                                        name, derived_from, node.name))
+                    raise KeyError("Can not find path element '{}' of path '{}' in node '{}'".format(name, derived_from, node.name))
                 node = res
 
             self.__dict__ = dict(node.__dict__)

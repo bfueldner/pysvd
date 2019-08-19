@@ -1,5 +1,4 @@
-# import re
-
+import re
 import pysvd
 
 
@@ -188,15 +187,71 @@ class Interrupt(pysvd.classes.Parent):
         attr['value'] = pysvd.parser.Integer(pysvd.node.Element(node, 'value', True))
         self.add_attributes(attr)
 
+# /device/peripherals/peripheral/registers element
 
-x = '''
 # /device/peripherals/registers
 
-class write_constraint(svd.classes.parent):
+
+class Registers(pysvd.classes.Parent):
+    """All registers of a peripheral are enclosed between the <registers> opening and closing tags. Clusters define a
+    set of registers. You can either use the <cluster> or the <register> element.
+    """
+
+    def __init__(self, parent, node):
+        super().__init__(parent, node)
+
+        self.register = []
+        Register.add_elements(self, self.register, node, 'register')
+
+        if len(self.register) < 1:
+            raise SyntaxError("At least one element of 'register' is mandatory in 'registers'")
+
+
+class Cluster(pysvd.classes.Dim):
+
+    def __init__(self, parent, node):
+        super().__init__(parent, node)
+
+
+class Register(pysvd.classes.Dim):
+
+    def __init__(self, parent, node):
+        super().__init__(parent, node)
+
+        attr = {}
+        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
+        attr['display_name'] = pysvd.parser.Text(pysvd.node.Element(node, 'displayName'))
+        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        attr['alternate_group'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateGroup'))
+        attr['alternate_register'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateRegister'))
+        attr['address_offset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset', True))
+
+        attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'))
+        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'))
+        attr['protection'] = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Element(node, 'protection'))
+        attr['reset_value'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetValue'))
+        attr['reset_mask'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetMask'))
+
+        attr['data_type'] = pysvd.parser.Enum(pysvd.type.dataType, pysvd.node.Element(node, 'dataType'))
+        attr['modified_write_values'] = pysvd.parser.Enum(
+            pysvd.type.modifiedWriteValues, pysvd.node.Element(node, 'modifiedWriteValues'), pysvd.type.modifiedWriteValues.modify)
+        attr['read_action'] = pysvd.parser.Enum(pysvd.type.readAction, pysvd.node.Element(node, 'readAction'))
+        self.add_attributes(attr)
+
+        write_constraint_node = node.find('./writeConstraint')
+        if write_constraint_node is not None:
+            self.write_constraint = WriteConstraint(self, write_constraint_node)
+
+        fields_node = node.find('./fields')
+        if fields_node is not None:
+            self.fields = Fields(self, fields_node)
+
+
+class WriteConstraint(pysvd.classes.Parent):
     """Define constraints for writing values to a field. You can choose between three options, which are mutualy exclusive."""
 
     def __init__(self, parent, node):
-        svd.classes.parent.__init__(self, parent, node)
+        super().__init__(parent, node)
 
         attr = {}
         write_as_read = pysvd.node.Element(node, 'writeAsRead')
@@ -221,25 +276,31 @@ class write_constraint(svd.classes.parent):
 
         self.add_attributes(attr)
 
-class fields(svd.classes.parent):
+
+class Fields(pysvd.classes.Parent):
     """Grouping element to define bit-field properties of a register."""
 
     def __init__(self, parent, node):
-    #    if not (isinstance(parent, register)):
-    #        raise TypeError("Only parent 'register' allowed")
-        svd.classes.parent.__init__(self, parent, node)
+        super().__init__(parent, node)
 
-class field(svd.classes.dim):
+        self.field = []
+        Field.add_elements(self, self.field, node, 'field')
+
+        if len(self.field) < 1:
+            raise SyntaxError("At least one element of 'field' is mandatory in 'fields'")
+
+
+class Field(pysvd.classes.Dim):
     """All fields of a register are enclosed between the <fields> opening and closing tags."""
 
     attributes = ['access']
 
-    def __init__(self, parent, node, name = None, offset = 0):
-        svd.classes.dim.__init__(self, parent, node, name, offset)
+    def __init__(self, parent, node, name=None, offset=0):
+        super().__init__(parent, node, name, offset)
 
         attr = {}
-    #    attr['name'] = pysvd.parser.Text(svd.node.elememnt(node, 'name', True))
-    #    attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
+        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
 
         # bitRangeOffsetWidthStyle
         bit_offset = pysvd.parser.Integer(pysvd.node.Element(node, 'bitOffset'))
@@ -266,21 +327,19 @@ class field(svd.classes.dim):
         attr['bit_offset'] = bit_offset
         attr['bit_width'] = bit_width
 
-        attr['access'] = pysvd.parser.Enum(svd.type.access, pysvd.node.Element(node, 'access'))
-        attr['modified_write_values'] = pysvd.parser.Enum(svd.type.modified_write_values, pysvd.node.Element(node, 'modifiedWriteValues'))
-        attr['read_action'] = pysvd.parser.Enum(svd.type.read_action, pysvd.node.Element(node, 'readAction'))
+        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'))
+        attr['modified_write_values'] = pysvd.parser.Enum(
+            pysvd.type.modifiedWriteValues, pysvd.node.Element(node, 'modifiedWriteValues'), pysvd.type.modifiedWriteValues.modify)
+        attr['read_action'] = pysvd.parser.Enum(pysvd.type.readAction, pysvd.node.Element(node, 'readAction'))
         self.add_attributes(attr)
-
-    #    self.write_constraint_node = write_constraint.add_elements(self, write_constraint_node)
 
         write_constraint_node = node.find('./writeConstraint')
         if write_constraint_node is not None:
-            self.write_constraint = write_constraint(self, write_constraint_node)
+            self.write_constraint = WriteConstraint(self, write_constraint_node)
 
         enumerated_values_node = node.find('./enumerated_values')
         if enumerated_values_node is not None:
-            self.enumerated_values = enumerated_values(self, enumerated_values_node)
-'''
+            self.enumerated_values = EnumeratedValues(self, enumerated_values_node)
 
 
 class EnumeratedValues(pysvd.classes.Parent):

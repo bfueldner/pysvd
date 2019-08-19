@@ -48,7 +48,7 @@ class endian(Enum):
     other = 'other'
 
 
-class dateType(Enum):
+class dataType(Enum):
     """Pre-defines the tokens in line with CMSIS data type definitions"""
 
     uint8_t = 'uint8_t'
