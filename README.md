@@ -7,3 +7,7 @@
 # pysvd
 
 Python System View Description format parser.
+
+## Conformance
+
+This parser is build to reflect 1:1 the XSD format behind SVD. The only compromis has been made by the nodes 'peripherals', 'registers' and 'fields' that are simple list of the equivalent objects.

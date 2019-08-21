@@ -72,6 +72,8 @@ class Derive(Group):
                 node = node.parent
                 count -= 1
 
+            print("Derive", node, derived_from)
+
             for name in parts:
                 res = node.find(name)
                 if res is None:
@@ -93,14 +95,17 @@ class Dim(Derive):
 
         self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         self.description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
-        self.dim_name = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'))
+        self.dim_name = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
+
+        # Replace %s with name if not None
         if name is not None:
-            self.name %= (name)
+            name = str(name)
+            self.name = self.name.replace('%s', name)
             if self.description is not None:
-                self.description %= (name)
+                self.description = self.description.replace('%s', name)
 
             if self.dim_name is not None:
-                self.dim_name %= (name)
+                self.dim_name = self.dim_name.replace('%s', name)
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
@@ -126,7 +131,9 @@ class Dim(Derive):
                     dim_indices = [dim]
 
                 offset = 0
+                print(dim_indices)
                 for index in dim_indices:
+                    print("Dim ctor", cls, index, offset)
                     elements.append(cls(parent, subnode, index, offset))
                     offset += dim_increment
             else:

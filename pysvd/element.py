@@ -45,12 +45,22 @@ class Device(pysvd.classes.Base):
         if cpu is not None:
             self.cpu = pysvd.element.Cpu(self, cpu)
 
-        peripherals = node.find('peripherals')
-        if peripherals is None:
+        peripherals_node = node.find('./peripherals')
+        if peripherals_node is None:
             raise SyntaxError("No element 'peripherals' found in 'device'")
 
         self.peripheral = []
-        # Peripheral.add_elements(self, self.peripheral, peripherals, 'peripheral')
+        Peripheral.add_elements(self, self.peripheral, peripherals_node, 'peripheral')
+
+        if len(self.peripheral) < 1:
+            raise SyntaxError("At least one element of 'peripheral' is mandatory in 'peripherals'")
+
+    def find(self, name):
+        """Find peripheral by name."""
+        for peripheral in self.peripheral:
+            if peripheral.name == name:
+                return peripheral
+        return None
 
 
 # /device/cpu
@@ -81,9 +91,9 @@ class Cpu(pysvd.classes.Parent):
         attr['sau_num_regions'] = pysvd.parser.Integer(pysvd.node.Element(node, 'sauNumRegions'))
         self.add_attributes(attr)
 
-        child = node.find('sauRegionsConfig')
-        if child is not None:
-            self.sau_regions_config = SauRegionConfig(self, child)
+        sau_regions_config_node = node.find('sauRegionsConfig')
+        if sau_regions_config_node is not None:
+            self.sau_regions_config = SauRegionConfig(self, sau_regions_config_node)
 
 
 class SauRegionConfig(pysvd.classes.Group):
@@ -100,8 +110,8 @@ class SauRegionConfig(pysvd.classes.Group):
         self.add_attributes(attr)
 
         self.region = []
-        for child in node.findall('region'):
-            self.region.append(SauRegionsConfigRegion(self, child))
+        for sau_regions_config_region_node in node.findall('region'):
+            self.region.append(SauRegionsConfigRegion(self, sau_regions_config_region_node))
 
 
 class SauRegionsConfigRegion(pysvd.classes.Parent):
@@ -120,30 +130,19 @@ class SauRegionsConfigRegion(pysvd.classes.Parent):
         self.add_attributes(attr)
 
 
-x = '''
 # /device/peripherals
-
-class peripherals(svd.classes.parent):
+class Peripherals(pysvd.classes.Parent):
     """All peripherals of a device are enclosed within the tag <peripherals>."""
 
     def __init__(self, parent, node):
-        if parent is not None and not isinstance(parent, device):
-            raise TypeError("Only parent 'device' allowed")
-        svd.classes.parent.__init__(self, parent, node)
+        super().__init__(parent, node)
 
-        self.peripheral = []
-        peripheral.add_elements(self, self.peripheral, node, 'peripheral')
 
-        if len(self.peripheral) < 1:
-            raise SyntaxError("At least one element of 'peripheral' is mandatory in 'peripherals'")
-
-class peripheral(pysvd.classes.dim):
+class Peripheral(pysvd.classes.Dim):
     """At least one peripheral has to be defined."""
 
-    def __init__(self, parent, node, name = None, offset = 0):
-        if parent is not None and not isinstance(parent, device):
-            raise TypeError("Only parent 'device' allowed")
-        svd.classes.dim.__init__(self, parent, node, name, offset)
+    def __init__(self, parent, node, name=None, offset=0):
+        super().__init__(parent, node, name, offset)
 
         attr = {}
         attr['version'] = pysvd.parser.Text(pysvd.node.Element(node, 'version'))
@@ -154,9 +153,32 @@ class peripheral(pysvd.classes.dim):
         attr['header_struct_name'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerStructName'))
         attr['disable_condition'] = pysvd.parser.Text(pysvd.node.Element(node, 'disableCondition'))
         attr['base_address'] = pysvd.parser.Integer(pysvd.node.Element(node, 'baseAddress', True))
-
         self.add_attributes(attr)
-'''
+
+        address_block_node = node.find('./addressBlock')
+        if address_block_node is not None:
+            self.address_block = AddressBlock(self, address_block_node)
+
+        interrupt_node = node.find('./interrupt')
+        if interrupt_node is not None:
+            self.interrupt = Interrupt(self, interrupt_node)
+
+        self.register = []
+        self.cluster = []
+        registers_node = node.find('./registers')
+        if registers_node is not None:
+            Register.add_elements(self, self.register, registers_node, 'register')
+            Cluster.add_elements(self, self.cluster, registers_node, 'cluster')
+
+            if len(self.register) < 1:
+                raise SyntaxError("At least one element of 'register' is mandatory in 'registers'")
+
+    def find(self, name):
+        """Find register by name."""
+        for register in self.register:
+            if register.name == name:
+                return register
+        return None
 
 
 class AddressBlock(pysvd.classes.Group):
@@ -200,23 +222,17 @@ class Registers(pysvd.classes.Parent):
     def __init__(self, parent, node):
         super().__init__(parent, node)
 
-        self.register = []
-        Register.add_elements(self, self.register, node, 'register')
-
-        if len(self.register) < 1:
-            raise SyntaxError("At least one element of 'register' is mandatory in 'registers'")
-
 
 class Cluster(pysvd.classes.Dim):
 
-    def __init__(self, parent, node):
-        super().__init__(parent, node)
+    def __init__(self, parent, node, name=None, offset=0):
+        super().__init__(parent, node, name, offset)
 
 
 class Register(pysvd.classes.Dim):
 
-    def __init__(self, parent, node):
-        super().__init__(parent, node)
+    def __init__(self, parent, node, name=None, offset=0):
+        super().__init__(parent, node, name, offset)
 
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
@@ -242,9 +258,20 @@ class Register(pysvd.classes.Dim):
         if write_constraint_node is not None:
             self.write_constraint = WriteConstraint(self, write_constraint_node)
 
+        self.field = []
         fields_node = node.find('./fields')
         if fields_node is not None:
-            self.fields = Fields(self, fields_node)
+            Field.add_elements(self, self.field, fields_node, 'field')
+
+            if len(self.field) < 1:
+                raise SyntaxError("At least one element of 'field' is mandatory in 'fields'")
+
+    def find(self, name):
+        """Find field by name."""
+        for field in self.field:
+            if field.name == name:
+                return field
+        return None
 
 
 class WriteConstraint(pysvd.classes.Parent):
@@ -282,12 +309,6 @@ class Fields(pysvd.classes.Parent):
 
     def __init__(self, parent, node):
         super().__init__(parent, node)
-
-        self.field = []
-        Field.add_elements(self, self.field, node, 'field')
-
-        if len(self.field) < 1:
-            raise SyntaxError("At least one element of 'field' is mandatory in 'fields'")
 
 
 class Field(pysvd.classes.Dim):
@@ -361,7 +382,7 @@ class EnumeratedValues(pysvd.classes.Parent):
         for child in node.findall('./enumeratedValue'):
             self.enumerated_value.append(EnumeratedValue(self, child))
 
-        if len(self.enumerated_value) == 0:
+        if len(self.enumerated_value) < 1:
             raise SyntaxError("At least one element of enumeratedValue is needed in enumeratedValues '{}'".format(attr['name']))
 
 

@@ -42,7 +42,22 @@ class TestElementDevice(unittest.TestCase):
             <resetValue>0</resetValue>
             <resetMask>0xffffffff</resetMask>
             <peripherals>
-
+                <peripheral>
+                    <name>Timer1</name>
+                    <version>1.0</version>
+                    <description>Timer 1 is a standard timer ... </description>
+                    <baseAddress>0x40002000</baseAddress>
+                    <addressBlock>
+                        <offset>0x0</offset>
+                        <size>0x400</size>
+                        <usage>registers</usage>
+                        <protection>s</protection>
+                    </addressBlock>
+                    <interrupt>
+                        <name>TIM0_INT</name>
+                        <value>34</value>
+                    </interrupt>
+                </peripheral>
             </peripherals>
         </device>'''
         node = ET.fromstring(xml)
@@ -66,7 +81,7 @@ class TestElementDevice(unittest.TestCase):
         self.assertEqual(test.reset_value, 0)
         self.assertEqual(test.reset_mask, 0xffffffff)
 
-        self.assertEqual(len(test.peripheral), 0)
+        self.assertEqual(len(test.peripheral), 1)
 
 
 class TestElementCpu(unittest.TestCase):
@@ -199,20 +214,56 @@ class TestElementPeripherals(unittest.TestCase):
 
     def test_attributes(self):
         xml = '''
-        <region enabled="false" name="SAU2">
-            <base>0x10006000</base>
-            <limit>0x10008000</limit>
-            <access>c</access>
-        </region>'''
+        <peripherals>
+            <peripheral>
+                <name>Timer1</name>
+                <version>1.0</version>
+                <description>Timer 1 is a standard timer ... </description>
+                <baseAddress>0x40002000</baseAddress>
+                <addressBlock>
+                    <offset>0x0</offset>
+                    <size>0x400</size>
+                    <usage>registers</usage>
+                    <protection>s</protection>
+                </addressBlock>
+                <interrupt>
+                    <name>TIM0_INT</name>
+                    <value>34</value>
+                </interrupt>
+            </peripheral>
+            <peripheral>
+                <name>Timer1_Alt</name>
+                <version>1.0</version>
+                <description>Alternate Timer 1 is a special timer execution mode ... </description>
+                <baseAddress>0x40002000</baseAddress>
+                <alternatePeripheral>Timer1</alternatePeripheral>
+
+            </peripheral>
+        </peripherals>'''
         node = ET.fromstring(xml)
         test = pysvd.element.Peripherals(None, node)
 
-        self.assertEqual(test.base, 0x10006000)
-        self.assertEqual(test.limit, 0x10008000)
-        self.assertEqual(test.access, pysvd.type.sauAccess.non_secure_callable_secure)
+        self.assertEqual(len(test.peripheral), 2)
 
-        self.assertEqual(test.name, "SAU2")
-        self.assertFalse(test.enabled)
+        self.assertEqual(test.peripheral[0].name, "Timer1")
+        self.assertEqual(test.peripheral[0].version, "1.0")
+        self.assertEqual(test.peripheral[0].description, "Timer 1 is a standard timer ...")
+        self.assertEqual(test.peripheral[0].base_address, 0x40002000)
+
+        self.assertEqual(test.peripheral[0].address_block.offset, 0)
+        self.assertEqual(test.peripheral[0].address_block.size, 0x400)
+        self.assertEqual(test.peripheral[0].address_block.usage, pysvd.type.usage.registers)
+        self.assertEqual(test.peripheral[0].address_block.protection, pysvd.type.protection.secure)
+
+        self.assertEqual(test.peripheral[0].interrupt.name, "TIM0_INT")
+        self.assertEqual(test.peripheral[0].interrupt.value, 34)
+
+        self.assertEqual(test.peripheral[1].name, "Timer1_Alt")
+        self.assertEqual(test.peripheral[1].version, "1.0")
+        self.assertEqual(test.peripheral[1].description, "Alternate Timer 1 is a special timer execution mode ...")
+        self.assertEqual(test.peripheral[1].base_address, 0x40002000)
+        self.assertEqual(test.peripheral[1].alternate_peripheral, "Timer1")
+"""
 
 
 class TestElementPeripheral(unittest.TestCase):
@@ -225,21 +276,71 @@ class TestElementPeripheral(unittest.TestCase):
 
     def test_attributes(self):
         xml = '''
-        <region enabled="false" name="SAU2">
-            <base>0x10006000</base>
-            <limit>0x10008000</limit>
-            <access>c</access>
-        </region>'''
+        <peripheral>
+            <name>Timer1</name>
+            <version>1.0</version>
+            <description>Timer 1 is a standard timer ... </description>
+            <baseAddress>0x40002000</baseAddress>
+            <addressBlock>
+                <offset>0x0</offset>
+                <size>0x400</size>
+                <usage>registers</usage>
+                <protection>s</protection>
+            </addressBlock>
+            <interrupt>
+                <name>TIM0_INT</name>
+                <value>34</value>
+            </interrupt>
+            <registers>
+                <register>
+                    <name>TimerCtrl0</name>
+                    <description>Timer Control Register</description>
+                    <addressOffset>0x0</addressOffset>
+                    <access>read-write</access>
+                    <resetValue>0x00008001</resetValue>
+                    <resetMask>0x0000ffff</resetMask>
+                    <size>32</size>
+                </register>
+                <register derivedFrom="TimerCtrl0">
+                    <name>TimerCtrl1</name>
+                    <description>Derived Timer</description>
+                    <addressOffset>0x4</addressOffset>
+                </register>
+            </registers>
+        </peripheral>'''
         node = ET.fromstring(xml)
         test = pysvd.element.Peripheral(None, node)
 
-        self.assertEqual(test.base, 0x10006000)
-        self.assertEqual(test.limit, 0x10008000)
-        self.assertEqual(test.access, pysvd.type.sauAccess.non_secure_callable_secure)
+        self.assertEqual(test.name, "Timer1")
+        self.assertEqual(test.version, "1.0")
+        self.assertEqual(test.description, "Timer 1 is a standard timer ...")
+        self.assertEqual(test.base_address, 0x40002000)
 
-        self.assertEqual(test.name, "SAU2")
-        self.assertFalse(test.enabled)
-"""
+        self.assertEqual(test.address_block.offset, 0)
+        self.assertEqual(test.address_block.size, 0x400)
+        self.assertEqual(test.address_block.usage, pysvd.type.usage.registers)
+        self.assertEqual(test.address_block.protection, pysvd.type.protection.secure)
+
+        self.assertEqual(test.interrupt.name, "TIM0_INT")
+        self.assertEqual(test.interrupt.value, 34)
+
+        self.assertEqual(len(test.register), 2)
+
+        self.assertEqual(test.register[0].name, "TimerCtrl0")
+        self.assertEqual(test.register[0].description, "Timer Control Register")
+        self.assertEqual(test.register[0].address_offset, 0)
+        self.assertEqual(test.register[0].access, pysvd.type.access.read_write)
+        self.assertEqual(test.register[0].reset_value, 0x00008001)
+        self.assertEqual(test.register[0].reset_mask, 0x0000ffff)
+        self.assertEqual(test.register[0].size, 32)
+
+        self.assertEqual(test.register[1].name, "TimerCtrl1")
+        self.assertEqual(test.register[1].description, "Derived Timer")
+        self.assertEqual(test.register[1].address_offset, 4)
+        self.assertEqual(test.register[1].access, pysvd.type.access.read_write)
+        self.assertEqual(test.register[1].reset_value, 0x00008001)
+        self.assertEqual(test.register[1].reset_mask, 0x0000ffff)
+        self.assertEqual(test.register[1].size, 32)
 
 
 class TestElementAddressBlock(unittest.TestCase):
@@ -292,6 +393,7 @@ class TestElementInterrupt(unittest.TestCase):
         self.assertEqual(test.value, 34)
 
 
+x = """
 class TestElementRegisters(unittest.TestCase):
 
     def test_exception(self):
@@ -299,6 +401,7 @@ class TestElementRegisters(unittest.TestCase):
         node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
             pysvd.element.Registers(None, node)
+"""
 
 
 class TestElementCluster(unittest.TestCase):
@@ -399,6 +502,7 @@ class TestElementWriteConstraint(unittest.TestCase):
         self.assertEqual(test.range_maximum, 4)
 
 
+x = """
 class TestElementFields(unittest.TestCase):
 
     def test_exception(self):
@@ -467,6 +571,7 @@ class TestElementFields(unittest.TestCase):
 
     def test_derived(self):
         pass
+"""
 
 
 class TestElementField(unittest.TestCase):
