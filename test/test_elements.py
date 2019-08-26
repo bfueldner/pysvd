@@ -63,23 +63,23 @@ class TestElementDevice(unittest.TestCase):
         node = ET.fromstring(xml)
         test = pysvd.element.Device(node)
 
-        self.assertEqual(test.schema_version, '1.3')
+        self.assertEqual(test.schemaVersion, '1.3')
 
         self.assertEqual(test.vendor, 'ARM Ltd.')
-        self.assertEqual(test.vendor_id, 'ARM')
+        self.assertEqual(test.vendorID, 'ARM')
         self.assertEqual(test.name, 'ARM_Cortex_M4')
         self.assertEqual(test.series, 'ARMCM4')
         self.assertEqual(test.version, '0.1')
         self.assertEqual(test.description, 'Arm Cortex-M4 based Microcontroller demonstration device')
-        self.assertEqual(test.header_system_filename, 'system_ARMCM4')
-        self.assertEqual(test.header_definitions_prefix, 'ARM_')
-        self.assertEqual(test.address_unit_bits, 8)
+        self.assertEqual(test.headerSystemFilename, 'system_ARMCM4')
+        self.assertEqual(test.headerDefinitionsPrefix, 'ARM_')
+        self.assertEqual(test.addressUnitBits, 8)
         self.assertEqual(test.width, 32)
 
         self.assertEqual(test.size, 32)
         self.assertEqual(test.access, pysvd.type.access.read_write)
-        self.assertEqual(test.reset_value, 0)
-        self.assertEqual(test.reset_mask, 0xffffffff)
+        self.assertEqual(test.resetValue, 0)
+        self.assertEqual(test.resetMask, 0xffffffff)
 
         self.assertEqual(len(test.peripheral), 1)
 
@@ -120,20 +120,20 @@ class TestElementCpu(unittest.TestCase):
         self.assertEqual(test.name, pysvd.type.cpuName.CM7)
         self.assertEqual(test.revision, "r0p0")
         self.assertEqual(test.endian, pysvd.type.endian.little)
-        self.assertTrue(test.mpu_present)
-        self.assertTrue(test.fpu_present)
-        self.assertTrue(test.fpu_dp)
-        self.assertTrue(test.icache_present)
-        self.assertTrue(test.dcache_present)
-        self.assertFalse(test.itcm_present)
-        self.assertFalse(test.dtcm_present)
-        self.assertEqual(test.nvic_prio_bits, 4)
-        self.assertFalse(test.vendor_systick_config)
+        self.assertTrue(test.mpuPresent)
+        self.assertTrue(test.fpuPresent)
+        self.assertTrue(test.fpuDP)
+        self.assertTrue(test.icachePresent)
+        self.assertTrue(test.dcachePresent)
+        self.assertFalse(test.itcmPresent)
+        self.assertFalse(test.dtcmPresent)
+        self.assertEqual(test.nvicPrioBits, 4)
+        self.assertFalse(test.vendorSystickConfig)
 
-        self.assertTrue(test.vtor_present)
+        self.assertTrue(test.vtorPresent)
 
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.sau_num_regions)
+            self.assertIsNotNone(test.sauNumRegions)
 
 
 class TestElementSauRegionsConfig(unittest.TestCase):
@@ -250,10 +250,10 @@ class TestElementPeripherals(unittest.TestCase):
         self.assertEqual(test.peripheral[0].description, "Timer 1 is a standard timer ...")
         self.assertEqual(test.peripheral[0].base_address, 0x40002000)
 
-        self.assertEqual(test.peripheral[0].address_block.offset, 0)
-        self.assertEqual(test.peripheral[0].address_block.size, 0x400)
-        self.assertEqual(test.peripheral[0].address_block.usage, pysvd.type.usage.registers)
-        self.assertEqual(test.peripheral[0].address_block.protection, pysvd.type.protection.secure)
+        self.assertEqual(test.peripheral[0].addressBlock.offset, 0)
+        self.assertEqual(test.peripheral[0].addressBlock.size, 0x400)
+        self.assertEqual(test.peripheral[0].addressBlock.usage, pysvd.type.usage.registers)
+        self.assertEqual(test.peripheral[0].addressBlock.protection, pysvd.type.protection.secure)
 
         self.assertEqual(test.peripheral[0].interrupt.name, "TIM0_INT")
         self.assertEqual(test.peripheral[0].interrupt.value, 34)
@@ -314,12 +314,12 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.name, "Timer1")
         self.assertEqual(test.version, "1.0")
         self.assertEqual(test.description, "Timer 1 is a standard timer ...")
-        self.assertEqual(test.base_address, 0x40002000)
+        self.assertEqual(test.baseAddress, 0x40002000)
 
-        self.assertEqual(test.address_block.offset, 0)
-        self.assertEqual(test.address_block.size, 0x400)
-        self.assertEqual(test.address_block.usage, pysvd.type.usage.registers)
-        self.assertEqual(test.address_block.protection, pysvd.type.protection.secure)
+        self.assertEqual(test.addressBlock.offset, 0)
+        self.assertEqual(test.addressBlock.size, 0x400)
+        self.assertEqual(test.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
+        self.assertEqual(test.addressBlock.protection, pysvd.type.protection.secure)
 
         self.assertEqual(test.interrupt.name, "TIM0_INT")
         self.assertEqual(test.interrupt.value, 34)
@@ -328,18 +328,18 @@ class TestElementPeripheral(unittest.TestCase):
 
         self.assertEqual(test.register[0].name, "TimerCtrl0")
         self.assertEqual(test.register[0].description, "Timer Control Register")
-        self.assertEqual(test.register[0].address_offset, 0)
+        self.assertEqual(test.register[0].addressOffset, 0)
         self.assertEqual(test.register[0].access, pysvd.type.access.read_write)
-        self.assertEqual(test.register[0].reset_value, 0x00008001)
-        self.assertEqual(test.register[0].reset_mask, 0x0000ffff)
+        self.assertEqual(test.register[0].resetValue, 0x00008001)
+        self.assertEqual(test.register[0].resetMask, 0x0000ffff)
         self.assertEqual(test.register[0].size, 32)
 
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
-        self.assertEqual(test.register[1].address_offset, 4)
+        self.assertEqual(test.register[1].addressOffset, 4)
         self.assertEqual(test.register[1].access, pysvd.type.access.read_write)
-        self.assertEqual(test.register[1].reset_value, 0x00008001)
-        self.assertEqual(test.register[1].reset_mask, 0x0000ffff)
+        self.assertEqual(test.register[1].resetValue, 0x00008001)
+        self.assertEqual(test.register[1].resetMask, 0x0000ffff)
         self.assertEqual(test.register[1].size, 32)
 
 
@@ -365,7 +365,7 @@ class TestElementAddressBlock(unittest.TestCase):
 
         self.assertEqual(test.offset, 0)
         self.assertEqual(test.size, 0x400)
-        self.assertEqual(test.usage, pysvd.type.usage.registers)
+        self.assertEqual(test.usage, pysvd.type.addressBlockUsage.registers)
         self.assertEqual(test.protection, pysvd.type.protection.secure)
 
 
@@ -440,14 +440,14 @@ class TestElementRegister(unittest.TestCase):
 
         self.assertEqual(test.name, "TimerCtrl0")
         self.assertEqual(test.description, "Timer Control Register")
-        self.assertEqual(test.address_offset, 0)
+        self.assertEqual(test.addressOffset, 0)
         self.assertEqual(test.access, pysvd.type.access.read_write)
-        self.assertEqual(test.reset_value, 0x00008001)
-        self.assertEqual(test.reset_mask, 0x0000ffff)
+        self.assertEqual(test.resetValue, 0x00008001)
+        self.assertEqual(test.resetMask, 0x0000ffff)
         self.assertEqual(test.size, 32)
 
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.write_constraint)
+            self.assertIsNotNone(test.writeConstraint)
 
         with self.assertRaises(AttributeError):
             self.assertIsNotNone(test.fields)
@@ -461,7 +461,7 @@ class TestElementWriteConstraint(unittest.TestCase):
         with self.assertRaises(SyntaxError):
             pysvd.element.WriteConstraint(None, node)
 
-    def test_write_as_read(self):
+    def test_writeAsRead(self):
         xml = '''
         <writeConstraint>
             <writeAsRead>true</writeAsRead>
@@ -471,9 +471,9 @@ class TestElementWriteConstraint(unittest.TestCase):
         node = ET.fromstring(xml)
         test = pysvd.element.WriteConstraint(None, node)
 
-        self.assertTrue(test.write_as_read)
+        self.assertTrue(test.writeAsRead)
 
-    def test_use_enumerated_values(self):
+    def test_useEnumeratedValues(self):
         xml = '''
         <writeConstraint>
             <useEnumeratedValues>true</useEnumeratedValues>
@@ -483,7 +483,7 @@ class TestElementWriteConstraint(unittest.TestCase):
         node = ET.fromstring(xml)
         test = pysvd.element.WriteConstraint(None, node)
 
-        self.assertTrue(test.use_enumerated_values)
+        self.assertTrue(test.useEnumeratedValues)
 
     def test_range(self):
         xml = '''
@@ -498,8 +498,8 @@ class TestElementWriteConstraint(unittest.TestCase):
         node = ET.fromstring(xml)
         test = pysvd.element.WriteConstraint(None, node)
 
-        self.assertEqual(test.range_minimum, 2)
-        self.assertEqual(test.range_maximum, 4)
+        self.assertEqual(test.rangeMinimum, 2)
+        self.assertEqual(test.rangeMaximum, 4)
 
 
 x = """
@@ -545,29 +545,29 @@ class TestElementFields(unittest.TestCase):
 
         self.assertEqual(test.field[0].name, "TimerCtrl0_IntSel")
         self.assertEqual(test.field[0].description, "Select interrupt line that is triggered by timer overflow.")
-        self.assertEqual(test.field[0].bit_offset, 1)
-        self.assertEqual(test.field[0].bit_width, 3)
+        self.assertEqual(test.field[0].bitOffset, 1)
+        self.assertEqual(test.field[0].bitWidth, 3)
         self.assertEqual(test.field[0].access, pysvd.type.access.read_write)
-        self.assertEqual(test.field[0].modified_write_values, pysvd.type.modifiedWriteValues.oneToSet)
-        self.assertEqual(test.field[0].read_action, pysvd.type.readAction.clear)
-        self.assertIsNotNone(test.field[0].write_constraint)
-        self.assertEqual(test.field[0].write_constraint.range_minimum, 0)
-        self.assertEqual(test.field[0].write_constraint.range_maximum, 5)
+        self.assertEqual(test.field[0].modifiedWriteValues, pysvd.type.modifiedWriteValues.oneToSet)
+        self.assertEqual(test.field[0].readAction, pysvd.type.readAction.clear)
+        self.assertIsNotNone(test.field[0].writeConstraint)
+        self.assertEqual(test.field[0].writeConstraint.rangeMinimum, 0)
+        self.assertEqual(test.field[0].writeConstraint.rangeMaximum, 5)
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[0].enumerated_value)
+            self.assertIsNotNone(test.field[0].enumeratedValue)
 
         self.assertEqual(test.field[1].name, "BIT1")
         self.assertEqual(test.field[1].description, "test")
-        self.assertEqual(test.field[1].bit_offset, 0)
-        self.assertEqual(test.field[1].bit_width, 8)
+        self.assertEqual(test.field[1].bitOffset, 0)
+        self.assertEqual(test.field[1].bitWidth, 8)
         self.assertEqual(test.field[1].access, pysvd.type.access.read_write)
-        self.assertEqual(test.field[1].modified_write_values, pysvd.type.modifiedWriteValues.modify)
+        self.assertEqual(test.field[1].modifiedWriteValues, pysvd.type.modifiedWriteValues.modify)
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[1].read_action)
+            self.assertIsNotNone(test.field[1].readAction)
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[1].write_constraint)
+            self.assertIsNotNone(test.field[1].writeConstraint)
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[1].enumerated_value)
+            self.assertIsNotNone(test.field[1].enumeratedValue)
 
     def test_derived(self):
         pass
@@ -593,8 +593,8 @@ class TestElementField(unittest.TestCase):
         test = pysvd.element.Field(None, node)
 
         self.assertEqual(test.name, "BIT1")
-        self.assertEqual(test.bit_offset, 4)
-        self.assertEqual(test.bit_width, 1)
+        self.assertEqual(test.bitOffset, 4)
+        self.assertEqual(test.bitWidth, 1)
 
     def test_bit_range_offset_width(self):
         xml = '''
@@ -608,8 +608,8 @@ class TestElementField(unittest.TestCase):
         test = pysvd.element.Field(None, node)
 
         self.assertEqual(test.name, "BIT1")
-        self.assertEqual(test.bit_offset, 5)
-        self.assertEqual(test.bit_width, 3)
+        self.assertEqual(test.bitOffset, 5)
+        self.assertEqual(test.bitWidth, 3)
 
     def test_bit_range_lsb_msb(self):
         xml = '''
@@ -623,8 +623,8 @@ class TestElementField(unittest.TestCase):
         test = pysvd.element.Field(None, node)
 
         self.assertEqual(test.name, "BIT1")
-        self.assertEqual(test.bit_offset, 16)
-        self.assertEqual(test.bit_width, 16)
+        self.assertEqual(test.bitOffset, 16)
+        self.assertEqual(test.bitWidth, 16)
 
     def test_bit_range_pattern(self):
         xml = '''
@@ -637,8 +637,8 @@ class TestElementField(unittest.TestCase):
         test = pysvd.element.Field(None, node)
 
         self.assertEqual(test.name, "BIT1")
-        self.assertEqual(test.bit_offset, 4)
-        self.assertEqual(test.bit_width, 4)
+        self.assertEqual(test.bitOffset, 4)
+        self.assertEqual(test.bitWidth, 4)
 
     def test_attributes(self):
         xml = '''
@@ -663,19 +663,19 @@ class TestElementField(unittest.TestCase):
 
         self.assertEqual(test.name, "TimerCtrl0_IntSel")
         self.assertEqual(test.description, "Select interrupt line that is triggered by timer overflow.")
-        self.assertEqual(test.bit_offset, 1)
-        self.assertEqual(test.bit_width, 3)
+        self.assertEqual(test.bitOffset, 1)
+        self.assertEqual(test.bitWidth, 3)
 
         self.assertEqual(test.access, pysvd.type.access.read_write)
-        self.assertEqual(test.modified_write_values, pysvd.type.modifiedWriteValues.oneToSet)
-        self.assertEqual(test.read_action, pysvd.type.readAction.clear)
+        self.assertEqual(test.modifiedWriteValues, pysvd.type.modifiedWriteValues.oneToSet)
+        self.assertEqual(test.readAction, pysvd.type.readAction.clear)
 
-        self.assertIsNotNone(test.write_constraint)
-        self.assertEqual(test.write_constraint.range_minimum, 0)
-        self.assertEqual(test.write_constraint.range_maximum, 5)
+        self.assertIsNotNone(test.writeConstraint)
+        self.assertEqual(test.writeConstraint.rangeMinimum, 0)
+        self.assertEqual(test.writeConstraint.rangeMaximum, 5)
 
         with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.enumerated_value)
+            self.assertIsNotNone(test.enumeratedValue)
 
     def test_derived(self):
         pass
@@ -701,9 +701,9 @@ class TestElementEnumberatedValues(unittest.TestCase):
         test = pysvd.element.EnumeratedValues(None, node)
 
         self.assertEqual(test.usage, pysvd.type.enumUsage.read_write)
-        self.assertEqual(len(test.enumerated_value), 1)
+        self.assertEqual(len(test.enumeratedValue), 1)
 
-        self.assertEqual(test.enumerated_value[0].value, 0)
+        self.assertEqual(test.enumeratedValue[0].value, 0)
 
     def test_attributes(self):
         xml = '''
@@ -732,21 +732,21 @@ class TestElementEnumberatedValues(unittest.TestCase):
         test = pysvd.element.EnumeratedValues(None, node)
 
         self.assertEqual(test.name, "TimerIntSelect")
-        self.assertEqual(test.header_enum_name, "TimerIntSelectEnum")
+        self.assertEqual(test.headerEnumName, "TimerIntSelectEnum")
         self.assertEqual(test.usage, pysvd.type.enumUsage.read_write)
-        self.assertEqual(len(test.enumerated_value), 3)
+        self.assertEqual(len(test.enumeratedValue), 3)
 
-        self.assertEqual(test.enumerated_value[0].name, "disabled")
-        self.assertEqual(test.enumerated_value[0].description, "The clock source clk0 is turned off.")
-        self.assertEqual(test.enumerated_value[0].value, 0)
+        self.assertEqual(test.enumeratedValue[0].name, "disabled")
+        self.assertEqual(test.enumeratedValue[0].description, "The clock source clk0 is turned off.")
+        self.assertEqual(test.enumeratedValue[0].value, 0)
 
-        self.assertEqual(test.enumerated_value[1].name, "enabled")
-        self.assertEqual(test.enumerated_value[1].description, "The clock source clk1 is running.")
-        self.assertEqual(test.enumerated_value[1].value, 1)
+        self.assertEqual(test.enumeratedValue[1].name, "enabled")
+        self.assertEqual(test.enumeratedValue[1].description, "The clock source clk1 is running.")
+        self.assertEqual(test.enumeratedValue[1].value, 1)
 
-        self.assertEqual(test.enumerated_value[2].name, "reserved")
-        self.assertEqual(test.enumerated_value[2].description, "Reserved values. Do not use.")
-        self.assertTrue(test.enumerated_value[2].is_default)
+        self.assertEqual(test.enumeratedValue[2].name, "reserved")
+        self.assertEqual(test.enumeratedValue[2].description, "Reserved values. Do not use.")
+        self.assertTrue(test.enumeratedValue[2].isDefault)
 
     def test_derived(self):
         pass
@@ -787,9 +787,9 @@ class TestElementEnumberatedValue(unittest.TestCase):
         self.assertEqual(test.value, 0)
 
         with self.assertRaises(AttributeError):
-            self.assertIsNone(test.is_default)
+            self.assertIsNone(test.isDefault)
 
-    def test_attributes_is_default(self):
+    def test_attributes_isDefault(self):
         xml = '''
         <enumeratedValue>
             <name>reserved</name>
@@ -802,7 +802,7 @@ class TestElementEnumberatedValue(unittest.TestCase):
 
         self.assertEqual(test.name, "reserved")
         self.assertEqual(test.description, "Reserved values. Do not use.")
-        self.assertTrue(test.is_default)
+        self.assertTrue(test.isDefault)
 
         with self.assertRaises(AttributeError):
             self.assertIsNone(test.value)

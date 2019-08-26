@@ -162,7 +162,7 @@ class enumUsage(Enum):
     read_write = 'read-write'
 
 
-class usage(Enum):
+class addressBlockUsage(Enum):
     registers = 'registers'
     buffer = 'buffer'
     reserved = 'reserved'

@@ -36,7 +36,7 @@ class Parent(Base):
 class Group(Parent):
     """Base class for elements with registerPropertiesGroup"""
 
-    attributes = ['size', 'access', 'protection', 'reset_value', 'reset_mask']
+    attributes = ['size', 'access', 'protection', 'resetValue', 'resetMask']
 #   elements = ['device', 'peripheral', 'register', 'cluster', 'field', \
 #               'sauRegionsConfig', 'addressBlock']
 
@@ -63,24 +63,26 @@ class Derive(Group):
     def __init__(self, parent, node):
 
         # If derived, search class, copy its attributes and call base ctor
-        derived_from = pysvd.node.Attribute(node, 'derivedFrom')
-        if derived_from is not None:
-            parts = derived_from.split('.')
+        derivedFrom = pysvd.node.Attribute(node, 'derivedFrom')
+        if derivedFrom is not None:
+            parts = derivedFrom.split('.')
             count = len(parts) - 1
-            node = parent
+            object = parent
             while count:
-                node = node.parent
+                object = object.parent
                 count -= 1
 
-            print("Derive", node, derived_from)
+            if object is None:
+                raise KeyError("Can not find root element of path '{}' of parent '{}'".format(derivedFrom, parent.name))
 
             for name in parts:
-                res = node.find(name)
+                res = object.find(name)
                 if res is None:
-                    raise KeyError("Can not find path element '{}' of path '{}' in node '{}'".format(name, derived_from, node.name))
-                node = res
+                    raise KeyError("Can not find path element '{}' of path '{}' in object '{}'".format(name, derivedFrom, object.name))
+                object = res
 
-            self.__dict__ = dict(node.__dict__)
+            # TODO: Recursive copy dict!
+            self.__dict__ = dict(object.__dict__)
             self.derived = True
         else:
             self.derived = False
@@ -95,7 +97,7 @@ class Dim(Derive):
 
         self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         self.description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
-        self.dim_name = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
+        self.dimName = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
 
         # Replace %s with name if not None
         if name is not None:
@@ -104,8 +106,8 @@ class Dim(Derive):
             if self.description is not None:
                 self.description = self.description.replace('%s', name)
 
-            if self.dim_name is not None:
-                self.dim_name = self.dim_name.replace('%s', name)
+            if self.dimName is not None:
+                self.dimName = self.dimName.replace('%s', name)
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
@@ -114,27 +116,25 @@ class Dim(Derive):
         for subnode in node.findall(name):
             dim = pysvd.parser.Integer(pysvd.node.Element(subnode, 'dim'))
             if dim is not None:
-                dim_increment = pysvd.parser.Integer(pysvd.node.Element(subnode, 'dimIncrement', True))
-                dim_index = pysvd.parser.Text(pysvd.node.Element(subnode, 'dimIndex'))
-                if dim_index is not None:
-                    if ',' in dim_index:
-                        dim_indices = dim_index.split(',')
-                    elif '-' in dim_index:
-                        match = re.search('([0-9]+)\-([0-9]+)', dim_index)
-                        dim_indices = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                dimIncrement = pysvd.parser.Integer(pysvd.node.Element(subnode, 'dimIncrement', True))
+                dimIndex = pysvd.parser.Text(pysvd.node.Element(subnode, 'dimIndex'))
+                if dimIndex is not None:
+                    if ',' in dimIndex:
+                        dimIndices = dimIndex.split(',')
+                    elif '-' in dimIndex:
+                        match = re.search('([0-9]+)\-([0-9]+)', dimIndex)
+                        dimIndices = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     else:
-                        raise ValueError("Unexpected value in 'dim_index': {}".format(dim_index))
+                        raise ValueError("Unexpected value in 'dimIndex': {}".format(dimIndex))
 
-                    if len(dim_indices) != dim:
-                        raise AttributeError("'dim' size does not match elements in 'dim_index' ({} != {})".format(dim, len(dim_index)))
+                    if len(dimIndices) != dim:
+                        raise AttributeError("'dim' size does not match elements in 'dimIndex' ({} != {})".format(dim, len(dimIndex)))
                 else:
-                    dim_indices = [dim]
+                    dimIndices = [dim]
 
                 offset = 0
-                print(dim_indices)
-                for index in dim_indices:
-                    print("Dim ctor", cls, index, offset)
+                for index in dimIndices:
                     elements.append(cls(parent, subnode, index, offset))
-                    offset += dim_increment
+                    offset += dimIncrement
             else:
                 elements.append(cls(parent, subnode))

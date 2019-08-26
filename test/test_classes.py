@@ -37,7 +37,7 @@ class HelperClassDeriveRegister(pysvd.classes.Derive):
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', True))
-        attr['address_offset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset'))
+        attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset'))
         attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'))
         self.add_attributes(attr)
 
@@ -138,7 +138,7 @@ class TestClassGroup(unittest.TestCase):
         test_attr = {
             'name': 'test',
             'size': 8,
-            'reset_value': 0xFFFF,
+            'resetValue': 0xFFFF,
             'extra': 'xxx',
         }
 
@@ -160,12 +160,12 @@ class TestClassGroup(unittest.TestCase):
 
         self.assertEqual(test.name, 'test')
         self.assertEqual(test.size, 8)
-        self.assertEqual(test.reset_value, 0xFFFF)
+        self.assertEqual(test.resetValue, 0xFFFF)
         self.assertEqual(test.extra, 'xxx')
 
         self.assertEqual(child.name, 'child')
         self.assertEqual(child.size, 16)
-        self.assertEqual(child.reset_value, 0xFFFF)
+        self.assertEqual(child.resetValue, 0xFFFF)
         with self.assertRaises(AttributeError):
             self.assertIsNone(child.extra)
 
@@ -173,7 +173,7 @@ class TestClassGroup(unittest.TestCase):
         test_attr = {
             'name': 'test',
             'size': 8,
-            'reset_value': 0xFFFF,
+            'resetValue': 0xFFFF,
             'extra': 'xxx',
         }
 
@@ -203,18 +203,18 @@ class TestClassGroup(unittest.TestCase):
 
         self.assertEqual(test.name, 'test')
         self.assertEqual(test.size, 8)
-        self.assertEqual(test.reset_value, 0xFFFF)
+        self.assertEqual(test.resetValue, 0xFFFF)
         self.assertEqual(test.extra, 'xxx')
 
         self.assertEqual(child.name, 'child')
         self.assertEqual(child.size, 16)
-        self.assertEqual(child.reset_value, 0xFFFF)
+        self.assertEqual(child.resetValue, 0xFFFF)
         with self.assertRaises(AttributeError):
             self.assertIsNone(child.extra)
 
         self.assertEqual(subchild.name, 'subchild')
         self.assertEqual(subchild.size, 16)
-        self.assertEqual(subchild.reset_value, 0xFFFF)
+        self.assertEqual(subchild.resetValue, 0xFFFF)
         with self.assertRaises(AttributeError):
             self.assertIsNone(subchild.extra)
 
@@ -222,7 +222,7 @@ class TestClassGroup(unittest.TestCase):
         test_attr = {
             'name': 'test',
             'size': 8,
-            'reset_value': 0xFFFF,
+            'resetValue': 0xFFFF,
             'extra': 'xxx',
         }
 
@@ -244,7 +244,7 @@ class TestClassGroup(unittest.TestCase):
 
         self.assertEqual(test.name, 'test')
         self.assertEqual(test.size, 8)
-        self.assertEqual(test.reset_value, 0xFFFF)
+        self.assertEqual(test.resetValue, 0xFFFF)
         self.assertEqual(test.extra, 'xxx')
 
         self.assertEqual(child.name, 'child')
@@ -301,14 +301,14 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(type(test.register[0]), HelperClassDeriveRegister)
         self.assertEqual(test.register[0].name, "TimerCtrl0")
         self.assertEqual(test.register[0].description, "Timer Control Register")
-        self.assertEqual(test.register[0].address_offset, 0)
+        self.assertEqual(test.register[0].addressOffset, 0)
         self.assertEqual(test.register[0].size, 32)
         self.assertFalse(test.register[0].derived)
 
         self.assertEqual(type(test.register[1]), HelperClassDeriveRegister)
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
-        self.assertEqual(test.register[1].address_offset, 4)
+        self.assertEqual(test.register[1].addressOffset, 4)
         self.assertEqual(test.register[1].size, 32)
         self.assertTrue(test.register[1].derived)
 
@@ -348,7 +348,7 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(type(test.register[0]), HelperClassDeriveRegister)
         self.assertEqual(test.register[0].name, "TimerCtrl0")
         self.assertEqual(test.register[0].description, "Timer Control Register")
-        self.assertEqual(test.register[0].address_offset, 0)
+        self.assertEqual(test.register[0].addressOffset, 0)
         self.assertEqual(test.register[0].size, 32)
         self.assertFalse(test.register[0].derived)
 
@@ -362,7 +362,7 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(type(test.register[1]), HelperClassDeriveRegister)
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
-        self.assertEqual(test.register[1].address_offset, 4)
+        self.assertEqual(test.register[1].addressOffset, 4)
         self.assertEqual(test.register[1].size, 32)
         self.assertTrue(test.register[1].derived)
 
@@ -478,13 +478,13 @@ class TestClassDim(unittest.TestCase):
         self.assertEqual(len(test), 4)
 
         self.assertEqual(test[0].name, "IRQ3")
-        self.assertEqual(test[0].dim_name, "irq3_t")
+        self.assertEqual(test[0].dimName, "irq3_t")
         self.assertEqual(test[1].name, "IRQ4")
-        self.assertEqual(test[1].dim_name, "irq4_t")
+        self.assertEqual(test[1].dimName, "irq4_t")
         self.assertEqual(test[2].name, "IRQ5")
-        self.assertEqual(test[2].dim_name, "irq5_t")
+        self.assertEqual(test[2].dimName, "irq5_t")
         self.assertEqual(test[3].name, "IRQ6")
-        self.assertEqual(test[3].dim_name, "irq6_t")
+        self.assertEqual(test[3].dimName, "irq6_t")
 
     def test_index_exception(self):
         '''dimIndex can not be interpreted as integer'''
