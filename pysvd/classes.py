@@ -1,17 +1,32 @@
 import re
 import pysvd
 
+# Note construtors: First class specific code is executed than parent constructor
+# called, so that on last constructor of Base parser() can be called also hierachical
+# on every parent object automatically.
+
 
 class Base(object):
     """Base class for all SVD elements"""
 
     def __init__(self, node):
         self.node = node
-        self.parent = None
+        self.parent = getattr(self, 'parent', None)
+
+        self.parse(self.node)
+
+    def parse(self, node):
+        """Overwrite in derived classes to parse nodes"""
+        pass
 
     def add_attributes(self, attr):
         """Add not 'None' entries as class attributes"""
         self.__dict__.update({k: v for k, v in attr.items() if v is not None})
+
+    def find(self, name):
+        """Find child by name. Has to be overwritten by each derived class with child elements."""
+        assert not hasattr(super(), 'find')
+        return None
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
@@ -20,17 +35,14 @@ class Base(object):
         for subnode in node.findall(name):
             elements.append(cls(parent, subnode))
 
-    def find(self, name):
-        """Find child by name. Has to be overwritten by each node level."""
-        return None
-
 
 class Parent(Base):
     """Base class for parents"""
 
     def __init__(self, parent, node):
-        super().__init__(node)
         self.parent = parent
+
+        super().__init__(node)
 
 
 class Group(Parent):
@@ -61,19 +73,25 @@ class Derive(Group):
 #   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
 
     def __init__(self, parent, node):
+        super().__init__(parent, node)
 
-        # If derived, search class, copy its attributes and call base ctor
+    def parse(self, node):
+        super().parse(node)
+
+        # If derived, search class, call parse attributes of derived object and call base ctor
         derivedFrom = pysvd.node.Attribute(node, 'derivedFrom')
         if derivedFrom is not None:
             parts = derivedFrom.split('.')
             count = len(parts) - 1
-            object = parent
+            object = self.parent
+            print(count, object)
             while count:
                 object = object.parent
                 count -= 1
+                print(count, object)
 
             if object is None:
-                raise KeyError("Can not find root element of path '{}' of parent '{}'".format(derivedFrom, parent.name))
+                raise KeyError("Can not find root element of path '{}' of parent '{}'".format(derivedFrom, self.parent.name))
 
             for name in parts:
                 res = object.find(name)
@@ -81,33 +99,46 @@ class Derive(Group):
                     raise KeyError("Can not find path element '{}' of path '{}' in object '{}'".format(name, derivedFrom, object.name))
                 object = res
 
+            if object.derived:
+                raise TypeError("Can not derive from derived object '{}'".format(object.name))
+
+            if type(self) != type(object):
+                raise TypeError("Can not derive from object with othen type than '{}'".format(type(self)))
+
+            print("DeriveFrom", object.name)
             # TODO: Recursive copy dict!
-            self.__dict__ = dict(object.__dict__)
+            # self.__dict__ = dict(object.__dict__)
+            self.parse(object.node)
             self.derived = True
         else:
             self.derived = False
 
-        super().__init__(parent, node)
-
 
 class Dim(Derive):
 
-    def __init__(self, parent, node, name=None, offset=0):
+    def __init__(self, parent, node):
         super().__init__(parent, node)
+
+    def parse(self, node):
+        super().parse(node)
 
         self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         self.description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
         self.dimName = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
+        self.offset = 0
 
-        # Replace %s with name if not None
-        if name is not None:
-            name = str(name)
-            self.name = self.name.replace('%s', name)
-            if self.description is not None:
-                self.description = self.description.replace('%s', name)
+    # Replace %s with name if not None
+    def set_index(self, value):
+        value = str(value)
+        self.name = self.name.replace('%s', value)
+        if self.description is not None:
+            self.description = self.description.replace('%s', value)
 
-            if self.dimName is not None:
-                self.dimName = self.dimName.replace('%s', name)
+        if self.dimName is not None:
+            self.dimName = self.dimName.replace('%s', value)
+
+    def set_offset(self, value):
+        self.offset = value
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
@@ -134,7 +165,10 @@ class Dim(Derive):
 
                 offset = 0
                 for index in dimIndices:
-                    elements.append(cls(parent, subnode, index, offset))
+                    object = cls(parent, subnode)
+                    object.set_index(index)
+                    object.set_offset(offset)
+                    elements.append(object)
                     offset += dimIncrement
             else:
                 elements.append(cls(parent, subnode))

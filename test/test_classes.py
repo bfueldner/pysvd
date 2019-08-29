@@ -10,16 +10,23 @@ class HelperClassGroupAttributes(pysvd.classes.Group):
     attributes = ['extra']
 
     def __init__(self, parent, node):
+        print("HelperClassGroupAttributes ctor")
         super().__init__(parent, node)
 
 
 class HelperClassDeriveRoot(pysvd.classes.Base):
 
     def __init__(self, node):
-        super().__init__(node)
+        print("HelperClassDeriveRoot ctor")
 
         self.name = "root"
         self.register = []
+        super().__init__(node)
+
+    def parse(self, node):
+        print("HelperClassDeriveRoot parse")
+        super().parse(node)
+
         HelperClassDeriveRegister.add_elements(self, self.register, node, 'register')
 
     def find(self, name):
@@ -32,7 +39,14 @@ class HelperClassDeriveRoot(pysvd.classes.Base):
 class HelperClassDeriveRegister(pysvd.classes.Derive):
 
     def __init__(self, parent, node):
+        print("HelperClassDeriveRegister ctor")
+        self.field = []
+
         super().__init__(parent, node)
+
+    def parse(self, node):
+        print("HelperClassDeriveRegister parse")
+        super().parse(node)
 
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
@@ -41,7 +55,6 @@ class HelperClassDeriveRegister(pysvd.classes.Derive):
         attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'))
         self.add_attributes(attr)
 
-        self.field = []
         HelperClassDeriveField.add_elements(self, self.field, node, 'field')
 
     def find(self, name):
@@ -54,7 +67,12 @@ class HelperClassDeriveRegister(pysvd.classes.Derive):
 class HelperClassDeriveField(pysvd.classes.Derive):
 
     def __init__(self, parent, node):
+        print("HelperClassDeriveField ctor")
         super().__init__(parent, node)
+
+    def parse(self, node):
+        print("HelperClassDeriveField parse")
+        super().parse(node)
 
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
@@ -65,10 +83,15 @@ class HelperClassDeriveField(pysvd.classes.Derive):
 
 class TestClassBase(unittest.TestCase):
 
+    def test_inheritance(self):
+        self.assertTrue(issubclass(pysvd.classes.Base, object))
+
     def test_ctor(self):
         test = pysvd.classes.Base(None)
 
         self.assertEqual(type(test), pysvd.classes.Base)
+        self.assertIsNone(test.node)
+        self.assertIsNone(test.parent)
 
     def test_attributes(self):
         test = pysvd.classes.Base(None)
@@ -84,8 +107,16 @@ class TestClassBase(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertNone(test.none)
 
+    def test_find(self):
+        test = pysvd.classes.Base(None)
+
+        self.assertIsNone(test.find("test"))
+
 
 class TestClassParent(unittest.TestCase):
+
+    def test_inheritance(self):
+        self.assertTrue(issubclass(pysvd.classes.Parent, pysvd.classes.Base))
 
     def test_ctor(self):
         test = pysvd.classes.Parent(None, None)
@@ -109,8 +140,16 @@ class TestClassParent(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertNone(test.none)
 
+    def test_find(self):
+        test = pysvd.classes.Parent(None,  None)
+
+        self.assertIsNone(test.find("test"))
+
 
 class TestClassGroup(unittest.TestCase):
+
+    def test_inheritance(self):
+        self.assertTrue(issubclass(pysvd.classes.Group, pysvd.classes.Parent))
 
     def test_ctor(self):
         test = pysvd.classes.Group(None, None)
@@ -257,9 +296,12 @@ class TestClassGroup(unittest.TestCase):
 
 class TestClassDerive(unittest.TestCase):
 
+    def test_inheritance(self):
+        self.assertTrue(issubclass(pysvd.classes.Derive, pysvd.classes.Group))
+
     def test_exception(self):
         xml = '''
-        <registers>
+        <root>
             <register>
                 <name>TimerCtrl0</name>
                 <description>Timer Control Register</description>
@@ -268,7 +310,7 @@ class TestClassDerive(unittest.TestCase):
                 <name>TimerCtrl1</name>
                 <description>Derived Timer</description>
             </register>
-        </registers>'''
+        </root>'''
 
         node = ET.fromstring(xml)
         with self.assertRaises(KeyError):
@@ -276,7 +318,7 @@ class TestClassDerive(unittest.TestCase):
 
     def test_one_level(self):
         xml = '''
-        <registers>
+        <root>
             <register>
                 <name>TimerCtrl0</name>
                 <description>Timer Control Register</description>
@@ -291,7 +333,7 @@ class TestClassDerive(unittest.TestCase):
                 <description>Derived Timer</description>
                 <addressOffset>0x4</addressOffset>
             </register>
-        </registers>'''
+        </root>'''
 
         node = ET.fromstring(xml)
         test = HelperClassDeriveRoot(node)
@@ -314,7 +356,7 @@ class TestClassDerive(unittest.TestCase):
 
     def test_two_level(self):
         xml = '''
-        <registers>
+        <root>
             <register>
                 <name>TimerCtrl0</name>
                 <description>Timer Control Register</description>
@@ -336,9 +378,10 @@ class TestClassDerive(unittest.TestCase):
                 <field derivedFrom="TimerCtrl0.BitField0">
                     <name>BitField1</name>
                     <description>Bit field 1</description>
+                    <access>read-only</access>
                 </field>
             </register>
-        </registers>'''
+        </root>'''
 
         node = ET.fromstring(xml)
         test = HelperClassDeriveRoot(node)
@@ -366,15 +409,23 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(test.register[1].size, 32)
         self.assertTrue(test.register[1].derived)
 
-        self.assertEqual(len(test.register[1].field), 1)
+        self.assertEqual(len(test.register[1].field), 2)
 
-        self.assertEqual(test.register[1].field[0].name, "BitField1")
-        self.assertEqual(test.register[1].field[0].description, "Bit field 1")
+        self.assertEqual(test.register[1].field[0].name, "BitField0")
+        self.assertEqual(test.register[1].field[0].description, "Bit field 0")
         self.assertEqual(test.register[1].field[0].access, pysvd.type.access.read_write)
-        self.assertTrue(test.register[1].field[0].derived)
+        self.assertFalse(test.register[1].field[0].derived)
+
+        self.assertEqual(test.register[1].field[1].name, "BitField1")
+        self.assertEqual(test.register[1].field[1].description, "Bit field 1")
+        self.assertEqual(test.register[1].field[1].access, pysvd.type.access.read_only)
+        self.assertTrue(test.register[1].field[1].derived)
 
 
 class TestClassDim(unittest.TestCase):
+
+    def test_inheritance(self):
+        self.assertTrue(issubclass(pysvd.classes.Dim, pysvd.classes.Derive))
 
     def test_no_name_exception(self):
         '''Required name field is missing'''

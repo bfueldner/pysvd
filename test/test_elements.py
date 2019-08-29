@@ -75,13 +75,26 @@ class TestElementDevice(unittest.TestCase):
         self.assertEqual(test.headerDefinitionsPrefix, 'ARM_')
         self.assertEqual(test.addressUnitBits, 8)
         self.assertEqual(test.width, 32)
-
         self.assertEqual(test.size, 32)
         self.assertEqual(test.access, pysvd.type.access.read_write)
         self.assertEqual(test.resetValue, 0)
         self.assertEqual(test.resetMask, 0xffffffff)
 
         self.assertEqual(len(test.peripheral), 1)
+        print(test.peripheral[0])
+
+        self.assertEqual(test.peripheral[0].name, "Timer1")
+        self.assertEqual(test.peripheral[0].version, "1.0")
+        self.assertEqual(test.peripheral[0].description, "Timer 1 is a standard timer ...")
+        self.assertEqual(test.peripheral[0].baseAddress, 0x40002000)
+
+        self.assertEqual(test.peripheral[0].addressBlock.offset, 0)
+        self.assertEqual(test.peripheral[0].addressBlock.size, 0x400)
+        self.assertEqual(test.peripheral[0].addressBlock.usage, pysvd.type.addressBlockUsage.registers)
+        self.assertEqual(test.peripheral[0].addressBlock.protection, pysvd.type.protection.secure)
+
+        self.assertEqual(test.peripheral[0].interrupt.name, "TIM0_INT")
+        self.assertEqual(test.peripheral[0].interrupt.value, 34)
 
 
 class TestElementCpu(unittest.TestCase):
