@@ -84,11 +84,9 @@ class Derive(Group):
             parts = derivedFrom.split('.')
             count = len(parts) - 1
             object = self.parent
-            print(count, object)
             while count:
                 object = object.parent
                 count -= 1
-                print(count, object)
 
             if object is None:
                 raise KeyError("Can not find root element of path '{}' of parent '{}'".format(derivedFrom, self.parent.name))
@@ -99,15 +97,9 @@ class Derive(Group):
                     raise KeyError("Can not find path element '{}' of path '{}' in object '{}'".format(name, derivedFrom, object.name))
                 object = res
 
-            if object.derived:
-                raise TypeError("Can not derive from derived object '{}'".format(object.name))
-
             if type(self) != type(object):
                 raise TypeError("Can not derive from object with othen type than '{}'".format(type(self)))
 
-            print("DeriveFrom", object.name)
-            # TODO: Recursive copy dict!
-            # self.__dict__ = dict(object.__dict__)
             self.parse(object.node)
             self.derived = True
         else:

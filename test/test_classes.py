@@ -10,21 +10,18 @@ class HelperClassGroupAttributes(pysvd.classes.Group):
     attributes = ['extra']
 
     def __init__(self, parent, node):
-        print("HelperClassGroupAttributes ctor")
         super().__init__(parent, node)
 
 
 class HelperClassDeriveRoot(pysvd.classes.Base):
 
     def __init__(self, node):
-        print("HelperClassDeriveRoot ctor")
-
         self.name = "root"
         self.register = []
+
         super().__init__(node)
 
     def parse(self, node):
-        print("HelperClassDeriveRoot parse")
         super().parse(node)
 
         HelperClassDeriveRegister.add_elements(self, self.register, node, 'register')
@@ -39,13 +36,11 @@ class HelperClassDeriveRoot(pysvd.classes.Base):
 class HelperClassDeriveRegister(pysvd.classes.Derive):
 
     def __init__(self, parent, node):
-        print("HelperClassDeriveRegister ctor")
         self.field = []
 
         super().__init__(parent, node)
 
     def parse(self, node):
-        print("HelperClassDeriveRegister parse")
         super().parse(node)
 
         attr = {}
@@ -67,11 +62,9 @@ class HelperClassDeriveRegister(pysvd.classes.Derive):
 class HelperClassDeriveField(pysvd.classes.Derive):
 
     def __init__(self, parent, node):
-        print("HelperClassDeriveField ctor")
         super().__init__(parent, node)
 
     def parse(self, node):
-        print("HelperClassDeriveField parse")
         super().parse(node)
 
         attr = {}
@@ -420,6 +413,97 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(test.register[1].field[1].description, "Bit field 1")
         self.assertEqual(test.register[1].field[1].access, pysvd.type.access.read_only)
         self.assertTrue(test.register[1].field[1].derived)
+
+    def test_derive_from_derived(self):
+        xml = '''
+        <root>
+            <register>
+                <name>TimerCtrl0</name>
+                <description>Timer Control Register</description>
+                <addressOffset>0x0</addressOffset>
+                <access>read-write</access>
+                <resetValue>0x00008001</resetValue>
+                <resetMask>0x0000ffff</resetMask>
+                <size>32</size>
+                <field>
+                    <name>BitField0</name>
+                    <description>Bit field 0</description>
+                    <access>read-write</access>
+                </field>
+            </register>
+            <register derivedFrom="TimerCtrl0">
+                <name>TimerCtrl1</name>
+                <description>Derived Timer</description>
+                <addressOffset>0x4</addressOffset>
+                <field derivedFrom="TimerCtrl0.BitField0">
+                    <name>BitField1</name>
+                    <description>Bit field 1</description>
+                    <access>read-only</access>
+                </field>
+            </register>
+            <register derivedFrom="TimerCtrl1">
+                <name>TimerCtrl2</name>
+                <description>Double Derived Timer</description>
+                <addressOffset>0x8</addressOffset>
+            </register>
+        </root>'''
+
+        node = ET.fromstring(xml)
+        test = HelperClassDeriveRoot(node)
+
+        self.assertEqual(len(test.register), 3)
+
+        self.assertEqual(type(test.register[0]), HelperClassDeriveRegister)
+        self.assertEqual(test.register[0].name, "TimerCtrl0")
+        self.assertEqual(test.register[0].description, "Timer Control Register")
+        self.assertEqual(test.register[0].addressOffset, 0)
+        self.assertEqual(test.register[0].size, 32)
+        self.assertFalse(test.register[0].derived)
+
+        self.assertEqual(len(test.register[0].field), 1)
+
+        self.assertEqual(test.register[0].field[0].name, "BitField0")
+        self.assertEqual(test.register[0].field[0].description, "Bit field 0")
+        self.assertEqual(test.register[0].field[0].access, pysvd.type.access.read_write)
+        self.assertFalse(test.register[0].field[0].derived)
+
+        self.assertEqual(type(test.register[1]), HelperClassDeriveRegister)
+        self.assertEqual(test.register[1].name, "TimerCtrl1")
+        self.assertEqual(test.register[1].description, "Derived Timer")
+        self.assertEqual(test.register[1].addressOffset, 4)
+        self.assertEqual(test.register[1].size, 32)
+        self.assertTrue(test.register[1].derived)
+
+        self.assertEqual(len(test.register[1].field), 2)
+
+        self.assertEqual(test.register[1].field[0].name, "BitField0")
+        self.assertEqual(test.register[1].field[0].description, "Bit field 0")
+        self.assertEqual(test.register[1].field[0].access, pysvd.type.access.read_write)
+        self.assertFalse(test.register[1].field[0].derived)
+
+        self.assertEqual(test.register[1].field[1].name, "BitField1")
+        self.assertEqual(test.register[1].field[1].description, "Bit field 1")
+        self.assertEqual(test.register[1].field[1].access, pysvd.type.access.read_only)
+        self.assertTrue(test.register[1].field[1].derived)
+
+        self.assertEqual(type(test.register[2]), HelperClassDeriveRegister)
+        self.assertEqual(test.register[2].name, "TimerCtrl2")
+        self.assertEqual(test.register[2].description, "Double Derived Timer")
+        self.assertEqual(test.register[2].addressOffset, 8)
+        self.assertEqual(test.register[2].size, 32)
+        self.assertTrue(test.register[2].derived)
+
+        self.assertEqual(len(test.register[2].field), 2)
+
+        self.assertEqual(test.register[2].field[0].name, "BitField0")
+        self.assertEqual(test.register[2].field[0].description, "Bit field 0")
+        self.assertEqual(test.register[2].field[0].access, pysvd.type.access.read_write)
+        self.assertFalse(test.register[2].field[0].derived)
+
+        self.assertEqual(test.register[2].field[1].name, "BitField1")
+        self.assertEqual(test.register[2].field[1].description, "Bit field 1")
+        self.assertEqual(test.register[2].field[1].access, pysvd.type.access.read_only)
+        self.assertTrue(test.register[2].field[1].derived)
 
 
 class TestClassDim(unittest.TestCase):
