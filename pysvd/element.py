@@ -268,7 +268,7 @@ class Register(pysvd.classes.Dim):
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         attr['displayName'] = pysvd.parser.Text(pysvd.node.Element(node, 'displayName'))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'), self.derived)
         attr['alternateGroup'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateGroup'))
         attr['alternateRegister'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateRegister'))
         attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset', True))
@@ -357,7 +357,7 @@ class Field(pysvd.classes.Dim):
 
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', self.derived))
 
         # bitRangeOffsetWidthStyle
         bitOffset = pysvd.parser.Integer(pysvd.node.Element(node, 'bitOffset'))
@@ -394,12 +394,12 @@ class Field(pysvd.classes.Dim):
         if write_constraint_node is not None:
             self.writeConstraint = WriteConstraint(self, write_constraint_node)
 
-        enumerated_values_node = node.find('./enumerated_values')
+        enumerated_values_node = node.find('./enumeratedValues')
         if enumerated_values_node is not None:
             self.enumeratedValues = EnumeratedValues(self, enumerated_values_node)
 
 
-class EnumeratedValues(pysvd.classes.Parent):
+class EnumeratedValues(pysvd.classes.Derive):
     """The concept of enumerated values creates a map between unsigned integers
     and an identifier string. In addition, a description string can be
     associated with each entry in the map.
