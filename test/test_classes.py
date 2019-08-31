@@ -532,6 +532,7 @@ class TestClassDim(unittest.TestCase):
         <root>
             <register>
                 <name>Name</name>
+                <description>Description</description>
             </register>
         </root>'''
 
@@ -541,6 +542,8 @@ class TestClassDim(unittest.TestCase):
         self.assertEqual(len(test), 1)
 
         self.assertEqual(test[0].name, "Name")
+        self.assertEqual(test[0].description, "Description")
+        self.assertEqual(test[0].offset, 0)
 
     def test_index_fix(self):
         '''Fixed array generation'''
@@ -560,6 +563,7 @@ class TestClassDim(unittest.TestCase):
         self.assertEqual(len(test), 1)
 
         self.assertEqual(test[0].name, "MyArr[4]")
+        self.assertEqual(test[0].offset, 0)
 
     def test_index_list(self):
         '''Index generation by list'''
@@ -582,16 +586,22 @@ class TestClassDim(unittest.TestCase):
 
         self.assertEqual(test[0].name, "GPIO_A_CTRL")
         self.assertEqual(test[0].description, "GPIO Controller A")
+        self.assertEqual(test[0].offset, 0)
         self.assertEqual(test[1].name, "GPIO_B_CTRL")
         self.assertEqual(test[1].description, "GPIO Controller B")
+        self.assertEqual(test[1].offset, 4)
         self.assertEqual(test[2].name, "GPIO_C_CTRL")
         self.assertEqual(test[2].description, "GPIO Controller C")
+        self.assertEqual(test[2].offset, 8)
         self.assertEqual(test[3].name, "GPIO_D_CTRL")
         self.assertEqual(test[3].description, "GPIO Controller D")
+        self.assertEqual(test[3].offset, 12)
         self.assertEqual(test[4].name, "GPIO_E_CTRL")
         self.assertEqual(test[4].description, "GPIO Controller E")
+        self.assertEqual(test[4].offset, 16)
         self.assertEqual(test[5].name, "GPIO_Z_CTRL")
         self.assertEqual(test[5].description, "GPIO Controller Z")
+        self.assertEqual(test[5].offset, 20)
 
     def test_index_range(self):
         '''Index generation by range'''
@@ -600,10 +610,11 @@ class TestClassDim(unittest.TestCase):
         <root>
             <register>
                 <dim>4</dim>
-                <dimIncrement>4</dimIncrement>
+                <dimIncrement>8</dimIncrement>
                 <dimIndex>3-6</dimIndex>
                 <dimName>irq%s_t</dimName>
                 <name>IRQ%s</name>
+                <description>Interrupt %s</description>
             </register>
         </root>'''
 
@@ -613,13 +624,21 @@ class TestClassDim(unittest.TestCase):
         self.assertEqual(len(test), 4)
 
         self.assertEqual(test[0].name, "IRQ3")
+        self.assertEqual(test[0].description, "Interrupt 3")
         self.assertEqual(test[0].dimName, "irq3_t")
+        self.assertEqual(test[0].offset, 0)
         self.assertEqual(test[1].name, "IRQ4")
+        self.assertEqual(test[1].description, "Interrupt 4")
         self.assertEqual(test[1].dimName, "irq4_t")
+        self.assertEqual(test[1].offset, 8)
         self.assertEqual(test[2].name, "IRQ5")
+        self.assertEqual(test[2].description, "Interrupt 5")
         self.assertEqual(test[2].dimName, "irq5_t")
+        self.assertEqual(test[2].offset, 16)
         self.assertEqual(test[3].name, "IRQ6")
+        self.assertEqual(test[3].description, "Interrupt 6")
         self.assertEqual(test[3].dimName, "irq6_t")
+        self.assertEqual(test[3].offset, 24)
 
     def test_index_exception(self):
         '''dimIndex can not be interpreted as integer'''

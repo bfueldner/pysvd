@@ -45,7 +45,26 @@ class TestTreeComplete(unittest.TestCase):
         self.assertTrue(test.peripheral[1].derived)
         self.assertTrue(test.peripheral[2].derived)
 
+        peripheral_index = 0
         for peripheral in test.peripheral:
+            print("--------------------------------------")
+            print(peripheral.name)
+            print(peripheral.description)
+            print(peripheral_index)
+
+            for key, value in peripheral.__dict__.items():
+                print(key, value)
+            print()
+
+            if peripheral_index == 0:
+                self.assertEqual(peripheral.name, "TIMER0")
+                self.assertEqual(peripheral.baseAddress, 0x40010000)
+
+            self.assertEqual(peripheral.version, "1.0")
+            self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
+            self.assertEqual(peripheral.size, 32)
+            self.assertEqual(peripheral.access, pysvd.type.access.read_write)
+
             self.assertEqual(peripheral.groupName, "TIMER")
             self.assertEqual(peripheral.addressBlock.offset, 0)
             self.assertEqual(peripheral.addressBlock.size, 0x100)
@@ -53,4 +72,5 @@ class TestTreeComplete(unittest.TestCase):
             self.assertEqual(peripheral.resetValue, 0)
 
             self.assertEqual(len(peripheral.register), 8)
-            print(peripheral.name)
+
+            peripheral_index += 1

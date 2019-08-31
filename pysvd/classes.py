@@ -101,6 +101,10 @@ class Derive(Group):
                 raise TypeError("Can not derive from object with othen type than '{}'".format(type(self)))
 
             self.parse(object.node)
+            if not hasattr(self, 'name') or not hasattr(self, 'description') or not hasattr(self, 'addressOffset'):
+                raise KeyError("Derived element '{}' must have attributes 'name', 'descritption' and 'addressOffset'".format(self.name))
+            Move check to derived classes and check against XSD (peripheral, register, field)
+
             self.derived = True
         else:
             self.derived = False
@@ -119,9 +123,15 @@ class Dim(Derive):
         self.dimName = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
         self.offset = 0
 
+        print(self.name)
+        print(self.description)
+        print(self.dimName)
+        print(self.offset)
+
     # Replace %s with name if not None
     def set_index(self, value):
         value = str(value)
+        print("set_index", value)
         self.name = self.name.replace('%s', value)
         if self.description is not None:
             self.description = self.description.replace('%s', value)
