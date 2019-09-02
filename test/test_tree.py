@@ -9,75 +9,44 @@ class TestTreeComplete(unittest.TestCase):
     # def setup()
     # use setup to parse file and separate tests to check deriveFrom, derive  Attribute and dim functionallity
 
-    def test_attributes(self):
-
+    @classmethod
+    def setUpClass(cls):
         node = ET.parse("test/example.svd").getroot()
-        test = pysvd.element.Device(node)
+        cls.device = pysvd.element.Device(node)
 
-        self.assertEqual(test.schemaVersion, '1.1')
+    def test_device_attributes(self):
+        device = self.device
 
-        self.assertEqual(test.vendor, 'ARM Ltd.')
-        self.assertEqual(test.vendorID, 'ARM')
-        self.assertEqual(test.name, 'ARM_Example')
-        self.assertEqual(test.series, 'ARMCM3')
-        self.assertEqual(test.version, '1.2')
-        self.assertEqual(test.description, 'ARM 32-bit Cortex-M3 Microcontroller based device, CPU clock up to 80MHz, etc.')
+        self.assertEqual(device.schemaVersion, '1.1')
+        self.assertEqual(device.vendor, 'ARM Ltd.')
+        self.assertEqual(device.vendorID, 'ARM')
+        self.assertEqual(device.name, 'ARM_Example')
+        self.assertEqual(device.series, 'ARMCM3')
+        self.assertEqual(device.version, '1.2')
+        self.assertEqual(device.description, 'ARM 32-bit Cortex-M3 Microcontroller based device, CPU clock up to 80MHz, etc.')
+        self.assertEqual(device.addressUnitBits, 8)
+        self.assertEqual(device.width, 32)
+        self.assertEqual(device.size, 32)
+        self.assertEqual(device.access, pysvd.type.access.read_write)
+        self.assertEqual(device.resetValue, 0)
+        self.assertEqual(device.resetMask, 0xffffffff)
 
-        self.assertEqual(test.cpu.name, pysvd.type.cpuName.CM3)
-        self.assertEqual(test.cpu.revision, 'r1p0')
-        self.assertEqual(test.cpu.endian, pysvd.type.endian.little)
-        self.assertTrue(test.cpu.mpuPresent)
-        self.assertFalse(test.cpu.fpuPresent)
-        self.assertEqual(test.cpu.nvicPrioBits, 3)
-        self.assertFalse(test.cpu.vendorSystickConfig)
+    def test_cpu_attributes(self):
+        cpu = self.device.cpu
 
-        self.assertEqual(test.addressUnitBits, 8)
-        self.assertEqual(test.width, 32)
-        self.assertEqual(test.size, 32)
-        self.assertEqual(test.access, pysvd.type.access.read_write)
-        self.assertEqual(test.resetValue, 0)
-        self.assertEqual(test.resetMask, 0xffffffff)
+        self.assertEqual(cpu.name, pysvd.type.cpuName.CM3)
+        self.assertEqual(cpu.revision, 'r1p0')
+        self.assertEqual(cpu.endian, pysvd.type.endian.little)
+        self.assertTrue(cpu.mpuPresent)
+        self.assertFalse(cpu.fpuPresent)
+        self.assertEqual(cpu.nvicPrioBits, 3)
+        self.assertFalse(cpu.vendorSystickConfig)
 
-        self.assertEqual(len(test.peripheral), 3)
-        self.assertFalse(test.peripheral[0].derived)
-        self.assertTrue(test.peripheral[1].derived)
-        self.assertTrue(test.peripheral[2].derived)
+    def test_peripheral_equal_attributes(self):
+        device = self.device
 
-        peripheral_index = 0
-        for peripheral in test.peripheral:
-            if peripheral_index == 0:
-                # general
-                self.assertEqual(peripheral.name, "TIMER0")
-                self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
-                self.assertEqual(peripheral.baseAddress, 0x40010000)
-
-                # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER0")
-                self.assertEqual(peripheral.interrupt.description, "Timer 0 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 0)
-
-            elif peripheral_index == 1:
-                # general
-                self.assertEqual(peripheral.name, "TIMER1")
-                self.assertIsNone(peripheral.description)
-                self.assertEqual(peripheral.baseAddress, 0x40010100)
-
-                # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER1")
-                self.assertEqual(peripheral.interrupt.description, "Timer 1 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 4)
-
-            elif peripheral_index == 2:
-                # general
-                self.assertEqual(peripheral.name, "TIMER2")
-                self.assertIsNone(peripheral.description)
-                self.assertEqual(peripheral.baseAddress, 0x40010200)
-
-                # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER2")
-                self.assertEqual(peripheral.interrupt.description, "Timer 2 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 6)
-
+        self.assertEqual(len(device.peripheral), 3)
+        for peripheral in device.peripheral:
             # general
             self.assertEqual(peripheral.version, "1.0")
             self.assertEqual(peripheral.size, 32)
@@ -92,6 +61,48 @@ class TestTreeComplete(unittest.TestCase):
             self.assertEqual(peripheral.addressBlock.offset, 0)
             self.assertEqual(peripheral.addressBlock.size, 0x100)
             self.assertEqual(peripheral.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
+
+    def test_peripheral_derived_attributes(self):
+        device = self.device
+
+        peripheral_index = 0
+        self.assertEqual(len(device.peripheral), 3)
+        for peripheral in device.peripheral:
+            if peripheral_index == 0:
+                # general
+                self.assertEqual(peripheral.name, "TIMER0")
+                self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
+                self.assertEqual(peripheral.baseAddress, 0x40010000)
+                self.assertFalse(peripheral.derived)
+
+                # interrupt
+                self.assertEqual(peripheral.interrupt.name, "TIMER0")
+                self.assertEqual(peripheral.interrupt.description, "Timer 0 interrupt")
+                self.assertEqual(peripheral.interrupt.value, 0)
+
+            elif peripheral_index == 1:
+                # general
+                self.assertEqual(peripheral.name, "TIMER1")
+                self.assertIsNone(peripheral.description)
+                self.assertEqual(peripheral.baseAddress, 0x40010100)
+                self.assertTrue(peripheral.derived)
+
+                # interrupt
+                self.assertEqual(peripheral.interrupt.name, "TIMER1")
+                self.assertEqual(peripheral.interrupt.description, "Timer 1 interrupt")
+                self.assertEqual(peripheral.interrupt.value, 4)
+
+            elif peripheral_index == 2:
+                # general
+                self.assertEqual(peripheral.name, "TIMER2")
+                self.assertIsNone(peripheral.description)
+                self.assertEqual(peripheral.baseAddress, 0x40010200)
+                self.assertTrue(peripheral.derived)
+
+                # interrupt
+                self.assertEqual(peripheral.interrupt.name, "TIMER2")
+                self.assertEqual(peripheral.interrupt.description, "Timer 2 interrupt")
+                self.assertEqual(peripheral.interrupt.value, 6)
 
             # registers
             register_index = 0
