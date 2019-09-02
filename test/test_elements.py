@@ -68,9 +68,11 @@ class TestElementDevice(unittest.TestCase):
             <resetMask>0xffffffff</resetMask>
             <peripherals>
                 <peripheral>
-                    <name>Timer1</name>
+                    <dim>2</dim>
+                    <dimIncrement>0x200</dimIncrement>
+                    <name>Timer%s</name>
                     <version>1.0</version>
-                    <description>Timer 1 is a standard timer ... </description>
+                    <description>Timer %s is a standard timer ... </description>
                     <baseAddress>0x40002000</baseAddress>
                     <addressBlock>
                         <offset>0x0</offset>
@@ -105,22 +107,32 @@ class TestElementDevice(unittest.TestCase):
         self.assertEqual(test.resetValue, 0)
         self.assertEqual(test.resetMask, 0xffffffff)
 
-        self.assertEqual(len(test.peripheral), 1)
-        print(test.peripheral[0])
+        peripheral_index = 0
+        self.assertEqual(len(test.peripheral), 2)
+        for peripheral in test.peripheral:
+            if peripheral_index == 0:
+                self.assertEqual(peripheral.name, "Timer0")
+                self.assertEqual(peripheral.description, "Timer 0 is a standard timer ...")
+                self.assertEqual(peripheral.baseAddress, 0x40002000)
 
-        self.assertEqual(test.peripheral[0].name, "Timer1")
-        self.assertEqual(test.peripheral[0].version, "1.0")
-        self.assertEqual(test.peripheral[0].description, "Timer 1 is a standard timer ...")
-        self.assertEqual(test.peripheral[0].baseAddress, 0x40002000)
+            elif peripheral_index == 1:
+                self.assertEqual(peripheral.name, "Timer1")
+                self.assertEqual(peripheral.description, "Timer 1 is a standard timer ...")
+                self.assertEqual(peripheral.baseAddress, 0x40002200)
 
-        self.assertEqual(test.peripheral[0].addressBlock.offset, 0)
-        self.assertEqual(test.peripheral[0].addressBlock.size, 0x400)
-        self.assertEqual(test.peripheral[0].addressBlock.usage, pysvd.type.addressBlockUsage.registers)
-        self.assertEqual(test.peripheral[0].addressBlock.protection, pysvd.type.protection.secure)
+            self.assertEqual(peripheral.version, "1.0")
 
-        self.assertEqual(test.peripheral[0].interrupt.name, "TIM0_INT")
-        self.assertEqual(test.peripheral[0].interrupt.value, 34)
+            self.assertEqual(peripheral.addressBlock.offset, 0)
+            self.assertEqual(peripheral.addressBlock.size, 0x400)
+            self.assertEqual(peripheral.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
+            self.assertEqual(peripheral.addressBlock.protection, pysvd.type.protection.secure)
 
+            self.assertEqual(peripheral.interrupt.name, "TIM0_INT")
+            self.assertEqual(peripheral.interrupt.value, 34)
+
+            peripheral_index += 1
+
+        self.assertIsNotNone(test.find("Timer0"))
         self.assertIsNotNone(test.find("Timer1"))
         self.assertIsNone(test.find("Timer2"))
 
@@ -257,8 +269,19 @@ class TestElementSauRegionsConfigRegion(unittest.TestCase):
 
 class TestElementPeripheral(unittest.TestCase):
 
-    def test_exception(self):
+    def test_required_exception(self):
         xml = '''<peripheral />'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            pysvd.element.Peripheral(None, node)
+
+    def test_register_cluster_exception(self):
+        xml = '''
+        <peripheral>
+            <name>Timer1</name>
+            <baseAddress>0x40002000</baseAddress>
+            <registers />
+        </peripheral>'''
         node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
             pysvd.element.Peripheral(None, node)
@@ -330,6 +353,10 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.register[1].resetValue, 0x00008001)
         self.assertEqual(test.register[1].resetMask, 0x0000ffff)
         self.assertEqual(test.register[1].size, 32)
+
+        self.assertIsNotNone(test.find("TimerCtrl0"))
+        self.assertIsNotNone(test.find("TimerCtrl1"))
+        self.assertIsNone(test.find("TimerCtrl2"))
 
 
 class TestElementAddressBlock(unittest.TestCase):
