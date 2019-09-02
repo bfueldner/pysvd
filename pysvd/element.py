@@ -306,7 +306,7 @@ class Cluster(pysvd.classes.Dim):
 
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'), self.derived)
+        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', self.derived))
         attr['alternateCluster'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateCluster'))
         attr['headerStructName'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerStructName'))
         attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset', True))
@@ -351,7 +351,7 @@ class Register(pysvd.classes.Dim):
         attr = {}
         attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         attr['displayName'] = pysvd.parser.Text(pysvd.node.Element(node, 'displayName'))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'), self.derived)
+        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', self.derived))
         attr['alternateGroup'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateGroup'))
         attr['alternateRegister'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateRegister'))
         attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset', True))

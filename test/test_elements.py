@@ -318,6 +318,18 @@ class TestElementPeripheral(unittest.TestCase):
                     <description>Derived Timer</description>
                     <addressOffset>0x4</addressOffset>
                 </register>
+                <register>
+                    <dim>2</dim>
+                    <dimIncrement>4</dimIncrement>
+                    <name>Value%s</name>
+                    <addressOffset>0x8</addressOffset>
+                </register>
+                <cluster>
+                    <dim>2</dim>
+                    <dimIncrement>0x8</dimIncrement>
+                    <name>Mode%s</name>
+                    <addressOffset>0x10</addressOffset>
+                </cluster>
             </registers>
         </peripheral>'''
         node = ET.fromstring(xml)
@@ -336,7 +348,7 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.interrupt.name, "TIM0_INT")
         self.assertEqual(test.interrupt.value, 34)
 
-        self.assertEqual(len(test.register), 2)
+        self.assertEqual(len(test.register), 4)
 
         self.assertEqual(test.register[0].name, "TimerCtrl0")
         self.assertEqual(test.register[0].description, "Timer Control Register")
@@ -353,6 +365,20 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.register[1].resetValue, 0x00008001)
         self.assertEqual(test.register[1].resetMask, 0x0000ffff)
         self.assertEqual(test.register[1].size, 32)
+
+        self.assertEqual(test.register[2].name, "Value0")
+        self.assertEqual(test.register[2].addressOffset, 8)
+
+        self.assertEqual(test.register[3].name, "Value1")
+        self.assertEqual(test.register[3].addressOffset, 12)
+
+        self.assertEqual(len(test.cluster), 2)
+
+        self.assertEqual(test.cluster[0].name, "Mode0")
+        self.assertEqual(test.cluster[0].addressOffset, 0x10)
+
+        self.assertEqual(test.cluster[1].name, "Mode1")
+        self.assertEqual(test.cluster[1].addressOffset, 0x18)
 
         self.assertIsNotNone(test.find("TimerCtrl0"))
         self.assertIsNotNone(test.find("TimerCtrl1"))
@@ -412,17 +438,60 @@ class TestElementInterrupt(unittest.TestCase):
 class TestElementCluster(unittest.TestCase):
 
     def test_exception(self):
-        pass
-        # xml = '''<cluster />'''
-        # node = ET.fromstring(xml)
-        # with self.assertRaises(SyntaxError):
-        #    pysvd.element.Cluster(None, node)
+        xml = '''<cluster />'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            pysvd.element.Register(None, node)
+
+    def test_attributes(self):
+        xml = '''
+        <registers>
+            <name>Timer1</name>
+            <addressOffset>0x1000</addressOffset>
+            <cluster>
+                <name>MODE0</name>
+                <addressOffset>0x0</addressOffset>
+                <register>
+                    <name>CTRL</name>
+                    <addressOffset>0x00</addressOffset>
+                </register>
+                <register>
+                    <name>READREQ</name>
+                    <addressOffset>0x02</addressOffset>
+                </register>
+            </cluster>
+        </registers>'''
+        node = ET.fromstring(xml)
+        test = pysvd.element.Cluster(None, node)
+
+        self.assertEqual(len(test.cluster), 1)
+        self.assertEqual(test.cluster[0].name, "MODE0")
+        self.assertEqual(test.cluster[0].addressOffset, 0)
+
+        cluster = test.cluster[0]
+        self.assertEqual(len(cluster.register), 2)
+        self.assertEqual(cluster.register[0].name, "CTRL")
+        self.assertEqual(cluster.register[0].addressOffset, 0)
+        self.assertEqual(cluster.register[1].name, "READREQ")
+        self.assertEqual(cluster.register[1].addressOffset, 2)
 
 
 class TestElementRegister(unittest.TestCase):
 
-    def test_exception(self):
+    def test_required_exception(self):
         xml = '''<register />'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            pysvd.element.Register(None, node)
+
+    def test_fields_exception(self):
+        xml = '''
+        <register>
+            <name>TimerCtrl0</name>
+            <addressOffset>0x0</addressOffset>
+            <fields />
+        </register>
+        '''
         node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
             pysvd.element.Register(None, node)
@@ -437,6 +506,18 @@ class TestElementRegister(unittest.TestCase):
             <resetValue>0x00008001</resetValue>
             <resetMask>0x0000ffff</resetMask>
             <size>32</size>
+            <writeConstraint>
+                <writeAsRead>true</writeAsRead>
+            </writeConstraint>
+            <fields>
+                <field>
+                    <dim>2</dim>
+                    <dimIncrement>3</dimIncrement>
+                    <name>BIT%s</name>
+                    <bitOffset>1</bitOffset>
+                    <bitWidth>3</bitWidth>
+                </field>
+            </fields>
         </register>
         '''
 
@@ -451,11 +532,19 @@ class TestElementRegister(unittest.TestCase):
         self.assertEqual(test.resetMask, 0x0000ffff)
         self.assertEqual(test.size, 32)
 
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.writeConstraint)
+        self.assertIsNotNone(test.writeConstraint)
 
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.fields)
+        self.assertEqual(len(test.field), 2)
+        self.assertEqual(test.field[0].name, "BIT0")
+        self.assertEqual(test.field[0].bitOffset, 1)
+        self.assertEqual(test.field[0].bitWidth, 3)
+        self.assertEqual(test.field[1].name, "BIT1")
+        self.assertEqual(test.field[1].bitOffset, 4)
+        self.assertEqual(test.field[1].bitWidth, 3)
+
+        self.assertIsNotNone(test.find("BIT0"))
+        self.assertIsNotNone(test.find("BIT1"))
+        self.assertIsNone(test.find("BIT2"))
 
 
 class TestElementWriteConstraint(unittest.TestCase):
@@ -509,10 +598,19 @@ class TestElementWriteConstraint(unittest.TestCase):
 
 class TestElementField(unittest.TestCase):
 
-    def test_exception(self):
+    def test_required_exception(self):
         xml = '''<field />'''
         node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
+            pysvd.element.Field(None, node)
+
+    def test_bitrange_exception(self):
+        xml = '''
+        <field>
+            <name>BIT1</name>
+        </field>'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(ValueError):
             pysvd.element.Field(None, node)
 
     def test_bit_range_offset(self):
