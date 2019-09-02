@@ -45,16 +45,17 @@ class Device(pysvd.classes.Base):
 
         # Clean up license text from whitespaces
         result = ''
-        for line in license_text.splitlines():
-            line = line.strip()
-            if len(line):
-                result += line + '\n'
+        if license_text is not None:
+            for line in license_text.splitlines():
+                line = line.strip()
+                if len(line):
+                    result += line + '\n'
         attr['licenseText'] = result
         self.add_attributes(attr)
 
-        cpu = node.find('cpu')
-        if cpu is not None:
-            self.cpu = pysvd.element.Cpu(self, cpu)
+        cpu_node = node.find('cpu')
+        if cpu_node is not None:
+            self.cpu = pysvd.element.Cpu(self, cpu_node)
 
         peripherals_node = node.find('./peripherals')
         if peripherals_node is None:

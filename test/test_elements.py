@@ -6,8 +6,33 @@ import pysvd
 
 class TestElementDevice(unittest.TestCase):
 
-    def test_exception(self):
+    def test_required_exception(self):
         xml = '''<device />'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            pysvd.element.Device(node)
+
+    def test_peripherals_exception(self):
+        xml = '''<device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
+            <name>ARM_Cortex_M4</name>
+            <version>0.1</version>
+            <description>Arm Cortex-M4 based Microcontroller demonstration device</description>
+            <addressUnitBits>8</addressUnitBits>
+            <width>32</width>
+        </device>'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            pysvd.element.Device(node)
+
+    def test_peripheral_minimal_exception(self):
+        xml = '''<device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
+            <name>ARM_Cortex_M4</name>
+            <version>0.1</version>
+            <description>Arm Cortex-M4 based Microcontroller demonstration device</description>
+            <addressUnitBits>8</addressUnitBits>
+            <width>32</width>
+            <peripherals />
+        </device>'''
         node = ET.fromstring(xml)
         with self.assertRaises(SyntaxError):
             pysvd.element.Device(node)
@@ -96,6 +121,9 @@ class TestElementDevice(unittest.TestCase):
         self.assertEqual(test.peripheral[0].interrupt.name, "TIM0_INT")
         self.assertEqual(test.peripheral[0].interrupt.value, 34)
 
+        self.assertIsNotNone(test.find("Timer1"))
+        self.assertIsNone(test.find("Timer2"))
+
 
 class TestElementCpu(unittest.TestCase):
 
@@ -126,6 +154,14 @@ class TestElementCpu(unittest.TestCase):
             <dtcmPresent>false</dtcmPresent>
             <nvicPrioBits>4</nvicPrioBits>
             <vendorSystickConfig>false</vendorSystickConfig>
+
+            <sauRegionsConfig>
+                <region name="SAU1">
+                    <base>0x10001000</base>
+                    <limit>0x10005000</limit>
+                    <access>n</access>
+                </region>
+            </sauRegionsConfig>
         </cpu>'''
         node = ET.fromstring(xml)
         test = pysvd.element.Cpu(None, node)
@@ -142,11 +178,14 @@ class TestElementCpu(unittest.TestCase):
         self.assertFalse(test.dtcmPresent)
         self.assertEqual(test.nvicPrioBits, 4)
         self.assertFalse(test.vendorSystickConfig)
-
         self.assertTrue(test.vtorPresent)
 
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.sauNumRegions)
+        self.assertEqual(len(test.sauRegionsConfig.region), 1)
+        self.assertTrue(test.sauRegionsConfig.region[0].enabled)
+        self.assertEqual(test.sauRegionsConfig.region[0].name, 'SAU1')
+        self.assertEqual(test.sauRegionsConfig.region[0].base, 0x10001000)
+        self.assertEqual(test.sauRegionsConfig.region[0].limit, 0x10005000)
+        self.assertEqual(test.sauRegionsConfig.region[0].access, pysvd.type.sauAccess.non_secure)
 
 
 class TestElementSauRegionsConfig(unittest.TestCase):
