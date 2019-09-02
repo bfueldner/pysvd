@@ -74,6 +74,19 @@ class HelperClassDeriveField(pysvd.classes.Derive):
         self.add_attributes(attr)
 
 
+class HelperClassDim(pysvd.classes.Dim):
+
+    def __init__(self, parent, node):
+        self.offset = 0
+        super().__init__(parent, node)
+
+    def set_offset(self, value):
+        self.offset += value
+
+    def parse(self, node):
+        super().parse(node)
+
+
 class TestClassBase(unittest.TestCase):
 
     def test_inheritance(self):
@@ -527,6 +540,7 @@ class TestClassDim(unittest.TestCase):
 
     def test_inheritance(self):
         self.assertTrue(issubclass(pysvd.classes.Dim, pysvd.classes.Derive))
+        self.assertTrue(issubclass(HelperClassDim, pysvd.classes.Dim))
 
     def test_no_name_exception(self):
         '''Required name field is missing'''
@@ -560,7 +574,40 @@ class TestClassDim(unittest.TestCase):
 
         self.assertEqual(test[0].name, "Name")
         self.assertEqual(test[0].description, "Description")
+
+    def test_index_minimal(self):
+        '''Minimal register generation'''
+
+        xml = '''
+        <root>
+            <register>
+                <dim>4</dim>
+                <dimIncrement>2</dimIncrement>
+                <name>PORT%s</name>
+                <description>Port %s</description>
+            </register>
+        </root>'''
+
+        node = ET.fromstring(xml)
+        test = []
+        HelperClassDim.add_elements(None, test, node, 'register')
+        self.assertEqual(len(test), 4)
+
+        self.assertEqual(test[0].name, "PORT0")
+        self.assertEqual(test[0].description, "Port 0")
         self.assertEqual(test[0].offset, 0)
+
+        self.assertEqual(test[1].name, "PORT1")
+        self.assertEqual(test[1].description, "Port 1")
+        self.assertEqual(test[1].offset, 2)
+
+        self.assertEqual(test[2].name, "PORT2")
+        self.assertEqual(test[2].description, "Port 2")
+        self.assertEqual(test[2].offset, 4)
+
+        self.assertEqual(test[3].name, "PORT3")
+        self.assertEqual(test[3].description, "Port 3")
+        self.assertEqual(test[3].offset, 6)
 
     def test_index_fix(self):
         '''Fixed array generation'''
@@ -580,7 +627,6 @@ class TestClassDim(unittest.TestCase):
         self.assertEqual(len(test), 1)
 
         self.assertEqual(test[0].name, "MyArr[4]")
-        self.assertEqual(test[0].offset, 0)
 
     def test_index_list(self):
         '''Index generation by list'''
@@ -598,7 +644,7 @@ class TestClassDim(unittest.TestCase):
 
         node = ET.fromstring(xml)
         test = []
-        pysvd.classes.Dim.add_elements(None, test, node, 'register')
+        HelperClassDim.add_elements(None, test, node, 'register')
         self.assertEqual(len(test), 6)
 
         self.assertEqual(test[0].name, "GPIO_A_CTRL")
@@ -637,7 +683,7 @@ class TestClassDim(unittest.TestCase):
 
         node = ET.fromstring(xml)
         test = []
-        pysvd.classes.Dim.add_elements(None, test, node, 'register')
+        HelperClassDim.add_elements(None, test, node, 'register')
         self.assertEqual(len(test), 4)
 
         self.assertEqual(test[0].name, "IRQ3")

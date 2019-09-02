@@ -111,7 +111,6 @@ class Dim(Derive):
         self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
         self.description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
         self.dimName = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
-        self.offset = 0
 
     # Replace %s with name if not None
     def set_index(self, value):
@@ -124,7 +123,7 @@ class Dim(Derive):
             self.dimName = self.dimName.replace('%s', value)
 
     def set_offset(self, value):
-        self.offset = value
+        pass
 
     @classmethod
     def add_elements(cls, parent, elements, node, name):
@@ -135,19 +134,27 @@ class Dim(Derive):
             if dim is not None:
                 dimIncrement = pysvd.parser.Integer(pysvd.node.Element(subnode, 'dimIncrement', True))
                 dimIndex = pysvd.parser.Text(pysvd.node.Element(subnode, 'dimIndex'))
-                if dimIndex is not None:
+
+                # if dimIndex is not present, dimName and name has to be examined for '[%s]' string presence,
+                # to distinguish between array and index
+                if dimIndex is None:
+                    dimName = pysvd.parser.Text(pysvd.node.Element(subnode, 'dimName'))
+                    name = pysvd.parser.Text(pysvd.node.Element(subnode, 'name'))
+                    if dimName is not None and '[%s]' not in dimName or name is not None and '[%s]' not in name:
+                        dimIndices = range(dim)
+                    else:
+                        dimIndices = [dim]
+                else:
                     if ',' in dimIndex:
                         dimIndices = dimIndex.split(',')
                     elif '-' in dimIndex:
-                        match = re.search('([0-9]+)\-([0-9]+)', dimIndex)
+                        match = re.search('([0-9]+)-([0-9]+)', dimIndex)
                         dimIndices = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     else:
                         raise ValueError("Unexpected value in 'dimIndex': {}".format(dimIndex))
 
                     if len(dimIndices) != dim:
                         raise AttributeError("'dim' size does not match elements in 'dimIndex' ({} != {})".format(dim, len(dimIndex)))
-                else:
-                    dimIndices = [dim]
 
                 offset = 0
                 for index in dimIndices:
