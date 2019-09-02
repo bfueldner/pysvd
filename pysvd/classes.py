@@ -49,8 +49,6 @@ class Group(Parent):
     """Base class for elements with registerPropertiesGroup"""
 
     attributes = ['size', 'access', 'protection', 'resetValue', 'resetMask']
-#   elements = ['device', 'peripheral', 'register', 'cluster', 'field', \
-#               'sauRegionsConfig', 'addressBlock']
 
     def __init__(self, parent_, node):
         super().__init__(parent_, node)
@@ -69,8 +67,6 @@ class Group(Parent):
 
 class Derive(Group):
     """Base for deriveable classes"""
-
-#   elements = ['device', 'peripheral', 'register', 'cluster', 'field']
 
     def __init__(self, parent, node):
         super().__init__(parent, node)
