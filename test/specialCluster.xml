@@ -1,0 +1,152 @@
+<peripheral>
+  <name>RTC</name>
+  <version>1.0.1</version>
+  <description>Real-Time Counter</description>
+  <groupName>RTC</groupName>
+  <prependToName>RTC_</prependToName>
+  <baseAddress>0x40001400</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x40</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <interrupt>
+    <name>RTC_INTREQ</name>
+    <value>3</value>
+  </interrupt>
+  <registers>
+   <cluster>
+    <name>MODE0</name>
+    <description>32-bit Counter with Single 32-bit Compare</description>
+    <headerStructName>RtcMode0</headerStructName>
+    <addressOffset>0x0</addressOffset>
+    <register>
+      <name>CTRL</name>
+      <description>MODE0 Control</description>
+      <addressOffset>0x00</addressOffset>
+      <size>16</size>
+    </register>
+    <register>
+      <name>READREQ</name>
+      <description>Read Request</description>
+      <addressOffset>0x02</addressOffset>
+      <size>16</size>
+      <resetValue>0x0010</resetValue>
+    </register>
+    <register>
+      <name>STATUS</name>
+      <description>Status</description>
+      <addressOffset>0x0A</addressOffset>
+      <size>8</size>
+    </register>
+    <register>
+      <name>COUNT</name>
+      <description>MODE0 Counter Value</description>
+      <addressOffset>0x10</addressOffset>
+      <size>32</size>
+    </register>
+    <register>
+      <dim>1</dim>
+      <dimIncrement>0x4</dimIncrement>
+      <name>COMP%s</name>
+      <description>MODE0 Compare n Value</description>
+      <addressOffset>0x18</addressOffset>
+      <size>32</size>
+    </register>
+   </cluster>
+   <cluster>
+    <name>MODE1</name>
+    <description>16-bit Counter with Two 16-bit Compares</description>
+    <alternateCluster>MODE0</alternateCluster>
+    <headerStructName>RtcMode1</headerStructName>
+    <addressOffset>0x0</addressOffset>
+    <register>
+      <name>CTRL</name>
+      <description>MODE1 Control</description>
+      <addressOffset>0x00</addressOffset>
+      <size>16</size>
+    </register>
+    <register>
+      <name>READREQ</name>
+      <description>Read Request</description>
+      <addressOffset>0x02</addressOffset>
+      <size>16</size>
+      <resetValue>0x0010</resetValue>
+    </register>
+    <register>
+      <name>STATUS</name>
+      <description>Status</description>
+      <addressOffset>0x0A</addressOffset>
+      <size>8</size>
+    </register>
+    <register>
+      <name>COUNT</name>
+      <description>MODE1 Counter Value</description>
+      <addressOffset>0x10</addressOffset>
+      <size>16</size>
+    </register>
+    <register>
+      <name>PER</name>
+      <description>MODE1 Counter Period</description>
+      <addressOffset>0x14</addressOffset>
+      <size>16</size>
+    </register>
+    <register>
+      <dim>2</dim>
+      <dimIncrement>0x2</dimIncrement>
+      <name>COMP%s</name>
+      <description>MODE1 Compare n Value</description>
+      <addressOffset>0x18</addressOffset>
+      <size>16</size>
+    </register>
+   </cluster>
+   <cluster>
+    <name>MODE2</name>
+    <description>Clock/Calendar with Alarm</description>
+    <alternateCluster>MODE0</alternateCluster>
+    <headerStructName>RtcMode2</headerStructName>
+    <addressOffset>0x0</addressOffset>
+    <register>
+      <name>CTRL</name>
+      <description>MODE2 Control</description>
+      <addressOffset>0x00</addressOffset>
+      <size>16</size>
+    </register>
+    <register>
+      <name>READREQ</name>
+      <description>Read Request</description>
+      <addressOffset>0x02</addressOffset>
+      <size>16</size>
+      <resetValue>0x0010</resetValue>
+    </register>
+    <register>
+      <name>STATUS</name>
+      <description>Status</description>
+      <addressOffset>0x0A</addressOffset>
+      <size>8</size>
+    </register>
+    <register>
+      <name>CLOCK</name>
+      <description>MODE2 Clock Value</description>
+      <addressOffset>0x10</addressOffset>
+      <size>32</size>
+    </register>
+    <register>
+      <dim>1</dim>
+      <dimIncrement>0x8</dimIncrement>
+      <name>ALARM%s</name>
+      <description>MODE2 Alarm n Value</description>
+      <addressOffset>0x18</addressOffset>
+      <size>32</size>
+    </register>
+    <register>
+      <dim>1</dim>
+      <dimIncrement>0x8</dimIncrement>
+      <name>MASK%s</name>
+      <description>MODE2 Alarm n Mask</description>
+      <addressOffset>0x1C</addressOffset>
+      <size>8</size>
+    </register>
+   </cluster>
+  </registers>
+</peripheral>
