@@ -85,16 +85,14 @@ class Derive(Group):
                 count -= 1
 
             if object is None:
-                raise KeyError("Can not find root element of path '{}' of parent '{}'".format(derivedFrom, self.parent.name))
+                name = pysvd.parser.Text(pysvd.node.Element(node, 'name'))
+                raise KeyError("Can not find root element from path '{}' to derive '{}'".format(derivedFrom, name))
 
             for name in parts:
                 res = object.find(name)
                 if res is None:
-                    raise KeyError("Can not find path element '{}' of path '{}' in object '{}'".format(name, derivedFrom, object.name))
+                    raise KeyError("Can not find path element '{}' from path '{}' in object '{}'".format(name, derivedFrom, object.name))
                 object = res
-
-            if type(self) != type(object):
-                raise TypeError("Can not derive from object with othen type than '{}'".format(type(self)))
 
             self.parse(object.node)
             self.derived = True

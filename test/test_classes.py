@@ -292,7 +292,7 @@ class TestClassDerive(unittest.TestCase):
     def test_inheritance(self):
         self.assertTrue(issubclass(pysvd.classes.Derive, pysvd.classes.Group))
 
-    def test_exception(self):
+    def test_unknown_element_exception(self):
         xml = '''
         <root>
             <register>
@@ -300,6 +300,23 @@ class TestClassDerive(unittest.TestCase):
                 <description>Timer Control Register</description>
             </register>
             <register derivedFrom="UartCtrl0">
+                <name>TimerCtrl1</name>
+                <description>Derived Timer</description>
+            </register>
+        </root>'''
+
+        node = ET.fromstring(xml)
+        with self.assertRaises(KeyError):
+            HelperClassDeriveRoot(node)
+
+    def test_path_level_exception(self):
+        xml = '''
+        <root>
+            <register>
+                <name>TimerCtrl0</name>
+                <description>Timer Control Register</description>
+            </register>
+            <register derivedFrom="TimerCtrl0.BitField0">
                 <name>TimerCtrl1</name>
                 <description>Derived Timer</description>
             </register>
