@@ -187,6 +187,9 @@ class Peripheral(pysvd.classes.Dim):
 
         super().__init__(parent, node)
 
+    def set_offset(self, value):
+        self.baseAddress += value
+
     def parse(self, node):
         super().parse(node)
 
@@ -214,8 +217,8 @@ class Peripheral(pysvd.classes.Dim):
             Register.add_elements(self, self.register, registers_node, 'register')
             Cluster.add_elements(self, self.cluster, registers_node, 'cluster')
 
-            if len(self.register) < 1:
-                raise SyntaxError("At least one element of 'register' is mandatory in 'registers'")
+            if len(self.register) < 1 and len(self.cluster) < 1:
+                raise SyntaxError("At least one element of 'register' or 'cluster' is mandatory in 'registers'")
 
     def find(self, name):
         """Find register by name."""
@@ -294,6 +297,9 @@ class Cluster(pysvd.classes.Dim):
 
         super().__init__(parent, node)
 
+    def set_offset(self, value):
+        self.addressOffset += value
+
     def parse(self, node):
         super().parse(node)
 
@@ -334,6 +340,9 @@ class Register(pysvd.classes.Dim):
         self.field = []
 
         super().__init__(parent, node)
+
+    def set_offset(self, value):
+        self.addressOffset += value
 
     def parse(self, node):
         super().parse(node)
@@ -436,6 +445,9 @@ class Field(pysvd.classes.Dim):
 
     def __init__(self, parent, node):
         super().__init__(parent, node)
+
+    def set_offset(self, value):
+        self.bitOffset += value
 
     def parse(self, node):
         super().parse(node)
