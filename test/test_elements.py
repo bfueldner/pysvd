@@ -216,69 +216,6 @@ class TestElementSauRegionsConfigRegion(unittest.TestCase):
         self.assertFalse(test.enabled)
 
 
-x = """
-class TestElementPeripherals(unittest.TestCase):
-
-    def test_exception(self):
-        xml = '''<peripherals />'''
-        node = ET.fromstring(xml)
-        with self.assertRaises(SyntaxError):
-            pysvd.element.Peripherals(None, node)
-
-    def test_attributes(self):
-        xml = '''
-        <peripherals>
-            <peripheral>
-                <name>Timer1</name>
-                <version>1.0</version>
-                <description>Timer 1 is a standard timer ... </description>
-                <baseAddress>0x40002000</baseAddress>
-                <addressBlock>
-                    <offset>0x0</offset>
-                    <size>0x400</size>
-                    <usage>registers</usage>
-                    <protection>s</protection>
-                </addressBlock>
-                <interrupt>
-                    <name>TIM0_INT</name>
-                    <value>34</value>
-                </interrupt>
-            </peripheral>
-            <peripheral>
-                <name>Timer1_Alt</name>
-                <version>1.0</version>
-                <description>Alternate Timer 1 is a special timer execution mode ... </description>
-                <baseAddress>0x40002000</baseAddress>
-                <alternatePeripheral>Timer1</alternatePeripheral>
-
-            </peripheral>
-        </peripherals>'''
-        node = ET.fromstring(xml)
-        test = pysvd.element.Peripherals(None, node)
-
-        self.assertEqual(len(test.peripheral), 2)
-
-        self.assertEqual(test.peripheral[0].name, "Timer1")
-        self.assertEqual(test.peripheral[0].version, "1.0")
-        self.assertEqual(test.peripheral[0].description, "Timer 1 is a standard timer ...")
-        self.assertEqual(test.peripheral[0].base_address, 0x40002000)
-
-        self.assertEqual(test.peripheral[0].addressBlock.offset, 0)
-        self.assertEqual(test.peripheral[0].addressBlock.size, 0x400)
-        self.assertEqual(test.peripheral[0].addressBlock.usage, pysvd.type.usage.registers)
-        self.assertEqual(test.peripheral[0].addressBlock.protection, pysvd.type.protection.secure)
-
-        self.assertEqual(test.peripheral[0].interrupt.name, "TIM0_INT")
-        self.assertEqual(test.peripheral[0].interrupt.value, 34)
-
-        self.assertEqual(test.peripheral[1].name, "Timer1_Alt")
-        self.assertEqual(test.peripheral[1].version, "1.0")
-        self.assertEqual(test.peripheral[1].description, "Alternate Timer 1 is a special timer execution mode ...")
-        self.assertEqual(test.peripheral[1].base_address, 0x40002000)
-        self.assertEqual(test.peripheral[1].alternate_peripheral, "Timer1")
-"""
-
-
 class TestElementPeripheral(unittest.TestCase):
 
     def test_exception(self):
@@ -406,17 +343,6 @@ class TestElementInterrupt(unittest.TestCase):
         self.assertEqual(test.value, 34)
 
 
-x = """
-class TestElementRegisters(unittest.TestCase):
-
-    def test_exception(self):
-        xml = '''<registers />'''
-        node = ET.fromstring(xml)
-        with self.assertRaises(SyntaxError):
-            pysvd.element.Registers(None, node)
-"""
-
-
 class TestElementCluster(unittest.TestCase):
 
     def test_exception(self):
@@ -513,78 +439,6 @@ class TestElementWriteConstraint(unittest.TestCase):
 
         self.assertEqual(test.rangeMinimum, 2)
         self.assertEqual(test.rangeMaximum, 4)
-
-
-x = """
-class TestElementFields(unittest.TestCase):
-
-    def test_exception(self):
-        xml = '''<fields />'''
-        node = ET.fromstring(xml)
-        with self.assertRaises(SyntaxError):
-            pysvd.element.Fields(None, node)
-
-    def test_attributes(self):
-        xml = '''
-        <fields>
-            <field>
-                <name>TimerCtrl0_IntSel</name>
-                <description>Select interrupt line that is triggered by timer overflow.</description>
-                <bitOffset>1</bitOffset>
-                <bitWidth>3</bitWidth>
-                <access>read-write</access>
-                <modifiedWriteValues>oneToSet</modifiedWriteValues>
-                <writeConstraint>
-                    <range>
-                        <minimum>0</minimum>
-                        <maximum>5</maximum>
-                    </range>
-                </writeConstraint>
-                <readAction>clear</readAction>
-            </field>
-            <field>
-                <name>BIT1</name>
-                <description>test</description>
-                <bitRange>[7:0]</bitRange>
-                <access>read-write</access>
-            </field>
-        </fields>
-        '''
-
-        node = ET.fromstring(xml)
-        test = pysvd.element.Fields(None, node)
-
-        self.assertEqual(len(test.field), 2)
-
-        self.assertEqual(test.field[0].name, "TimerCtrl0_IntSel")
-        self.assertEqual(test.field[0].description, "Select interrupt line that is triggered by timer overflow.")
-        self.assertEqual(test.field[0].bitOffset, 1)
-        self.assertEqual(test.field[0].bitWidth, 3)
-        self.assertEqual(test.field[0].access, pysvd.type.access.read_write)
-        self.assertEqual(test.field[0].modifiedWriteValues, pysvd.type.modifiedWriteValues.oneToSet)
-        self.assertEqual(test.field[0].readAction, pysvd.type.readAction.clear)
-        self.assertIsNotNone(test.field[0].writeConstraint)
-        self.assertEqual(test.field[0].writeConstraint.rangeMinimum, 0)
-        self.assertEqual(test.field[0].writeConstraint.rangeMaximum, 5)
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[0].enumeratedValue)
-
-        self.assertEqual(test.field[1].name, "BIT1")
-        self.assertEqual(test.field[1].description, "test")
-        self.assertEqual(test.field[1].bitOffset, 0)
-        self.assertEqual(test.field[1].bitWidth, 8)
-        self.assertEqual(test.field[1].access, pysvd.type.access.read_write)
-        self.assertEqual(test.field[1].modifiedWriteValues, pysvd.type.modifiedWriteValues.modify)
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[1].readAction)
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[1].writeConstraint)
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.field[1].enumeratedValue)
-
-    def test_derived(self):
-        pass
-"""
 
 
 class TestElementField(unittest.TestCase):
@@ -690,9 +544,6 @@ class TestElementField(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertIsNotNone(test.enumeratedValue)
 
-    def test_derived(self):
-        pass
-
 
 class TestElementEnumberatedValues(unittest.TestCase):
 
@@ -761,9 +612,6 @@ class TestElementEnumberatedValues(unittest.TestCase):
         self.assertEqual(test.enumeratedValue[2].description, "Reserved values. Do not use.")
         self.assertTrue(test.enumeratedValue[2].isDefault)
 
-    def test_derived(self):
-        pass
-
 
 class TestElementEnumberatedValue(unittest.TestCase):
 
@@ -819,3 +667,42 @@ class TestElementEnumberatedValue(unittest.TestCase):
 
         with self.assertRaises(AttributeError):
             self.assertIsNone(test.value)
+
+
+class TestElementDimArrayIndex(unittest.TestCase):
+
+    def test_exception(self):
+        xml = '''<dimArrayIndex />'''
+        node = ET.fromstring(xml)
+        with self.assertRaises(SyntaxError):
+            pysvd.element.DimArrayIndex(None, node)
+
+    def test_attributes(self):
+        xml = '''
+        <dimArrayIndex>
+            <headerEnumName>FSMC_EnumArray</headerEnumName>
+            <enumeratedValue>
+                <name>UART0</name>
+                <description>UART0 Peripheral</description>
+                <value>0</value>
+            </enumeratedValue>
+            <enumeratedValue>
+                <name>TIMER0</name>
+                <description>TIMER0 Peripheral</description>
+                <value>1</value>
+            </enumeratedValue>
+        </dimArrayIndex>'''
+
+        node = ET.fromstring(xml)
+        test = pysvd.element.DimArrayIndex(None, node)
+
+        self.assertEqual(test.headerEnumName, "FSMC_EnumArray")
+        self.assertEqual(len(test.enumeratedValue), 2)
+
+        self.assertEqual(test.enumeratedValue[0].name, "UART0")
+        self.assertEqual(test.enumeratedValue[0].description, "UART0 Peripheral")
+        self.assertEqual(test.enumeratedValue[0].value, 0)
+
+        self.assertEqual(test.enumeratedValue[1].name, "TIMER0")
+        self.assertEqual(test.enumeratedValue[1].description, "TIMER0 Peripheral")
+        self.assertEqual(test.enumeratedValue[1].value, 1)
