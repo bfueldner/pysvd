@@ -1,17 +1,18 @@
-dist: xenial
 language: python
+dist: xenial
 python:
 - '3.4'
 - '3.5'
 - '3.6'
 - '3.7'
+- '3.8-dev'
+- pypy3
 install:
 - pip install -e .
 before_script:
 - pip install -r requirements.txt
 script:
-- py.test --verbose --color=yes --cov-report xml --cov pysvd --pep8 pysvd --flakes
-  pysvd test
+- py.test --verbose --color=yes --cov-report xml --cov pysvd --pep8 pysvd --flakes pysvd test
 after_success:
 - coveralls
 deploy:
