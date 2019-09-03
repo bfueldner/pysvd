@@ -211,7 +211,7 @@ class TestElementSauRegionsConfig(unittest.TestCase):
 
     def test_attributes(self):
         xml = '''
-        <sauRegionsConfig>
+        <sauRegionsConfig enabled="true" protectionWhenDisabled="n">
             <region name="SAU1">
                 <base>0x10001000</base>
                 <limit>0x10005000</limit>
@@ -225,6 +225,9 @@ class TestElementSauRegionsConfig(unittest.TestCase):
         </sauRegionsConfig>'''
         node = ET.fromstring(xml)
         test = pysvd.element.SauRegionConfig(None, node)
+
+        self.assertTrue(test.enabled)
+        self.assertEqual(test.protectionWhenDisabled, pysvd.type.protection.non_secure)
 
         self.assertEqual(len(test.region), 2)
 

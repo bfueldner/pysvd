@@ -21,37 +21,35 @@ class Device(pysvd.classes.Base):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['schemaVersion'] = pysvd.parser.Text(pysvd.node.Attribute(node, 'schemaVersion', True))
+        self.__dict__['schemaVersion'] = pysvd.parser.Text(pysvd.node.Attribute(node, 'schemaVersion', True))
 
-        attr['vendor'] = pysvd.parser.Text(pysvd.node.Element(node, 'vendor'))
-        attr['vendorID'] = pysvd.parser.Text(pysvd.node.Element(node, 'vendorID'))
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['series'] = pysvd.parser.Text(pysvd.node.Element(node, 'series'))
-        attr['version'] = pysvd.parser.Text(pysvd.node.Element(node, 'version', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', True))
-        license_text = pysvd.parser.Text(pysvd.node.Element(node, 'licenseText'))
-        attr['headerSystemFilename'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerSystemFilename'))
-        attr['headerDefinitionsPrefix'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerDefinitionsPrefix'))
-        attr['addressUnitBits'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressUnitBits', True))
-        attr['width'] = pysvd.parser.Integer(pysvd.node.Element(node, 'width', True))
+        self.add_attribute(node, 'vendor', pysvd.parser.Text)
+        self.add_attribute(node, 'vendorID', pysvd.parser.Text)
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'series', pysvd.parser.Text)
+        self.add_attribute(node, 'version', pysvd.parser.Text, True)
+        self.add_attribute(node, 'description', pysvd.parser.Text, True)
+        self.add_attribute(node, 'licenseText', pysvd.parser.Text)
+        self.add_attribute(node, 'headerSystemFilename', pysvd.parser.Text)
+        self.add_attribute(node, 'headerDefinitionsPrefix', pysvd.parser.Text)
+        self.add_attribute(node, 'addressUnitBits', pysvd.parser.Integer, True)
+        self.add_attribute(node, 'width', pysvd.parser.Integer, True)
 
         # property group
-        attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'), 32)
-        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'), pysvd.type.access.read_write)
-        attr['protection'] = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Element(node, 'protection'), pysvd.type.protection.none)
-        attr['resetValue'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetValue'), 0x00000000)
-        attr['resetMask'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetMask'), 0xFFFFFFFF)
+        self.add_attribute(node, 'size', pysvd.parser.Integer, False, 32)
+        self.add_enum_attribute(node, 'access', pysvd.type.access, False, pysvd.type.access.read_write)
+        self.add_enum_attribute(node, 'protection', pysvd.type.protection, False, pysvd.type.protection.none)
+        self.add_attribute(node, 'resetValue', pysvd.parser.Integer, False, 0x00000000)
+        self.add_attribute(node, 'resetMask', pysvd.parser.Integer, False, 0xFFFFFFFF)
 
         # Clean up license text from whitespaces
         result = ''
-        if license_text is not None:
-            for line in license_text.splitlines():
+        if hasattr(self, 'licenseText'):
+            for line in self.licenseText.splitlines():
                 line = line.strip()
                 if len(line):
                     result += line + '\n'
-        attr['licenseText'] = result
-        self.add_attributes(attr)
+            self.licenseText = result
 
         cpu_node = node.find('cpu')
         if cpu_node is not None:
@@ -86,26 +84,24 @@ class Cpu(pysvd.classes.Parent):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Enum(pysvd.type.cpuName, pysvd.node.Element(node, 'name', True).replace('+', 'PLUS'))
-        attr['revision'] = pysvd.parser.Text(pysvd.node.Element(node, 'revision', True))
-        attr['endian'] = pysvd.parser.Enum(pysvd.type.endian, pysvd.node.Element(node, 'endian', True))
-        attr['mpuPresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'mpuPresent', True))
-        attr['fpuPresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'fpuPresent', True))
+        self.__dict__['name'] = pysvd.parser.Enum(pysvd.type.cpuName, pysvd.node.Element(node, 'name', True).replace('+', 'PLUS'))
+        self.add_attribute(node, 'revision', pysvd.parser.Text, True)
+        self.add_enum_attribute(node, 'endian', pysvd.type.endian, True)
+        self.add_attribute(node, 'mpuPresent', pysvd.parser.Boolean, True)
+        self.add_attribute(node, 'fpuPresent', pysvd.parser.Boolean, True)
 
-        attr['fpuDP'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'fpuDP'))
-        attr['icachePresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'icachePresent'))
-        attr['dcachePresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'dcachePresent'))
-        attr['itcmPresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'itcmPresent'))
-        attr['dtcmPresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'dtcmPresent'))
-        attr['vtorPresent'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'vtorPresent'), True)
+        self.add_attribute(node, 'fpuDP', pysvd.parser.Boolean)
+        self.add_attribute(node, 'icachePresent', pysvd.parser.Boolean)
+        self.add_attribute(node, 'dcachePresent', pysvd.parser.Boolean)
+        self.add_attribute(node, 'itcmPresent', pysvd.parser.Boolean)
+        self.add_attribute(node, 'dtcmPresent', pysvd.parser.Boolean)
+        self.add_attribute(node, 'vtorPresent', pysvd.parser.Boolean, False, True)
 
-        attr['nvicPrioBits'] = pysvd.parser.Integer(pysvd.node.Element(node, 'nvicPrioBits', True))
-        attr['vendorSystickConfig'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'vendorSystickConfig', True))
+        self.add_attribute(node, 'nvicPrioBits', pysvd.parser.Integer, True)
+        self.add_attribute(node, 'vendorSystickConfig', pysvd.parser.Boolean, True)
 
-        attr['deviceNumInterrupts'] = pysvd.parser.Integer(pysvd.node.Element(node, 'deviceNumInterrupts'))
-        attr['sauNumRegions'] = pysvd.parser.Integer(pysvd.node.Element(node, 'sauNumRegions'))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'deviceNumInterrupts', pysvd.parser.Integer)
+        self.add_attribute(node, 'sauNumRegions', pysvd.parser.Integer)
 
         sau_regions_config_node = node.find('./sauRegionsConfig')
         if sau_regions_config_node is not None:
@@ -118,7 +114,7 @@ class SauRegionConfig(pysvd.classes.Group):
     """Set the configuration for the Secure Attribution Unit (SAU) when they are preconfigured by HW or Firmware.
     """
 
-    attributes = ['protection']
+    attributes = ['protectionWhenDisabled']
 
     def __init__(self, parent, node):
         self.region = []
@@ -128,10 +124,13 @@ class SauRegionConfig(pysvd.classes.Group):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['enabled'] = pysvd.parser.Boolean(pysvd.node.Attribute(node, 'enabled'))
-        attr['protection'] = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Element(node, 'protectionWhenDisabled'))
-        self.add_attributes(attr)
+        enabled = pysvd.parser.Boolean(pysvd.node.Attribute(node, 'enabled'))
+        if enabled is not None:
+            self.__dict__['enabled'] = enabled
+
+        protectionWhenDisabled = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Attribute(node, 'protectionWhenDisabled'))
+        if protectionWhenDisabled is not None:
+            self.__dict__['protectionWhenDisabled'] = protectionWhenDisabled
 
         for sau_regions_config_region_node in node.findall('region'):
             self.region.append(SauRegionsConfigRegion(self, sau_regions_config_region_node))
@@ -150,14 +149,14 @@ class SauRegionsConfigRegion(pysvd.classes.Parent):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['enabled'] = pysvd.parser.Boolean(pysvd.node.Attribute(node, 'enabled'), True)
-        attr['name'] = pysvd.parser.Text(pysvd.node.Attribute(node, 'name'))
+        self.__dict__['enabled'] = pysvd.parser.Boolean(pysvd.node.Attribute(node, 'enabled'), True)
+        name = pysvd.parser.Text(pysvd.node.Attribute(node, 'name'))
+        if name is not None:
+            self.__dict__['name'] = name
 
-        attr['base'] = pysvd.parser.Integer(pysvd.node.Element(node, 'base', True))
-        attr['limit'] = pysvd.parser.Integer(pysvd.node.Element(node, 'limit', True))
-        attr['access'] = pysvd.parser.Enum(pysvd.type.sauAccess, pysvd.node.Element(node, 'access', True))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'base', pysvd.parser.Integer, True)
+        self.add_attribute(node, 'limit', pysvd.parser.Integer, True)
+        self.add_enum_attribute(node, 'access', pysvd.type.sauAccess, True)
 
 
 # /device/peripherals
@@ -194,16 +193,14 @@ class Peripheral(pysvd.classes.Dim):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['version'] = pysvd.parser.Text(pysvd.node.Element(node, 'version'))
-        attr['alternatePeripheral'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternatePeripheral'))
-        attr['groupName'] = pysvd.parser.Text(pysvd.node.Element(node, 'groupName'))
-        attr['prependToName'] = pysvd.parser.Text(pysvd.node.Element(node, 'prependToName'))
-        attr['appendToName'] = pysvd.parser.Text(pysvd.node.Element(node, 'appendToName'))
-        attr['headerStructName'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerStructName'))
-        attr['disableDondition'] = pysvd.parser.Text(pysvd.node.Element(node, 'disableCondition'))
-        attr['baseAddress'] = pysvd.parser.Integer(pysvd.node.Element(node, 'baseAddress', True))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'version', pysvd.parser.Text)
+        self.add_attribute(node, 'alternatePeripheral', pysvd.parser.Text)
+        self.add_attribute(node, 'groupName', pysvd.parser.Text)
+        self.add_attribute(node, 'prependToName', pysvd.parser.Text)
+        self.add_attribute(node, 'appendToName', pysvd.parser.Text)
+        self.add_attribute(node, 'headerStructName', pysvd.parser.Text)
+        self.add_attribute(node, 'disableCondition', pysvd.parser.Text)
+        self.add_attribute(node, 'baseAddress', pysvd.parser.Integer, True)
 
         address_block_node = node.find('./addressBlock')
         if address_block_node is not None:
@@ -244,12 +241,10 @@ class AddressBlock(pysvd.classes.Group):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['offset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'offset', True))
-        attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size', True))
-        attr['usage'] = pysvd.parser.Enum(pysvd.type.addressBlockUsage, pysvd.node.Element(node, 'usage', True))
-        attr['protection'] = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Element(node, 'protection'))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'offset', pysvd.parser.Integer, True)
+        self.add_attribute(node, 'size', pysvd.parser.Integer, True)
+        self.add_enum_attribute(node, 'usage', pysvd.type.addressBlockUsage, True)
+        self.add_enum_attribute(node, 'protection', pysvd.type.protection)
 
 
 # /device/peripherals/peripheral/interrupt
@@ -264,11 +259,9 @@ class Interrupt(pysvd.classes.Parent):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
-        attr['value'] = pysvd.parser.Integer(pysvd.node.Element(node, 'value', True))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'description', pysvd.parser.Text)
+        self.add_attribute(node, 'value', pysvd.parser.Integer, True)
 
 
 # /device/peripherals/peripheral/registers
@@ -304,19 +297,17 @@ class Cluster(pysvd.classes.Dim):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', self.derived))
-        attr['alternateCluster'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateCluster'))
-        attr['headerStructName'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerStructName'))
-        attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset', True))
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'alternateCluster', pysvd.parser.Text)
+        self.add_attribute(node, 'headerStructName', pysvd.parser.Text)
+        self.add_attribute(node, 'addressOffset', pysvd.parser.Integer, True)
 
-        attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'))
-        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'))
-        attr['protection'] = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Element(node, 'protection'))
-        attr['resetValue'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetValue'))
-        attr['resetMask'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetMask'))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'size', pysvd.parser.Integer)
+        self.add_enum_attribute(node, 'access', pysvd.type.access)
+        self.add_enum_attribute(node, 'protection', pysvd.type.protection)
+        self.add_attribute(node, 'resetValue', pysvd.parser.Integer)
+        self.add_attribute(node, 'resetMask', pysvd.parser.Integer)
 
         Register.add_elements(self, self.register, node, 'register')
         Cluster.add_elements(self, self.cluster, node, 'cluster')
@@ -348,25 +339,22 @@ class Register(pysvd.classes.Dim):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['displayName'] = pysvd.parser.Text(pysvd.node.Element(node, 'displayName'))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', self.derived))
-        attr['alternateGroup'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateGroup'))
-        attr['alternateRegister'] = pysvd.parser.Text(pysvd.node.Element(node, 'alternateRegister'))
-        attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset', True))
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'displayName', pysvd.parser.Text)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'alternateGroup', pysvd.parser.Text)
+        self.add_attribute(node, 'alternateRegister', pysvd.parser.Text)
+        self.add_attribute(node, 'addressOffset', pysvd.parser.Integer, True)
 
-        attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'))
-        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'))
-        attr['protection'] = pysvd.parser.Enum(pysvd.type.protection, pysvd.node.Element(node, 'protection'))
-        attr['resetValue'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetValue'))
-        attr['resetMask'] = pysvd.parser.Integer(pysvd.node.Element(node, 'resetMask'))
+        self.add_attribute(node, 'size', pysvd.parser.Integer)
+        self.add_enum_attribute(node, 'access', pysvd.type.access)
+        self.add_enum_attribute(node, 'protection', pysvd.type.protection)
+        self.add_attribute(node, 'resetValue', pysvd.parser.Integer)
+        self.add_attribute(node, 'resetMask', pysvd.parser.Integer)
 
-        attr['dataType'] = pysvd.parser.Enum(pysvd.type.dataType, pysvd.node.Element(node, 'dataType'))
-        attr['modifiedWriteValues'] = pysvd.parser.Enum(
-            pysvd.type.modifiedWriteValues, pysvd.node.Element(node, 'modifiedWriteValues'), pysvd.type.modifiedWriteValues.modify)
-        attr['readAction'] = pysvd.parser.Enum(pysvd.type.readAction, pysvd.node.Element(node, 'readAction'))
-        self.add_attributes(attr)
+        self.add_enum_attribute(node, 'dataType', pysvd.type.dataType)
+        self.add_enum_attribute(node, 'modifiedWriteValues', pysvd.type.modifiedWriteValues, False, pysvd.type.modifiedWriteValues.modify)
+        self.add_enum_attribute(node, 'readAction', pysvd.type.readAction)
 
         write_constraint_node = node.find('./writeConstraint')
         if write_constraint_node is not None:
@@ -399,14 +387,13 @@ class WriteConstraint(pysvd.classes.Parent):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
         writeAsRead = pysvd.node.Element(node, 'writeAsRead')
         useEnumeratedValues = pysvd.node.Element(node, 'useEnumeratedValues')
         range_node = node.find("./range")
         if writeAsRead is not None:
-            attr['writeAsRead'] = pysvd.parser.Boolean(writeAsRead)
+            self.__dict__['writeAsRead'] = pysvd.parser.Boolean(writeAsRead)
         elif useEnumeratedValues is not None:
-            attr['useEnumeratedValues'] = pysvd.parser.Boolean(useEnumeratedValues)
+            self.__dict__['useEnumeratedValues'] = pysvd.parser.Boolean(useEnumeratedValues)
         else:
             rangeMinimum = None
             rangeMaximum = None
@@ -417,10 +404,8 @@ class WriteConstraint(pysvd.classes.Parent):
             if rangeMinimum is None or rangeMaximum is None:
                 raise SyntaxError("Either 'writeAsRead', 'useEnumeratedValues' or 'range' is mandatory in 'writeConstraint'")
 
-            attr['rangeMinimum'] = pysvd.parser.Integer(rangeMinimum)
-            attr['rangeMaximum'] = pysvd.parser.Integer(rangeMaximum)
-
-        self.add_attributes(attr)
+            self.__dict__['rangeMinimum'] = pysvd.parser.Integer(rangeMinimum)
+            self.__dict__['rangeMaximum'] = pysvd.parser.Integer(rangeMaximum)
 
 
 # /device/peripherals/peripheral/registers/.../register/fields
@@ -453,9 +438,8 @@ class Field(pysvd.classes.Dim):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', self.derived))
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
 
         # bitRangeOffsetWidthStyle
         bitOffset = pysvd.parser.Integer(pysvd.node.Element(node, 'bitOffset'))
@@ -470,7 +454,7 @@ class Field(pysvd.classes.Dim):
             if lsb is None or msb is None:
                 bitRange = pysvd.parser.Text(pysvd.node.Element(node, 'bitRange'))
                 if bitRange is None:
-                    raise ValueError("Field '{}' has no valid bit-range".format(attr['name']))
+                    raise ValueError("Field '{}' has no valid bit-range".format(self.name if hasattr(self, 'name') else '<unknown>'))
 
                 match = re.search('\[([0-9]+):([0-9]+)\]', bitRange)
                 lsb = int(match.group(2))
@@ -479,14 +463,12 @@ class Field(pysvd.classes.Dim):
             bitOffset = lsb
             bitWidth = (msb - lsb) + 1
 
-        attr['bitOffset'] = bitOffset
-        attr['bitWidth'] = bitWidth
+        self.__dict__['bitOffset'] = bitOffset
+        self.__dict__['bitWidth'] = bitWidth
 
-        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'))
-        attr['modifiedWriteValues'] = pysvd.parser.Enum(
-            pysvd.type.modifiedWriteValues, pysvd.node.Element(node, 'modifiedWriteValues'), pysvd.type.modifiedWriteValues.modify)
-        attr['readAction'] = pysvd.parser.Enum(pysvd.type.readAction, pysvd.node.Element(node, 'readAction'))
-        self.add_attributes(attr)
+        self.add_enum_attribute(node, 'access', pysvd.type.access)
+        self.add_enum_attribute(node, 'modifiedWriteValues', pysvd.type.modifiedWriteValues, False, pysvd.type.modifiedWriteValues.modify)
+        self.add_enum_attribute(node, 'readAction', pysvd.type.readAction)
 
         write_constraint_node = node.find('./writeConstraint')
         if write_constraint_node is not None:
@@ -521,17 +503,16 @@ class EnumeratedValues(pysvd.classes.Derive):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name'))
-        attr['headerEnumName'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerEnumName'))
-        attr['usage'] = pysvd.parser.Enum(pysvd.type.enumUsage, pysvd.node.Element(node, 'usage'), pysvd.type.enumUsage.read_write)
-        self.add_attributes(attr)
+        self.add_attribute(node, 'name', pysvd.parser.Text)
+        self.add_attribute(node, 'headerEnumName', pysvd.parser.Text)
+        self.add_enum_attribute(node, 'usage', pysvd.type.enumUsage, False, pysvd.type.enumUsage.read_write)
 
         for child in node.findall('./enumeratedValue'):
             self.enumeratedValue.append(EnumeratedValue(self, child))
 
         if len(self.enumeratedValue) < 1:
-            raise SyntaxError("At least one element of enumeratedValue is needed in enumeratedValues '{}'".format(attr['name']))
+            raise SyntaxError("At least one element of enumeratedValue is needed in enumeratedValues '{}'".format(
+                self.name if hasattr(self, 'name') else '<unknown>'))
 
 
 # /device/peripherals/peripheral/registers/.../enumeratedValue
@@ -546,15 +527,14 @@ class EnumeratedValue(pysvd.classes.Parent):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name'))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
-        attr['value'] = pysvd.parser.Integer(pysvd.node.Element(node, 'value'))
-        attr['isDefault'] = pysvd.parser.Boolean(pysvd.node.Element(node, 'isDefault'))
-        if attr['value'] is None and attr['isDefault'] is None:
-            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(attr['name']))
+        self.add_attribute(node, 'name', pysvd.parser.Text)
+        self.add_attribute(node, 'description', pysvd.parser.Text)
+        self.add_attribute(node, 'value', pysvd.parser.Integer)
+        self.add_attribute(node, 'isDefault', pysvd.parser.Boolean)
 
-        self.add_attributes(attr)
+        if not hasattr(self, 'value') and not hasattr(self, 'isDefault'):
+            raise SyntaxError("Either 'value' or 'isDefault' is mandatory in enumeratedValue '{}'".format(
+                self.name if hasattr(self, 'name') else '<unknown>'))
 
 
 # /device/peripherals/peripheral/.../dimArrayIndex
@@ -573,12 +553,11 @@ class DimArrayIndex(pysvd.classes.Parent):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['headerEnumName'] = pysvd.parser.Text(pysvd.node.Element(node, 'headerEnumName'))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'headerEnumName', pysvd.parser.Text)
 
         for child in node.findall('./enumeratedValue'):
             self.enumeratedValue.append(EnumeratedValue(self, child))
 
         if len(self.enumeratedValue) < 1:
-            raise SyntaxError("At least one element of enumeratedValue is needed in dimArrayIndex '{}'".format(attr['headerEnumName']))
+            raise SyntaxError("At least one element of enumeratedValue is needed in dimArrayIndex '{}'".format(
+                self.headerEnumName if hasattr(self, 'headerEnumName') else '<unknown>'))

@@ -19,9 +19,17 @@ class Base(object):
         """Overwrite in derived classes to parse nodes"""
         pass
 
-    def add_attributes(self, attr):
-        """Add not 'None' entries as class attributes"""
-        self.__dict__.update({k: v for k, v in attr.items() if v is not None})
+    def add_attribute(self, node, name, parser_type, mandatory=False, default=None):
+        """Parse node element as given type and add it to self if not None"""
+        value = parser_type(pysvd.node.Element(node, name, mandatory), default)
+        if value is not None:
+            self.__dict__[name] = value
+
+    def add_enum_attribute(self, node, name, enum, mandatory=False, default=None):
+        """Parse node element as given enum and add it to self if not None"""
+        value = pysvd.parser.Enum(enum, pysvd.node.Element(node, name, mandatory), default)
+        if value is not None:
+            self.__dict__[name] = value
 
     def find(self, name):
         """Find child by name. Has to be overwritten by each derived class with child elements."""

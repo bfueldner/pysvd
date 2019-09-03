@@ -43,12 +43,10 @@ class HelperClassDeriveRegister(pysvd.classes.Derive):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', True))
-        attr['addressOffset'] = pysvd.parser.Integer(pysvd.node.Element(node, 'addressOffset'))
-        attr['size'] = pysvd.parser.Integer(pysvd.node.Element(node, 'size'))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'description', pysvd.parser.Text, True)
+        self.add_attribute(node, 'addressOffset', pysvd.parser.Integer)
+        self.add_attribute(node, 'size', pysvd.parser.Integer)
 
         HelperClassDeriveField.add_elements(self, self.field, node, 'field')
 
@@ -67,11 +65,9 @@ class HelperClassDeriveField(pysvd.classes.Derive):
     def parse(self, node):
         super().parse(node)
 
-        attr = {}
-        attr['name'] = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        attr['description'] = pysvd.parser.Text(pysvd.node.Element(node, 'description', True))
-        attr['access'] = pysvd.parser.Enum(pysvd.type.access, pysvd.node.Element(node, 'access'))
-        self.add_attributes(attr)
+        self.add_attribute(node, 'name', pysvd.parser.Text, True)
+        self.add_attribute(node, 'description', pysvd.parser.Text, True)
+        self.add_attribute(node, 'access', pysvd.type.access)
 
 
 class HelperClassDim(pysvd.classes.Dim):
@@ -106,7 +102,7 @@ class TestClassBase(unittest.TestCase):
         attr['name'] = 'test'
         attr['enable'] = True
         attr['none'] = None
-        test.add_attributes(attr)
+        test.__dict__.update(attr)
 
         self.assertEqual(test.name, 'test')
         self.assertTrue(test.enable)
@@ -139,7 +135,7 @@ class TestClassParent(unittest.TestCase):
         attr['name'] = 'test'
         attr['enable'] = True
         attr['none'] = None
-        test.add_attributes(attr)
+        test.__dict__.update(attr)
 
         self.assertEqual(test.name, 'test')
         self.assertTrue(test.enable)
@@ -172,7 +168,7 @@ class TestClassGroup(unittest.TestCase):
         attr['name'] = 'test'
         attr['enable'] = True
         attr['none'] = None
-        test.add_attributes(attr)
+        test.__dict__.update(attr)
 
         self.assertEqual(test.name, 'test')
         self.assertTrue(test.enable)
@@ -193,9 +189,9 @@ class TestClassGroup(unittest.TestCase):
         }
 
         test = pysvd.classes.Group(None, None)
-        test.add_attributes(test_attr)
+        test.__dict__.update(test_attr)
         child = pysvd.classes.Group(test, None)
-        child.add_attributes(child_attr)
+        child.__dict__.update(child_attr)
 
         self.assertEqual(type(test), pysvd.classes.Group)
         self.assertEqual(type(child), pysvd.classes.Group)
@@ -232,11 +228,11 @@ class TestClassGroup(unittest.TestCase):
         }
 
         test = pysvd.classes.Group(None, None)
-        test.add_attributes(test_attr)
+        test.__dict__.update(test_attr)
         child = pysvd.classes.Group(test, None)
-        child.add_attributes(child_attr)
+        child.__dict__.update(child_attr)
         subchild = pysvd.classes.Group(child, None)
-        subchild.add_attributes(subchild_attr)
+        subchild.__dict__.update(subchild_attr)
 
         self.assertEqual(type(test), pysvd.classes.Group)
         self.assertEqual(type(child), pysvd.classes.Group)
@@ -277,9 +273,9 @@ class TestClassGroup(unittest.TestCase):
         }
 
         test = pysvd.classes.Group(None, None)
-        test.add_attributes(test_attr)
+        test.__dict__.update(test_attr)
         child = HelperClassGroupAttributes(test, None)
-        child.add_attributes(child_attr)
+        child.__dict__.update(child_attr)
 
         self.assertEqual(type(test), pysvd.classes.Group)
         self.assertEqual(type(child), HelperClassGroupAttributes)
