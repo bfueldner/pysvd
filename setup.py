@@ -1,12 +1,6 @@
 import setuptools
 import unittest
 
-def my_test_suite():
-    test_loader = unittest.TestLoader()
-    test_suite = test_loader.discover('test', pattern='test_*.py')
-    print(test_suite)
-    return test_suite
-
 exec(open('pysvd/version.py').read())
 
 with open("README.md", "r") as fh:
@@ -34,10 +28,6 @@ setuptools.setup(
         "Topic :: Software Development :: Code Generators",
         "Topic :: Software Development :: Embedded Systems",
     ],
-
-    # Tests can be run using `python setup.py test`
-#   test_suite = "setup.my_test_suite",
-#   tests_require = ["pytest"]
-    test_suite="nose.collector",
-    tests_require=["nose"]
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"]
 )
