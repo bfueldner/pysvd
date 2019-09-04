@@ -3,8 +3,8 @@ import unittest
 
 exec(open('pysvd/version.py').read())
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open("README.md", "r") as file:
+    long_description = file.read()
 
 setuptools.setup(
     name="pysvd",
@@ -19,15 +19,26 @@ setuptools.setup(
     url="https://code.fueldner.net/opensource/pysvd",
     packages=setuptools.find_packages(),
     classifiers=[
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: System :: Hardware",
         "Topic :: System :: Hardware :: Hardware Drivers",
         "Topic :: Software Development :: Code Generators",
         "Topic :: Software Development :: Embedded Systems",
     ],
+    python_requires='>=3.4',
+    entry_points={
+        'console_scripts': [
+            'svd2rst = scripts.svd2rst:main',
+        ],
+    },
     setup_requires=["pytest-runner"],
     tests_require=["pytest"]
 )
