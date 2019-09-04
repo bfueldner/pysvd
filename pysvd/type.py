@@ -34,6 +34,9 @@ class cpuName(Enum):
     CA72 = 'CA72'
     other = 'other'
 
+    def __str__(self):
+        return self.value
+
 
 # revision
 # Specifies the CPU revision format as defined by ARM (rNpM)
@@ -46,6 +49,9 @@ class endian(Enum):
     big = 'big'
     selectable = 'selectable'
     other = 'other'
+
+    def __str__(self):
+        return self.value
 
 
 class dataType(Enum):
@@ -68,6 +74,9 @@ class dataType(Enum):
     int16_t_ptr = 'int16_t *'
     int32_t_ptr = 'int32_t *'
     int64_t_ptr = 'int64_t *'
+
+    def __str__(self):
+        return self.value
 
 
 # nvicPrioBits
@@ -96,6 +105,9 @@ class protection(Enum):
     non_secure = 'n'
     privileged = 'p'
 
+    def __str__(self):
+        return self.name.replace('_', '-')
+
 
 class sauAccess(Enum):
     """V1.3: SAU Access Type"""
@@ -103,6 +115,9 @@ class sauAccess(Enum):
     none = ''
     non_secure_callable_secure = 'c'
     non_secure = 'n'
+
+    def __str__(self):
+        return self.name.replace('_', '-')
 
 
 # dimIndex
@@ -145,6 +160,9 @@ class modifiedWriteValues(Enum):
     set = 'set'
     modify = 'modify'
 
+    def __str__(self):
+        return self.value
+
 
 class readAction(Enum):
     """Specifies the pre-defined tokens for read side effects"""
@@ -153,6 +171,9 @@ class readAction(Enum):
     set = 'set'
     modify = 'modify'
     modifyExternal = 'modifyExternal'
+
+    def __str__(self):
+        return self.value
 
 
 class enumUsage(Enum):
@@ -164,8 +185,14 @@ class enumUsage(Enum):
     write = 'write'
     read_write = 'read-write'
 
+    def __str__(self):
+        return self.value
+
 
 class addressBlockUsage(Enum):
     registers = 'registers'
     buffer = 'buffer'
     reserved = 'reserved'
+
+    def __str__(self):
+        return self.value
