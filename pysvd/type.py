@@ -128,6 +128,9 @@ class access(Enum):
     writeOnce = 'writeOnce'
     read_writeOnce = 'read-writeOnce'
 
+    def __str__(self):
+        return self.value
+
 
 class modifiedWriteValues(Enum):
     """Specifies the pre-defined tokens for the write side effects"""
