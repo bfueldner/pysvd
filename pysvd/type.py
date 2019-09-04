@@ -1,4 +1,4 @@
-"""SVD types from schema file 1.3.3
+"""SVD types from XSD schema file v1.3.3
 
 Note: Type order taken from XSD file.
 """

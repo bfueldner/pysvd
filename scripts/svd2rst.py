@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
+"""pysvd example project.
+
+Read SVD file and generate device datasheet in rst format.
+"""
 
 import argparse
 import xml.etree.ElementTree as ET
