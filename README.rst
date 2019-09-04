@@ -1,11 +1,8 @@
-pysvd
-=====
-
-.. image:: https://img.shields.io/pypi/v/pysvd.svg
+.. image:: https://img.shields.io/pypi/v/pysvd
     :target: https://pypi.org/project/pysvd
     :alt: Latest version on pypi
 
-.. image:: https://img.shields.io/pypi/pyversions/pysvd.svg
+.. image:: https://img.shields.io/pypi/pyversions/pysvd
     :target: https://pypi.org/project/pysvd
     :alt: Python versions
 
@@ -19,6 +16,10 @@ pysvd
 .. image:: https://coveralls.io/repos/github/bfueldner/pysvd/badge.svg?branch=master
     :target: https://coveralls.io/github/bfueldner/pysvd?branch=master
 
+
+pysvd
+=====
+
 A **S**\ ystem **V**\ iew **D**\ escription parser package for python.
 
 This library supports Python 3.4+.
@@ -29,17 +30,18 @@ Installation
 
 Install from PyPI_ using pip::
 
-    $ pip install pysvd
+    $ pip3 install pysvd
 
 Install from latest master on GitHub::
 
-    $ pip install https://github.com/bfueldner/pysvd/archive/master.zip
+    $ pip3 install https://github.com/bfueldner/pysvd/archive/master.zip
 
 If you want to be able to change the code while using it, clone it and install the required pip packages::
 
     $ git clone https://github.com/bfueldner/pysvd.git
     $ cd pysvd
-    $ pip install -e .
+    $ pip3 install -e .
+
 
 Conformance
 -----------
