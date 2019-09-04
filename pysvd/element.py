@@ -1,3 +1,5 @@
+"""SVD elements from XSD schema file v1.3.3
+"""
 import re
 import pysvd
 

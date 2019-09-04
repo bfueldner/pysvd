@@ -16,7 +16,11 @@ setuptools.setup(
     license="MIT",
     author="Benjamin Füldner",
     author_email="benjamin@fueldner.net",
-    url="https://code.fueldner.net/opensource/pysvd",
+    url="https://github.com/bfueldner/pysvd",
+    project_urls={
+        'Bug Reports': 'https://github.com/bfueldner/pysvd/issues',
+        'Source': 'https://github.com/bfueldner/pysvd',
+    },
     packages=setuptools.find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
