@@ -58,9 +58,10 @@ class TestTreeComplete(unittest.TestCase):
             self.assertEqual(peripheral.resetMask, 0xffffffff)
 
             # addressBlock
-            self.assertEqual(peripheral.addressBlock.offset, 0)
-            self.assertEqual(peripheral.addressBlock.size, 0x100)
-            self.assertEqual(peripheral.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
+            self.assertEqual(len(peripheral.addressBlock), 1)
+            self.assertEqual(peripheral.addressBlock[0].offset, 0)
+            self.assertEqual(peripheral.addressBlock[0].size, 0x100)
+            self.assertEqual(peripheral.addressBlock[0].usage, pysvd.type.addressBlockUsage.registers)
 
     def test_peripheral_derivedFrom_attributes(self):
         device = self.device
@@ -76,9 +77,10 @@ class TestTreeComplete(unittest.TestCase):
                 self.assertIsNone(peripheral.derivedFrom)
 
                 # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER0")
-                self.assertEqual(peripheral.interrupt.description, "Timer 0 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 0)
+                self.assertEqual(len(peripheral.interrupt), 1)
+                self.assertEqual(peripheral.interrupt[0].name, "TIMER0")
+                self.assertEqual(peripheral.interrupt[0].description, "Timer 0 interrupt")
+                self.assertEqual(peripheral.interrupt[0].value, 0)
 
             elif peripheral_index == 1:
                 # general
@@ -88,9 +90,10 @@ class TestTreeComplete(unittest.TestCase):
                 self.assertEqual(peripheral.derivedFrom, device.peripheral[0])
 
                 # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER1")
-                self.assertEqual(peripheral.interrupt.description, "Timer 1 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 4)
+                self.assertEqual(len(peripheral.interrupt), 1)
+                self.assertEqual(peripheral.interrupt[0].name, "TIMER1")
+                self.assertEqual(peripheral.interrupt[0].description, "Timer 1 interrupt")
+                self.assertEqual(peripheral.interrupt[0].value, 4)
 
             elif peripheral_index == 2:
                 # general
@@ -100,9 +103,10 @@ class TestTreeComplete(unittest.TestCase):
                 self.assertEqual(peripheral.derivedFrom, device.peripheral[0])
 
                 # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER2")
-                self.assertEqual(peripheral.interrupt.description, "Timer 2 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 6)
+                self.assertEqual(len(peripheral.interrupt), 1)
+                self.assertEqual(peripheral.interrupt[0].name, "TIMER2")
+                self.assertEqual(peripheral.interrupt[0].description, "Timer 2 interrupt")
+                self.assertEqual(peripheral.interrupt[0].value, 6)
 
             # registers
             register_index = 0

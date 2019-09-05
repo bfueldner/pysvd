@@ -184,6 +184,7 @@ class Peripheral(pysvd.classes.Dim):
     """
 
     def __init__(self, parent, node):
+        self.addressBlock = []
         self.register = []
         self.cluster = []
 
@@ -204,13 +205,10 @@ class Peripheral(pysvd.classes.Dim):
         self.add_attribute(node, 'disableCondition', pysvd.parser.Text)
         self.add_attribute(node, 'baseAddress', pysvd.parser.Integer, True)
 
-        address_block_node = node.find('./addressBlock')
-        if address_block_node is not None:
-            self.addressBlock = AddressBlock(self, address_block_node)
+        AddressBlock.add_elements(self, self.addressBlock, node, 'addressBlock')
 
-        interrupt_node = node.find('./interrupt')
-        if interrupt_node is not None:
-            self.interrupt = Interrupt(self, interrupt_node)
+        self.interrupt = []
+        Interrupt.add_elements(self, self.interrupt, node, 'interrupt')
 
         registers_node = node.find('./registers')
         if registers_node is not None:

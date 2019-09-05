@@ -22,14 +22,16 @@ class TestSpecialCluster(unittest.TestCase):
         self.assertEqual(peripheral.baseAddress, 0x40001400)
 
     def test_address_block(self):
-        addressBlock = self.peripheral.addressBlock
+        self.assertEqual(len(self.peripheral.addressBlock), 1)
+        addressBlock = self.peripheral.addressBlock[0]
 
         self.assertEqual(addressBlock.offset, 0)
         self.assertEqual(addressBlock.size, 0x40)
         self.assertEqual(addressBlock.usage, pysvd.type.addressBlockUsage.registers)
 
     def test_interrupt(self):
-        interrupt = self.peripheral.interrupt
+        self.assertEqual(len(self.peripheral.interrupt), 1)
+        interrupt = self.peripheral.interrupt[0]
 
         self.assertEqual(interrupt.name, "RTC_INTREQ")
         self.assertEqual(interrupt.value, 3)

@@ -12,8 +12,8 @@ from enum import Enum
 
 rst_list_name = ":{}: {}\n"
 
-class section(Enum):
 
+class section(Enum):
     section = '='
     subsection = '-'
     subsubsection = '^'
@@ -25,6 +25,7 @@ class section(Enum):
 
 def underline(value, section):
     return "{}\n{}\n\n".format(value, str(section) * len(value))
+
 
 def table(header, data):
     if len(data) == 0:
@@ -67,6 +68,7 @@ def table(header, data):
     result += ' '.join(separator) + '\n'
 
     return result + '\n'
+
 
 def format_registers(output, prefix, registers):
     data = []
@@ -120,9 +122,11 @@ def main():
 
     output.write(rst_list_name.format('Name', device.name))
     output.write(rst_list_name.format('Description', device.description))
-    output.write(rst_list_name.format('Series', device.series))
+    if hasattr(device, 'series'):
+        output.write(rst_list_name.format('Series', device.series))
     output.write(rst_list_name.format('Version', device.version))
-    output.write(rst_list_name.format('Vendor', device.vendor))
+    if hasattr(device, 'vendor'):
+        output.write(rst_list_name.format('Vendor', device.vendor))
     output.write('\n')
 
     output.write(rst_list_name.format('Address unit bits', device.addressUnitBits))
@@ -159,22 +163,20 @@ def main():
     output.write(underline('Memory mapping', section.section))
 
     data = []
-    peripheral_baseAddress = device.peripheral.copy()
-    peripheral_baseAddress.sort(key=lambda peripheral:
-        peripheral.baseAddress + peripheral.addressBlock.offset if hasattr(peripheral, 'addressBlock') else peripheral.baseAddress)
-    for peripheral in peripheral_baseAddress:
-        data.append(('{}_'.format(peripheral.name), '0x{:08X}'.format(
-            peripheral.baseAddress + peripheral.addressBlock.offset if hasattr(peripheral, 'addressBlock') else peripheral.baseAddress)))
+    for peripheral in sorted(device.peripheral, key=lambda peripheral: peripheral.baseAddress):
+        data.append(('{}_'.format(peripheral.name), '0x{:08X}'.format(peripheral.baseAddress)))
     output.write(table( ('Peripheral', 'Address'), data))
 
     # Interrupt mapping
     output.write(underline('Interrupt mapping', section.section))
+
     data = []
-    peripheral_interrupt = device.peripheral.copy()
-    peripheral_interrupt.sort(key=lambda peripheral: peripheral.interrupt.value if hasattr(peripheral, 'interrupt') else 0)
-    for peripheral in peripheral_interrupt:
-        if hasattr(peripheral, 'interrupt'):
-            data.append(('{}_'.format(peripheral.name), str(peripheral.interrupt.value)))
+    interrupts = []
+    for peripheral in device.peripheral:
+        interrupts += peripheral.interrupt
+
+    for interrupt in sorted(interrupts, key=lambda interrupt: interrupt.value):
+        data.append(('`{0}.{1} <{0}_>`_'.format(interrupt.parent.name, interrupt.name), str(interrupt.value)))
     output.write(table( ('Peripheral', 'Interrupt'), data))
 
     # Peripheral
@@ -187,14 +189,9 @@ def main():
 
         if hasattr(peripheral, 'version'):
             output.write(rst_list_name.format('Version', peripheral.version))
-        if hasattr(peripheral, 'addressBlock'):
-            output.write(rst_list_name.format('Address', '0x{:08X}'.format(peripheral.baseAddress + peripheral.addressBlock.offset)))
-            output.write(rst_list_name.format('Size', '0x{:04X}'.format(peripheral.addressBlock.size)))
-            output.write(rst_list_name.format('Usage', peripheral.addressBlock.usage))
-        else:
-            output.write(rst_list_name.format('Address', '0x{:08X}'.format(peripheral.baseAddress)))
-        if hasattr(peripheral, 'interrupt'):
-            output.write(rst_list_name.format('Interrupt', peripheral.interrupt.value))
+        output.write(rst_list_name.format('Address', '0x{:08X}'.format(peripheral.baseAddress)))
+        for interrupt in peripheral.interrupt:
+            output.write(rst_list_name.format('Interrupt {}'.format(interrupt.name), interrupt.value))
         output.write("\n")
 
         data = []

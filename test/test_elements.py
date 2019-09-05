@@ -122,13 +122,15 @@ class TestElementDevice(unittest.TestCase):
 
             self.assertEqual(peripheral.version, "1.0")
 
-            self.assertEqual(peripheral.addressBlock.offset, 0)
-            self.assertEqual(peripheral.addressBlock.size, 0x400)
-            self.assertEqual(peripheral.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
-            self.assertEqual(peripheral.addressBlock.protection, pysvd.type.protection.secure)
+            self.assertEqual(len(peripheral.addressBlock), 1)
+            self.assertEqual(peripheral.addressBlock[0].offset, 0)
+            self.assertEqual(peripheral.addressBlock[0].size, 0x400)
+            self.assertEqual(peripheral.addressBlock[0].usage, pysvd.type.addressBlockUsage.registers)
+            self.assertEqual(peripheral.addressBlock[0].protection, pysvd.type.protection.secure)
 
-            self.assertEqual(peripheral.interrupt.name, "TIM0_INT")
-            self.assertEqual(peripheral.interrupt.value, 34)
+            self.assertEqual(len(peripheral.interrupt), 1)
+            self.assertEqual(peripheral.interrupt[0].name, "TIM0_INT")
+            self.assertEqual(peripheral.interrupt[0].value, 34)
 
             peripheral_index += 1
 
@@ -302,9 +304,18 @@ class TestElementPeripheral(unittest.TestCase):
                 <usage>registers</usage>
                 <protection>s</protection>
             </addressBlock>
+            <addressBlock>
+                <offset>0x400</offset>
+                <size>0x800</size>
+                <usage>registers</usage>
+            </addressBlock>
             <interrupt>
                 <name>TIM0_INT</name>
                 <value>34</value>
+            </interrupt>
+            <interrupt>
+                <name>TIM1_INT</name>
+                <value>35</value>
             </interrupt>
             <registers>
                 <register>
@@ -343,16 +354,22 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.description, "Timer 1 is a standard timer ...")
         self.assertEqual(test.baseAddress, 0x40002000)
 
-        self.assertEqual(test.addressBlock.offset, 0)
-        self.assertEqual(test.addressBlock.size, 0x400)
-        self.assertEqual(test.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
-        self.assertEqual(test.addressBlock.protection, pysvd.type.protection.secure)
+        self.assertEqual(len(test.addressBlock), 2)
+        self.assertEqual(test.addressBlock[0].offset, 0)
+        self.assertEqual(test.addressBlock[0].size, 0x400)
+        self.assertEqual(test.addressBlock[0].usage, pysvd.type.addressBlockUsage.registers)
+        self.assertEqual(test.addressBlock[0].protection, pysvd.type.protection.secure)
+        self.assertEqual(test.addressBlock[1].offset, 0x400)
+        self.assertEqual(test.addressBlock[1].size, 0x800)
+        self.assertEqual(test.addressBlock[1].usage, pysvd.type.addressBlockUsage.registers)
 
-        self.assertEqual(test.interrupt.name, "TIM0_INT")
-        self.assertEqual(test.interrupt.value, 34)
+        self.assertEqual(len(test.interrupt), 2)
+        self.assertEqual(test.interrupt[0].name, "TIM0_INT")
+        self.assertEqual(test.interrupt[0].value, 34)
+        self.assertEqual(test.interrupt[1].name, "TIM1_INT")
+        self.assertEqual(test.interrupt[1].value, 35)
 
         self.assertEqual(len(test.register), 4)
-
         self.assertEqual(test.register[0].name, "TimerCtrl0")
         self.assertEqual(test.register[0].description, "Timer Control Register")
         self.assertEqual(test.register[0].addressOffset, 0)
@@ -360,7 +377,6 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.register[0].resetValue, 0x00008001)
         self.assertEqual(test.register[0].resetMask, 0x0000ffff)
         self.assertEqual(test.register[0].size, 32)
-
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
         self.assertEqual(test.register[1].addressOffset, 4)
@@ -368,18 +384,14 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.register[1].resetValue, 0x00008001)
         self.assertEqual(test.register[1].resetMask, 0x0000ffff)
         self.assertEqual(test.register[1].size, 32)
-
         self.assertEqual(test.register[2].name, "Value0")
         self.assertEqual(test.register[2].addressOffset, 8)
-
         self.assertEqual(test.register[3].name, "Value1")
         self.assertEqual(test.register[3].addressOffset, 12)
 
         self.assertEqual(len(test.cluster), 2)
-
         self.assertEqual(test.cluster[0].name, "Mode0")
         self.assertEqual(test.cluster[0].addressOffset, 0x10)
-
         self.assertEqual(test.cluster[1].name, "Mode1")
         self.assertEqual(test.cluster[1].addressOffset, 0x18)
 
