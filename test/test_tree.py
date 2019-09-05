@@ -83,7 +83,7 @@ class TestTreeComplete(unittest.TestCase):
             elif peripheral_index == 1:
                 # general
                 self.assertEqual(peripheral.name, "TIMER1")
-                self.assertIsNone(peripheral.description)
+                self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010100)
                 self.assertTrue(peripheral.derived)
 
@@ -95,7 +95,7 @@ class TestTreeComplete(unittest.TestCase):
             elif peripheral_index == 2:
                 # general
                 self.assertEqual(peripheral.name, "TIMER2")
-                self.assertIsNone(peripheral.description)
+                self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010200)
                 self.assertTrue(peripheral.derived)
 
@@ -381,7 +381,7 @@ class TestTreeComplete(unittest.TestCase):
                                     self.assertEqual(enumeratedValue.name, "FALLING")
                                     self.assertEqual(
                                         enumeratedValue.description,
-                                        "Only falling edges  result in a counter increment or decrement")
+                                        "Only falling edges result in a counter increment or decrement")
                                     self.assertEqual(enumeratedValue.value, 1)
 
                                 elif enumeratedValue_index == 2:
