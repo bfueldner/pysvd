@@ -458,7 +458,7 @@ class Field(pysvd.classes.Dim):
                 if bitRange is None:
                     raise ValueError("Field '{}' has no valid bit-range".format(self.name if hasattr(self, 'name') else '<unknown>'))
 
-                match = re.search('\[([0-9]+):([0-9]+)\]', bitRange)
+                match = re.search(r'\[([0-9]+):([0-9]+)\]', bitRange)
                 lsb = int(match.group(2))
                 msb = int(match.group(1))
 

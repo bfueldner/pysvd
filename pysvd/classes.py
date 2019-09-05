@@ -156,7 +156,7 @@ class Dim(Derive):
                     if ',' in dimIndex:
                         dimIndices = dimIndex.split(',')
                     elif '-' in dimIndex:
-                        match = re.search('([0-9]+)-([0-9]+)', dimIndex)
+                        match = re.search(r'([0-9]+)\-([0-9]+)', dimIndex)
                         dimIndices = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     else:
                         raise ValueError("Unexpected value in 'dimIndex': {}".format(dimIndex))
