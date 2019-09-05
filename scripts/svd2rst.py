@@ -106,8 +106,8 @@ def format_registers(output, prefix, registers):
 
 def main():
     parser = argparse.ArgumentParser(description = 'SVD to ReST converter')
-    parser.add_argument('--svd', type = str, help = 'System view description (SVD) file', required = True)
-    parser.add_argument('--output', type = str, help = 'ReST output file', required = True)
+    parser.add_argument('--svd', metavar = 'FILE', type = str, help = 'System view description (SVD) file', required = True)
+    parser.add_argument('--output',  metavar = 'FILE', type = str, help = 'ReST output file', required = True)
     args = parser.parse_args()
 
     node = ET.parse(args.svd).getroot()

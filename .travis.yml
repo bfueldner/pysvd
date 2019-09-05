@@ -16,9 +16,11 @@ script:
 after_success:
 - coveralls
 deploy:
-  provider: pypi
-  user: fueldner
-  password:
-    secure: fRUG2hCSDR48C0g1DB+AVyvlt04bGuDbs3lWM4Zijp+6E37U8g4zJZzG+htDgdq+rookHiPLmyg3DYBqKlGMUHA3/D9JkowU5beupxntYhEzxcv5mIYsTRh5Wny6Fo6VE8KEf2HgB3IprmELD5XAxcpKiQOF4qCzekxrfn5i77tF4npoF6RAqMD0tksOYdr9QxXi79nmaaKGjVNsnje4vmYFBtYfRYs6SND10ZqMCHlCKO5/D2rElCiIYiDqP4hgboHBxvqjWTje1kF2DZJQVe5ePDNO4a1bGfDGjbMT+4GMHDCVrdwouXf+JE1NKIrUx8qDWUSl56bJ3aFrHVMZbAw740XlZw58t+jyy0OztVDSp01MxQe5hgvIrf1aN6j9ORR8A56eNxfRQA0e6tVMqrPJoAqwTYSHu0xKWN+9GQ534kh9h2gTJy2y6KT64URi4OIxt0GOEBqwr0iMQbz5JHSjm4S149qzm/++9tquv6EYJTYfjyhsinVS4qMX2lxIF9qX2VmAKi8icmhzurw4yEL60aVAVF43v8KgHLO0pm6tKpNL0eFGjSPpPmBdafqDim5/uCE0o/v7yJSUS3MtLDbxmO3ZOOCy+PygOKr9LTTMoiLdVjZYN1S+7+Fby/7/nEh7QIN3tV6Q64wHHtI6LgPXHfx1EiLYcIcJ6U85tR8=
-  on:
-    tags: true
+    provider: pypi
+    distributions: sdist bdist_wheel
+    user: fueldner
+    password:
+        secure: fRUG2hCSDR48C0g1DB+AVyvlt04bGuDbs3lWM4Zijp+6E37U8g4zJZzG+htDgdq+rookHiPLmyg3DYBqKlGMUHA3/D9JkowU5beupxntYhEzxcv5mIYsTRh5Wny6Fo6VE8KEf2HgB3IprmELD5XAxcpKiQOF4qCzekxrfn5i77tF4npoF6RAqMD0tksOYdr9QxXi79nmaaKGjVNsnje4vmYFBtYfRYs6SND10ZqMCHlCKO5/D2rElCiIYiDqP4hgboHBxvqjWTje1kF2DZJQVe5ePDNO4a1bGfDGjbMT+4GMHDCVrdwouXf+JE1NKIrUx8qDWUSl56bJ3aFrHVMZbAw740XlZw58t+jyy0OztVDSp01MxQe5hgvIrf1aN6j9ORR8A56eNxfRQA0e6tVMqrPJoAqwTYSHu0xKWN+9GQ534kh9h2gTJy2y6KT64URi4OIxt0GOEBqwr0iMQbz5JHSjm4S149qzm/++9tquv6EYJTYfjyhsinVS4qMX2lxIF9qX2VmAKi8icmhzurw4yEL60aVAVF43v8KgHLO0pm6tKpNL0eFGjSPpPmBdafqDim5/uCE0o/v7yJSUS3MtLDbxmO3ZOOCy+PygOKr9LTTMoiLdVjZYN1S+7+Fby/7/nEh7QIN3tV6Q64wHHtI6LgPXHfx1EiLYcIcJ6U85tR8=
+    on:
+        tags: true
+    skip_existing: true
