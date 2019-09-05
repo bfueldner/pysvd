@@ -300,7 +300,7 @@ class Cluster(pysvd.classes.Dim):
         super().parse(node)
 
         self.add_attribute(node, 'name', pysvd.parser.Text, True)
-        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derivedFrom is not None)
         self.add_attribute(node, 'alternateCluster', pysvd.parser.Text)
         self.add_attribute(node, 'headerStructName', pysvd.parser.Text)
         self.add_attribute(node, 'addressOffset', pysvd.parser.Integer, True)
@@ -343,7 +343,7 @@ class Register(pysvd.classes.Dim):
 
         self.add_attribute(node, 'name', pysvd.parser.Text, True)
         self.add_attribute(node, 'displayName', pysvd.parser.Text)
-        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derivedFrom is not None)
         self.add_attribute(node, 'alternateGroup', pysvd.parser.Text)
         self.add_attribute(node, 'alternateRegister', pysvd.parser.Text)
         self.add_attribute(node, 'addressOffset', pysvd.parser.Integer, True)
@@ -441,7 +441,7 @@ class Field(pysvd.classes.Dim):
         super().parse(node)
 
         self.add_attribute(node, 'name', pysvd.parser.Text, True)
-        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derivedFrom is not None)
 
         # bitRangeOffsetWidthStyle
         bitOffset = pysvd.parser.Integer(pysvd.node.Element(node, 'bitOffset'))

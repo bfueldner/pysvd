@@ -62,7 +62,7 @@ class TestTreeComplete(unittest.TestCase):
             self.assertEqual(peripheral.addressBlock.size, 0x100)
             self.assertEqual(peripheral.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
 
-    def test_peripheral_derived_attributes(self):
+    def test_peripheral_derivedFrom_attributes(self):
         device = self.device
 
         peripheral_index = 0
@@ -73,7 +73,7 @@ class TestTreeComplete(unittest.TestCase):
                 self.assertEqual(peripheral.name, "TIMER0")
                 self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010000)
-                self.assertFalse(peripheral.derived)
+                self.assertIsNone(peripheral.derivedFrom)
 
                 # interrupt
                 self.assertEqual(peripheral.interrupt.name, "TIMER0")
@@ -85,7 +85,7 @@ class TestTreeComplete(unittest.TestCase):
                 self.assertEqual(peripheral.name, "TIMER1")
                 self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010100)
-                self.assertTrue(peripheral.derived)
+                self.assertEqual(peripheral.derivedFrom, device.peripheral[0])
 
                 # interrupt
                 self.assertEqual(peripheral.interrupt.name, "TIMER1")
@@ -97,7 +97,7 @@ class TestTreeComplete(unittest.TestCase):
                 self.assertEqual(peripheral.name, "TIMER2")
                 self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010200)
-                self.assertTrue(peripheral.derived)
+                self.assertEqual(peripheral.derivedFrom, device.peripheral[0])
 
                 # interrupt
                 self.assertEqual(peripheral.interrupt.name, "TIMER2")

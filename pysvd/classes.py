@@ -12,6 +12,7 @@ class Base(object):
     def __init__(self, node):
         self.node = node
         self.parent = getattr(self, 'parent', None)
+        self.derivedFrom = None
 
         self.parse(self.node)
 
@@ -103,9 +104,7 @@ class Derive(Group):
                 object = res
 
             self.parse(object.node)
-            self.derived = True
-        else:
-            self.derived = False
+            self.derivedFrom = object
 
 
 class Dim(Derive):
