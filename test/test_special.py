@@ -22,14 +22,16 @@ class TestSpecialCluster(unittest.TestCase):
         self.assertEqual(peripheral.baseAddress, 0x40001400)
 
     def test_address_block(self):
-        addressBlock = self.peripheral.addressBlock
+        self.assertEqual(len(self.peripheral.addressBlocks), 1)
+        addressBlock = self.peripheral.addressBlocks[0]
 
         self.assertEqual(addressBlock.offset, 0)
         self.assertEqual(addressBlock.size, 0x40)
         self.assertEqual(addressBlock.usage, pysvd.type.addressBlockUsage.registers)
 
     def test_interrupt(self):
-        interrupt = self.peripheral.interrupt
+        self.assertEqual(len(self.peripheral.interrupts), 1)
+        interrupt = self.peripheral.interrupts[0]
 
         self.assertEqual(interrupt.name, "RTC_INTREQ")
         self.assertEqual(interrupt.value, 3)
@@ -37,14 +39,14 @@ class TestSpecialCluster(unittest.TestCase):
     def test_register(self):
         peripheral = self.peripheral
 
-        self.assertEqual(len(peripheral.register), 0)
+        self.assertEqual(len(peripheral.registers), 0)
 
     def test_cluster(self):
         peripheral = self.peripheral
 
         cluster_index = 0
-        self.assertEqual(len(peripheral.cluster), 3)
-        for cluster in peripheral.cluster:
+        self.assertEqual(len(peripheral.clusters), 3)
+        for cluster in peripheral.clusters:
             if cluster_index == 0:
                 self.assertEqual(cluster.name, "MODE0")
                 self.assertEqual(cluster.description, "32-bit Counter with Single 32-bit Compare")
@@ -70,12 +72,12 @@ class TestSpecialCluster(unittest.TestCase):
     def test_cluster0_register(self):
         peripheral = self.peripheral
 
-        self.assertEqual(len(peripheral.cluster), 3)
-        cluster = peripheral.cluster[0]
+        self.assertEqual(len(peripheral.clusters), 3)
+        cluster = peripheral.clusters[0]
 
         register_index = 0
-        self.assertEqual(len(cluster.register), 5)
-        for register in cluster.register:
+        self.assertEqual(len(cluster.registers), 5)
+        for register in cluster.registers:
             if register_index == 0:
                 self.assertEqual(register.name, "CTRL")
                 self.assertEqual(register.description, "MODE0 Control")
@@ -112,12 +114,12 @@ class TestSpecialCluster(unittest.TestCase):
     def test_cluster1_register(self):
         peripheral = self.peripheral
 
-        self.assertEqual(len(peripheral.cluster), 3)
-        cluster = peripheral.cluster[1]
+        self.assertEqual(len(peripheral.clusters), 3)
+        cluster = peripheral.clusters[1]
 
         register_index = 0
-        self.assertEqual(len(cluster.register), 7)
-        for register in cluster.register:
+        self.assertEqual(len(cluster.registers), 7)
+        for register in cluster.registers:
             if register_index == 0:
                 self.assertEqual(register.name, "CTRL")
                 self.assertEqual(register.description, "MODE1 Control")
@@ -166,12 +168,12 @@ class TestSpecialCluster(unittest.TestCase):
     def test_cluster2_register(self):
         peripheral = self.peripheral
 
-        self.assertEqual(len(peripheral.cluster), 3)
-        cluster = peripheral.cluster[2]
+        self.assertEqual(len(peripheral.clusters), 3)
+        cluster = peripheral.clusters[2]
 
         register_index = 0
-        self.assertEqual(len(cluster.register), 6)
-        for register in cluster.register:
+        self.assertEqual(len(cluster.registers), 6)
+        for register in cluster.registers:
             if register_index == 0:
                 self.assertEqual(register.name, "CTRL")
                 self.assertEqual(register.description, "MODE2 Control")

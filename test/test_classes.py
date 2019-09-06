@@ -94,6 +94,7 @@ class TestClassBase(unittest.TestCase):
         self.assertEqual(type(test), pysvd.classes.Base)
         self.assertIsNone(test.node)
         self.assertIsNone(test.parent)
+        self.assertIsNone(test.derivedFrom)
 
     def test_attributes(self):
         test = pysvd.classes.Base(None)
@@ -364,14 +365,14 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(test.register[0].description, "Timer Control Register")
         self.assertEqual(test.register[0].addressOffset, 0)
         self.assertEqual(test.register[0].size, 32)
-        self.assertFalse(test.register[0].derived)
+        self.assertIsNone(test.register[0].derivedFrom)
 
         self.assertEqual(type(test.register[1]), HelperClassDeriveRegister)
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
         self.assertEqual(test.register[1].addressOffset, 4)
         self.assertEqual(test.register[1].size, 32)
-        self.assertTrue(test.register[1].derived)
+        self.assertEqual(test.register[1].derivedFrom, test.register[0])
 
     def test_two_level(self):
         xml = '''
@@ -412,33 +413,33 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(test.register[0].description, "Timer Control Register")
         self.assertEqual(test.register[0].addressOffset, 0)
         self.assertEqual(test.register[0].size, 32)
-        self.assertFalse(test.register[0].derived)
+        self.assertIsNone(test.register[0].derivedFrom)
 
         self.assertEqual(len(test.register[0].field), 1)
 
         self.assertEqual(test.register[0].field[0].name, "BitField0")
         self.assertEqual(test.register[0].field[0].description, "Bit field 0")
         self.assertEqual(test.register[0].field[0].access, pysvd.type.access.read_write)
-        self.assertFalse(test.register[0].field[0].derived)
+        self.assertIsNone(test.register[0].field[0].derivedFrom)
 
         self.assertEqual(type(test.register[1]), HelperClassDeriveRegister)
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
         self.assertEqual(test.register[1].addressOffset, 4)
         self.assertEqual(test.register[1].size, 32)
-        self.assertTrue(test.register[1].derived)
+        self.assertEqual(test.register[1].derivedFrom, test.register[0])
 
         self.assertEqual(len(test.register[1].field), 2)
 
         self.assertEqual(test.register[1].field[0].name, "BitField0")
         self.assertEqual(test.register[1].field[0].description, "Bit field 0")
         self.assertEqual(test.register[1].field[0].access, pysvd.type.access.read_write)
-        self.assertFalse(test.register[1].field[0].derived)
+        self.assertIsNone(test.register[1].field[0].derivedFrom)
 
         self.assertEqual(test.register[1].field[1].name, "BitField1")
         self.assertEqual(test.register[1].field[1].description, "Bit field 1")
         self.assertEqual(test.register[1].field[1].access, pysvd.type.access.read_only)
-        self.assertTrue(test.register[1].field[1].derived)
+        self.assertEqual(test.register[1].field[1].derivedFrom, test.register[0].field[0])
 
     def test_derive_from_derived(self):
         xml = '''
@@ -484,52 +485,52 @@ class TestClassDerive(unittest.TestCase):
         self.assertEqual(test.register[0].description, "Timer Control Register")
         self.assertEqual(test.register[0].addressOffset, 0)
         self.assertEqual(test.register[0].size, 32)
-        self.assertFalse(test.register[0].derived)
+        self.assertIsNone(test.register[0].derivedFrom)
 
         self.assertEqual(len(test.register[0].field), 1)
 
         self.assertEqual(test.register[0].field[0].name, "BitField0")
         self.assertEqual(test.register[0].field[0].description, "Bit field 0")
         self.assertEqual(test.register[0].field[0].access, pysvd.type.access.read_write)
-        self.assertFalse(test.register[0].field[0].derived)
+        self.assertIsNone(test.register[0].field[0].derivedFrom)
 
         self.assertEqual(type(test.register[1]), HelperClassDeriveRegister)
         self.assertEqual(test.register[1].name, "TimerCtrl1")
         self.assertEqual(test.register[1].description, "Derived Timer")
         self.assertEqual(test.register[1].addressOffset, 4)
         self.assertEqual(test.register[1].size, 32)
-        self.assertTrue(test.register[1].derived)
+        self.assertEqual(test.register[1].derivedFrom, test.register[0])
 
         self.assertEqual(len(test.register[1].field), 2)
 
         self.assertEqual(test.register[1].field[0].name, "BitField0")
         self.assertEqual(test.register[1].field[0].description, "Bit field 0")
         self.assertEqual(test.register[1].field[0].access, pysvd.type.access.read_write)
-        self.assertFalse(test.register[1].field[0].derived)
+        self.assertIsNone(test.register[1].field[0].derivedFrom)
 
         self.assertEqual(test.register[1].field[1].name, "BitField1")
         self.assertEqual(test.register[1].field[1].description, "Bit field 1")
         self.assertEqual(test.register[1].field[1].access, pysvd.type.access.read_only)
-        self.assertTrue(test.register[1].field[1].derived)
+        self.assertEqual(test.register[1].field[1].derivedFrom, test.register[0].field[0])
 
         self.assertEqual(type(test.register[2]), HelperClassDeriveRegister)
         self.assertEqual(test.register[2].name, "TimerCtrl2")
         self.assertEqual(test.register[2].description, "Double Derived Timer")
         self.assertEqual(test.register[2].addressOffset, 8)
         self.assertEqual(test.register[2].size, 32)
-        self.assertTrue(test.register[2].derived)
+        self.assertEqual(test.register[2].derivedFrom, test.register[1])
 
         self.assertEqual(len(test.register[2].field), 2)
 
         self.assertEqual(test.register[2].field[0].name, "BitField0")
         self.assertEqual(test.register[2].field[0].description, "Bit field 0")
         self.assertEqual(test.register[2].field[0].access, pysvd.type.access.read_write)
-        self.assertFalse(test.register[2].field[0].derived)
+        self.assertIsNone(test.register[2].field[0].derivedFrom)
 
         self.assertEqual(test.register[2].field[1].name, "BitField1")
         self.assertEqual(test.register[2].field[1].description, "Bit field 1")
         self.assertEqual(test.register[2].field[1].access, pysvd.type.access.read_only)
-        self.assertTrue(test.register[2].field[1].derived)
+        self.assertEqual(test.register[2].field[1].derivedFrom, test.register[0].field[0])
 
 
 class TestClassDim(unittest.TestCase):

@@ -16,7 +16,7 @@ class Device(pysvd.classes.Base):
     """
 
     def __init__(self, node):
-        self.peripheral = []
+        self.peripherals = []
 
         super().__init__(node)
 
@@ -61,13 +61,13 @@ class Device(pysvd.classes.Base):
         if peripherals_node is None:
             raise SyntaxError("No element 'peripherals' found in 'device'")
 
-        Peripheral.add_elements(self, self.peripheral, peripherals_node, 'peripheral')
-        if len(self.peripheral) < 1:
+        Peripheral.add_elements(self, self.peripherals, peripherals_node, 'peripheral')
+        if len(self.peripherals) < 1:
             raise SyntaxError("At least one element of 'peripheral' is mandatory in 'peripherals'")
 
     def find(self, name):
         """Find peripheral by name."""
-        for peripheral in self.peripheral:
+        for peripheral in self.peripherals:
             if peripheral.name == name:
                 return peripheral
         return None
@@ -91,8 +91,8 @@ class Cpu(pysvd.classes.Parent):
         self.add_enum_attribute(node, 'endian', pysvd.type.endian, True)
         self.add_attribute(node, 'mpuPresent', pysvd.parser.Boolean, True)
         self.add_attribute(node, 'fpuPresent', pysvd.parser.Boolean, True)
-
         self.add_attribute(node, 'fpuDP', pysvd.parser.Boolean)
+        self.add_attribute(node, 'dspPresent', pysvd.parser.Boolean)
         self.add_attribute(node, 'icachePresent', pysvd.parser.Boolean)
         self.add_attribute(node, 'dcachePresent', pysvd.parser.Boolean)
         self.add_attribute(node, 'itcmPresent', pysvd.parser.Boolean)
@@ -119,7 +119,7 @@ class SauRegionConfig(pysvd.classes.Group):
     attributes = ['protectionWhenDisabled']
 
     def __init__(self, parent, node):
-        self.region = []
+        self.regions = []
 
         super().__init__(parent, node)
 
@@ -135,7 +135,7 @@ class SauRegionConfig(pysvd.classes.Group):
             self.__dict__['protectionWhenDisabled'] = protectionWhenDisabled
 
         for sau_regions_config_region_node in node.findall('region'):
-            self.region.append(SauRegionsConfigRegion(self, sau_regions_config_region_node))
+            self.regions.append(SauRegionsConfigRegion(self, sau_regions_config_region_node))
 
 
 # /device/cpu/sauRegionsConfig/region
@@ -184,8 +184,9 @@ class Peripheral(pysvd.classes.Dim):
     """
 
     def __init__(self, parent, node):
-        self.register = []
-        self.cluster = []
+        self.addressBlocks = []
+        self.registers = []
+        self.clusters = []
 
         super().__init__(parent, node)
 
@@ -204,25 +205,22 @@ class Peripheral(pysvd.classes.Dim):
         self.add_attribute(node, 'disableCondition', pysvd.parser.Text)
         self.add_attribute(node, 'baseAddress', pysvd.parser.Integer, True)
 
-        address_block_node = node.find('./addressBlock')
-        if address_block_node is not None:
-            self.addressBlock = AddressBlock(self, address_block_node)
+        AddressBlock.add_elements(self, self.addressBlocks, node, 'addressBlock')
 
-        interrupt_node = node.find('./interrupt')
-        if interrupt_node is not None:
-            self.interrupt = Interrupt(self, interrupt_node)
+        self.interrupts = []
+        Interrupt.add_elements(self, self.interrupts, node, 'interrupt')
 
         registers_node = node.find('./registers')
         if registers_node is not None:
-            Register.add_elements(self, self.register, registers_node, 'register')
-            Cluster.add_elements(self, self.cluster, registers_node, 'cluster')
+            Register.add_elements(self, self.registers, registers_node, 'register')
+            Cluster.add_elements(self, self.clusters, registers_node, 'cluster')
 
-            if len(self.register) < 1 and len(self.cluster) < 1:
+            if len(self.registers) < 1 and len(self.clusters) < 1:
                 raise SyntaxError("At least one element of 'register' or 'cluster' is mandatory in 'registers'")
 
     def find(self, name):
         """Find register by name."""
-        for register in self.register:
+        for register in self.registers:
             if register.name == name:
                 return register
         return None
@@ -288,8 +286,8 @@ class Cluster(pysvd.classes.Dim):
     """
 
     def __init__(self, parent, node):
-        self.register = []
-        self.cluster = []
+        self.registers = []
+        self.clusters = []
 
         super().__init__(parent, node)
 
@@ -300,7 +298,7 @@ class Cluster(pysvd.classes.Dim):
         super().parse(node)
 
         self.add_attribute(node, 'name', pysvd.parser.Text, True)
-        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derivedFrom is not None)
         self.add_attribute(node, 'alternateCluster', pysvd.parser.Text)
         self.add_attribute(node, 'headerStructName', pysvd.parser.Text)
         self.add_attribute(node, 'addressOffset', pysvd.parser.Integer, True)
@@ -311,8 +309,8 @@ class Cluster(pysvd.classes.Dim):
         self.add_attribute(node, 'resetValue', pysvd.parser.Integer)
         self.add_attribute(node, 'resetMask', pysvd.parser.Integer)
 
-        Register.add_elements(self, self.register, node, 'register')
-        Cluster.add_elements(self, self.cluster, node, 'cluster')
+        Register.add_elements(self, self.registers, node, 'register')
+        Cluster.add_elements(self, self.clusters, node, 'cluster')
 
 
 # /device/peripherals/peripheral/registers/.../register
@@ -331,7 +329,7 @@ class Register(pysvd.classes.Dim):
     """
 
     def __init__(self, parent, node):
-        self.field = []
+        self.fields = []
 
         super().__init__(parent, node)
 
@@ -343,7 +341,7 @@ class Register(pysvd.classes.Dim):
 
         self.add_attribute(node, 'name', pysvd.parser.Text, True)
         self.add_attribute(node, 'displayName', pysvd.parser.Text)
-        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derivedFrom is not None)
         self.add_attribute(node, 'alternateGroup', pysvd.parser.Text)
         self.add_attribute(node, 'alternateRegister', pysvd.parser.Text)
         self.add_attribute(node, 'addressOffset', pysvd.parser.Integer, True)
@@ -364,14 +362,14 @@ class Register(pysvd.classes.Dim):
 
         fields_node = node.find('./fields')
         if fields_node is not None:
-            Field.add_elements(self, self.field, fields_node, 'field')
+            Field.add_elements(self, self.fields, fields_node, 'field')
 
-            if len(self.field) < 1:
+            if len(self.fields) < 1:
                 raise SyntaxError("At least one element of 'field' is mandatory in 'fields'")
 
     def find(self, name):
         """Find field by name."""
-        for field in self.field:
+        for field in self.fields:
             if field.name == name:
                 return field
         return None
@@ -441,7 +439,7 @@ class Field(pysvd.classes.Dim):
         super().parse(node)
 
         self.add_attribute(node, 'name', pysvd.parser.Text, True)
-        self.add_attribute(node, 'description', pysvd.parser.Text, self.derived)
+        self.add_attribute(node, 'description', pysvd.parser.Text, self.derivedFrom is not None)
 
         # bitRangeOffsetWidthStyle
         bitOffset = pysvd.parser.Integer(pysvd.node.Element(node, 'bitOffset'))
@@ -458,7 +456,7 @@ class Field(pysvd.classes.Dim):
                 if bitRange is None:
                     raise ValueError("Field '{}' has no valid bit-range".format(self.name if hasattr(self, 'name') else '<unknown>'))
 
-                match = re.search('\[([0-9]+):([0-9]+)\]', bitRange)
+                match = re.search(r'\[([0-9]+):([0-9]+)\]', bitRange)
                 lsb = int(match.group(2))
                 msb = int(match.group(1))
 
@@ -480,6 +478,12 @@ class Field(pysvd.classes.Dim):
         if enumerated_values_node is not None:
             self.enumeratedValues = EnumeratedValues(self, enumerated_values_node)
 
+    def find(self, name):
+        """Find enumeratedValues by name."""
+        if hasattr(self, 'enumeratedValues') and hasattr(self.enumeratedValues, 'name') and self.enumeratedValues.name == name:
+            return self.enumeratedValues
+        return None
+
 
 # /device/peripherals/peripheral/registers/.../field/enumeratedValues
 # http://www.keil.com/pack/doc/cmsis/svd/html/elem_registers.html#elem_enumeratedValues
@@ -498,7 +502,7 @@ class EnumeratedValues(pysvd.classes.Derive):
     """
 
     def __init__(self, parent, node):
-        self.enumeratedValue = []
+        self.enumeratedValues = []
 
         super().__init__(parent, node)
 
@@ -510,9 +514,9 @@ class EnumeratedValues(pysvd.classes.Derive):
         self.add_enum_attribute(node, 'usage', pysvd.type.enumUsage, False, pysvd.type.enumUsage.read_write)
 
         for child in node.findall('./enumeratedValue'):
-            self.enumeratedValue.append(EnumeratedValue(self, child))
+            self.enumeratedValues.append(EnumeratedValue(self, child))
 
-        if len(self.enumeratedValue) < 1:
+        if len(self.enumeratedValues) < 1:
             raise SyntaxError("At least one element of enumeratedValue is needed in enumeratedValues '{}'".format(
                 self.name if hasattr(self, 'name') else '<unknown>'))
 
@@ -548,7 +552,7 @@ class DimArrayIndex(pysvd.classes.Parent):
     """
 
     def __init__(self, parent, node):
-        self.enumeratedValue = []
+        self.enumeratedValues = []
 
         super().__init__(parent, node)
 
@@ -558,8 +562,8 @@ class DimArrayIndex(pysvd.classes.Parent):
         self.add_attribute(node, 'headerEnumName', pysvd.parser.Text)
 
         for child in node.findall('./enumeratedValue'):
-            self.enumeratedValue.append(EnumeratedValue(self, child))
+            self.enumeratedValues.append(EnumeratedValue(self, child))
 
-        if len(self.enumeratedValue) < 1:
+        if len(self.enumeratedValues) < 1:
             raise SyntaxError("At least one element of enumeratedValue is needed in dimArrayIndex '{}'".format(
-                self.headerEnumName if hasattr(self, 'headerEnumName') else '<unknown>'))
+                self.headerEnumNames if hasattr(self, 'headerEnumName') else '<unknown>'))

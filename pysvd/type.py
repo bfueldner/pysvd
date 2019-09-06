@@ -18,6 +18,7 @@ class cpuName(Enum):
     CM23 = 'CM23'
     CM3 = 'CM3'
     CM33 = 'CM33'
+    CM35P = 'CM35P'
     SC300 = 'SC300'
     CM4 = 'CM4'
     CM7 = 'CM7'
