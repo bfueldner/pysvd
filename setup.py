@@ -15,7 +15,7 @@ setuptools.setup(
     license="MIT",
     author="Benjamin Füldner",
     author_email="benjamin@fueldner.net",
-    url="https://github.com/bfueldner/pysvd",
+    url="https://code.fueldner.net/opensource/pysvd",
     project_urls={
         'Bug Reports': 'https://github.com/bfueldner/pysvd/issues',
         'Source': 'https://github.com/bfueldner/pysvd',

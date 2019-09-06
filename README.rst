@@ -22,7 +22,14 @@
 pysvd
 =====
 
-A **S**\ ystem **V**\ iew **D**\ escription v1.3.3 parser package for Python 3.4+.
+A **S**\ ystem **V**\ iew **D**\ escription v1.3.5 parser package for Python 3.4+.
+
+
+What is SVD?
+------------
+
+SVD is a XML based file format developed by ARM to describe the software sight of a microcontroller device. It contains all peripherals,
+registers, bitfields and enumeration values to access every part on a device. For further information have a look at the `format description <https://www.keil.com/pack/doc/CMSIS/SVD/html/svd_Format_pg.html>`_.
 
 
 Motivation
@@ -78,9 +85,10 @@ As an example of the parser, a "SVD to ReST" converter ``svd2rst`` is included a
     SVD to ReST converter
 
     optional arguments:
-        -h, --help     show this help message and exit
-        --svd FILE     System view description (SVD) file
-        --output FILE  ReST output file
+        -h, --help              show this help message and exit
+        --svd FILE              System view description (SVD) file
+        --output FILE, -o FILE  ReST output file
+        --version               show program's version number and exit
 
 Running ``svd2rst`` on a Cortex-M3 core definition would generate this output::
 
