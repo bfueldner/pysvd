@@ -12,6 +12,7 @@ class Base(object):
     def __init__(self, node):
         self.node = node
         self.parent = getattr(self, 'parent', None)
+        self.derivedFrom = None
 
         self.parse(self.node)
 
@@ -67,7 +68,7 @@ class Group(Parent):
             while parent is not None:
                 try:
                     return parent.__getattribute__(attr)
-                except:
+                except AttributeError:
                     parent = parent.parent
 
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
@@ -103,9 +104,7 @@ class Derive(Group):
                 object = res
 
             self.parse(object.node)
-            self.derived = True
-        else:
-            self.derived = False
+            self.derivedFrom = object
 
 
 class Dim(Derive):
@@ -117,14 +116,16 @@ class Dim(Derive):
         super().parse(node)
 
         self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
-        self.description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
+        if description is not None:
+            self.description = description
         self.dimName = pysvd.parser.Text(pysvd.node.Element(node, 'dimName'), self.name)
 
     # Replace %s with name if not None
     def set_index(self, value):
         value = str(value)
         self.name = self.name.replace('%s', value)
-        if self.description is not None:
+        if hasattr(self, 'description') and self.description is not None:
             self.description = self.description.replace('%s', value)
 
         if self.dimName is not None:
@@ -156,7 +157,7 @@ class Dim(Derive):
                     if ',' in dimIndex:
                         dimIndices = dimIndex.split(',')
                     elif '-' in dimIndex:
-                        match = re.search('([0-9]+)-([0-9]+)', dimIndex)
+                        match = re.search(r'([0-9]+)\-([0-9]+)', dimIndex)
                         dimIndices = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     else:
                         raise ValueError("Unexpected value in 'dimIndex': {}".format(dimIndex))

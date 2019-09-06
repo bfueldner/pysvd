@@ -1,7 +1,6 @@
 language: python
 dist: xenial
 python:
-- '3.4'
 - '3.5'
 - '3.6'
 - '3.7'
@@ -12,7 +11,7 @@ install:
 before_script:
 - pip install -r requirements.txt
 script:
-- py.test --verbose --color=yes --cov-report xml --cov pysvd --pep8 pysvd --flakes pysvd test
+- py.test --verbose --color=yes --codestyle --flakes --cov-report xml --cov pysvd test
 after_success:
 - coveralls
 deploy:

@@ -45,8 +45,8 @@ class TestTreeComplete(unittest.TestCase):
     def test_peripheral_equal_attributes(self):
         device = self.device
 
-        self.assertEqual(len(device.peripheral), 3)
-        for peripheral in device.peripheral:
+        self.assertEqual(len(device.peripherals), 3)
+        for peripheral in device.peripherals:
             # general
             self.assertEqual(peripheral.version, "1.0")
             self.assertEqual(peripheral.size, 32)
@@ -58,56 +58,60 @@ class TestTreeComplete(unittest.TestCase):
             self.assertEqual(peripheral.resetMask, 0xffffffff)
 
             # addressBlock
-            self.assertEqual(peripheral.addressBlock.offset, 0)
-            self.assertEqual(peripheral.addressBlock.size, 0x100)
-            self.assertEqual(peripheral.addressBlock.usage, pysvd.type.addressBlockUsage.registers)
+            self.assertEqual(len(peripheral.addressBlocks), 1)
+            self.assertEqual(peripheral.addressBlocks[0].offset, 0)
+            self.assertEqual(peripheral.addressBlocks[0].size, 0x100)
+            self.assertEqual(peripheral.addressBlocks[0].usage, pysvd.type.addressBlockUsage.registers)
 
-    def test_peripheral_derived_attributes(self):
+    def test_peripheral_derivedFrom_attributes(self):
         device = self.device
 
         peripheral_index = 0
-        self.assertEqual(len(device.peripheral), 3)
-        for peripheral in device.peripheral:
+        self.assertEqual(len(device.peripherals), 3)
+        for peripheral in device.peripherals:
             if peripheral_index == 0:
                 # general
                 self.assertEqual(peripheral.name, "TIMER0")
                 self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010000)
-                self.assertFalse(peripheral.derived)
+                self.assertIsNone(peripheral.derivedFrom)
 
                 # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER0")
-                self.assertEqual(peripheral.interrupt.description, "Timer 0 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 0)
+                self.assertEqual(len(peripheral.interrupts), 1)
+                self.assertEqual(peripheral.interrupts[0].name, "TIMER0")
+                self.assertEqual(peripheral.interrupts[0].description, "Timer 0 interrupt")
+                self.assertEqual(peripheral.interrupts[0].value, 0)
 
             elif peripheral_index == 1:
                 # general
                 self.assertEqual(peripheral.name, "TIMER1")
-                self.assertIsNone(peripheral.description)
+                self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010100)
-                self.assertTrue(peripheral.derived)
+                self.assertEqual(peripheral.derivedFrom, device.peripherals[0])
 
                 # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER1")
-                self.assertEqual(peripheral.interrupt.description, "Timer 1 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 4)
+                self.assertEqual(len(peripheral.interrupts), 1)
+                self.assertEqual(peripheral.interrupts[0].name, "TIMER1")
+                self.assertEqual(peripheral.interrupts[0].description, "Timer 1 interrupt")
+                self.assertEqual(peripheral.interrupts[0].value, 4)
 
             elif peripheral_index == 2:
                 # general
                 self.assertEqual(peripheral.name, "TIMER2")
-                self.assertIsNone(peripheral.description)
+                self.assertEqual(peripheral.description, "32 Timer / Counter, counting up or down from different sources")
                 self.assertEqual(peripheral.baseAddress, 0x40010200)
-                self.assertTrue(peripheral.derived)
+                self.assertEqual(peripheral.derivedFrom, device.peripherals[0])
 
                 # interrupt
-                self.assertEqual(peripheral.interrupt.name, "TIMER2")
-                self.assertEqual(peripheral.interrupt.description, "Timer 2 interrupt")
-                self.assertEqual(peripheral.interrupt.value, 6)
+                self.assertEqual(len(peripheral.interrupts), 1)
+                self.assertEqual(peripheral.interrupts[0].name, "TIMER2")
+                self.assertEqual(peripheral.interrupts[0].description, "Timer 2 interrupt")
+                self.assertEqual(peripheral.interrupts[0].value, 6)
 
             # registers
             register_index = 0
-            self.assertEqual(len(peripheral.register), 8)
-            for register in peripheral.register:
+            self.assertEqual(len(peripheral.registers), 8)
+            for register in peripheral.registers:
                 if register_index == 0:
                     self.assertEqual(register.name, "CR")
                     self.assertEqual(register.description, "Control Register")
@@ -119,8 +123,8 @@ class TestTreeComplete(unittest.TestCase):
 
                     # fields
                     field_index = 0
-                    self.assertEqual(len(register.field), 12)
-                    for field in register.field:
+                    self.assertEqual(len(register.fields), 12)
+                    for field in register.fields:
                         if field_index == 0:
                             self.assertEqual(field.name, "EN")
                             self.assertEqual(field.description, "Enable")
@@ -130,8 +134,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Disable")
                                     self.assertEqual(enumeratedValue.description, "Timer is disabled and does not operate")
@@ -152,8 +156,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "No_Action")
                                     self.assertEqual(enumeratedValue.description, "Write as ZERO if necessary")
@@ -175,8 +179,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 3)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 3)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Count_UP")
                                     self.assertEqual(
@@ -209,8 +213,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 5)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 5)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Continous")
                                     self.assertEqual(
@@ -257,8 +261,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Disabled")
                                     self.assertEqual(enumeratedValue.description, "Prescaler is not used")
@@ -280,8 +284,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 9)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 9)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "CAP_SRC")
                                     self.assertEqual(enumeratedValue.description, "Capture Source is used directly")
@@ -338,8 +342,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 16)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 16)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "CClk")
                                     self.assertEqual(enumeratedValue.description, "Core Clock")
@@ -368,8 +372,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 3)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 3)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "RISING")
                                     self.assertEqual(
@@ -381,7 +385,7 @@ class TestTreeComplete(unittest.TestCase):
                                     self.assertEqual(enumeratedValue.name, "FALLING")
                                     self.assertEqual(
                                         enumeratedValue.description,
-                                        "Only falling edges  result in a counter increment or decrement")
+                                        "Only falling edges result in a counter increment or decrement")
                                     self.assertEqual(enumeratedValue.value, 1)
 
                                 elif enumeratedValue_index == 2:
@@ -402,8 +406,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 4)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 4)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "NONE")
                                     self.assertEqual(enumeratedValue.description, "No Trigger is emitted")
@@ -435,8 +439,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 4)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 4)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "RELOAD0")
                                     self.assertEqual(enumeratedValue.description, "Selects Reload Register number 0")
@@ -470,8 +474,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 3)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 3)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "KEEP")
                                     self.assertEqual(enumeratedValue.description, "Reload Register number does not change automatically")
@@ -498,8 +502,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "STOP")
                                     self.assertEqual(enumeratedValue.description, "Timer / Counter is stopped")
@@ -525,8 +529,8 @@ class TestTreeComplete(unittest.TestCase):
 
                     # fields
                     field_index = 0
-                    self.assertEqual(len(register.field), 6)
-                    for field in register.field:
+                    self.assertEqual(len(register.fields), 6)
+                    for field in register.fields:
                         if field_index == 0:
                             self.assertEqual(field.name, "RUN")
                             self.assertEqual(field.description, "Shows if Timer is running or not")
@@ -536,8 +540,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Stopped")
                                     self.assertEqual(enumeratedValue.description, "Timer is not running")
@@ -559,8 +563,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "No_Match")
                                     self.assertEqual(enumeratedValue.description, "The MATCH condition was not hit")
@@ -582,8 +586,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "No_Underflow")
                                     self.assertEqual(enumeratedValue.description, "No underflow occured since last clear")
@@ -605,8 +609,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "No_Overflow")
                                     self.assertEqual(enumeratedValue.description, "No overflow occured since last clear")
@@ -628,8 +632,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Ready")
                                     self.assertEqual(enumeratedValue.description, "Timer is not in RESET state and can operate")
@@ -651,8 +655,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 4)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 4)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "RELOAD0")
                                     self.assertEqual(enumeratedValue.description, "Reload Register number 0 is active")
@@ -688,8 +692,8 @@ class TestTreeComplete(unittest.TestCase):
 
                     # fields
                     field_index = 0
-                    self.assertEqual(len(register.field), 2)
-                    for field in register.field:
+                    self.assertEqual(len(register.fields), 2)
+                    for field in register.fields:
                         if field_index == 0:
                             self.assertEqual(field.name, "EN")
                             self.assertEqual(field.description, "Interrupt Enable")
@@ -699,8 +703,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 2)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 2)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Disabled")
                                     self.assertEqual(enumeratedValue.description, "Timer does not generate Interrupts")
@@ -724,8 +728,8 @@ class TestTreeComplete(unittest.TestCase):
 
                             # enumeratedValues
                             enumeratedValue_index = 0
-                            self.assertEqual(len(field.enumeratedValues.enumeratedValue), 3)
-                            for enumeratedValue in field.enumeratedValues.enumeratedValue:
+                            self.assertEqual(len(field.enumeratedValues.enumeratedValues), 3)
+                            for enumeratedValue in field.enumeratedValues.enumeratedValues:
                                 if enumeratedValue_index == 0:
                                     self.assertEqual(enumeratedValue.name, "Match")
                                     self.assertEqual(
