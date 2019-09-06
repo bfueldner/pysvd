@@ -91,8 +91,8 @@ class Cpu(pysvd.classes.Parent):
         self.add_enum_attribute(node, 'endian', pysvd.type.endian, True)
         self.add_attribute(node, 'mpuPresent', pysvd.parser.Boolean, True)
         self.add_attribute(node, 'fpuPresent', pysvd.parser.Boolean, True)
-
         self.add_attribute(node, 'fpuDP', pysvd.parser.Boolean)
+        self.add_attribute(node, 'dspPresent', pysvd.parser.Boolean)
         self.add_attribute(node, 'icachePresent', pysvd.parser.Boolean)
         self.add_attribute(node, 'dcachePresent', pysvd.parser.Boolean)
         self.add_attribute(node, 'itcmPresent', pysvd.parser.Boolean)
