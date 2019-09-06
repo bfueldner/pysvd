@@ -11,7 +11,7 @@ install:
 before_script:
 - pip install -r requirements.txt
 script:
-- py.test --verbose --color=yes --codestyle --flakes --cov --cov-report xml pysvd test
+- py.test --verbose --color=yes --codestyle --flakes --cov-report xml --cov pysvd test
 after_success:
 - coveralls
 deploy:
