@@ -22,7 +22,7 @@
 pysvd
 =====
 
-A **S**\ ystem **V**\ iew **D**\ escription v1.3.5 parser package for Python 3.4+.
+A **S**\ ystem **V**\ iew **D**\ escription v1.3.5 parser package for Python 3.5+.
 
 
 What is SVD?
