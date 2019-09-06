@@ -110,8 +110,8 @@ class TestElementDevice(unittest.TestCase):
         self.assertEqual(test.resetMask, 0xffffffff)
 
         peripheral_index = 0
-        self.assertEqual(len(test.peripheral), 2)
-        for peripheral in test.peripheral:
+        self.assertEqual(len(test.peripherals), 2)
+        for peripheral in test.peripherals:
             if peripheral_index == 0:
                 self.assertEqual(peripheral.name, "Timer0")
                 self.assertEqual(peripheral.description, "Timer 0 is a standard timer ...")
@@ -124,15 +124,15 @@ class TestElementDevice(unittest.TestCase):
 
             self.assertEqual(peripheral.version, "1.0")
 
-            self.assertEqual(len(peripheral.addressBlock), 1)
-            self.assertEqual(peripheral.addressBlock[0].offset, 0)
-            self.assertEqual(peripheral.addressBlock[0].size, 0x400)
-            self.assertEqual(peripheral.addressBlock[0].usage, pysvd.type.addressBlockUsage.registers)
-            self.assertEqual(peripheral.addressBlock[0].protection, pysvd.type.protection.secure)
+            self.assertEqual(len(peripheral.addressBlocks), 1)
+            self.assertEqual(peripheral.addressBlocks[0].offset, 0)
+            self.assertEqual(peripheral.addressBlocks[0].size, 0x400)
+            self.assertEqual(peripheral.addressBlocks[0].usage, pysvd.type.addressBlockUsage.registers)
+            self.assertEqual(peripheral.addressBlocks[0].protection, pysvd.type.protection.secure)
 
-            self.assertEqual(len(peripheral.interrupt), 1)
-            self.assertEqual(peripheral.interrupt[0].name, "TIM0_INT")
-            self.assertEqual(peripheral.interrupt[0].value, 34)
+            self.assertEqual(len(peripheral.interrupts), 1)
+            self.assertEqual(peripheral.interrupts[0].name, "TIM0_INT")
+            self.assertEqual(peripheral.interrupts[0].value, 34)
 
             peripheral_index += 1
 
@@ -196,12 +196,12 @@ class TestElementCpu(unittest.TestCase):
         self.assertFalse(test.vendorSystickConfig)
         self.assertTrue(test.vtorPresent)
 
-        self.assertEqual(len(test.sauRegionsConfig.region), 1)
-        self.assertTrue(test.sauRegionsConfig.region[0].enabled)
-        self.assertEqual(test.sauRegionsConfig.region[0].name, 'SAU1')
-        self.assertEqual(test.sauRegionsConfig.region[0].base, 0x10001000)
-        self.assertEqual(test.sauRegionsConfig.region[0].limit, 0x10005000)
-        self.assertEqual(test.sauRegionsConfig.region[0].access, pysvd.type.sauAccess.non_secure)
+        self.assertEqual(len(test.sauRegionsConfig.regions), 1)
+        self.assertTrue(test.sauRegionsConfig.regions[0].enabled)
+        self.assertEqual(test.sauRegionsConfig.regions[0].name, 'SAU1')
+        self.assertEqual(test.sauRegionsConfig.regions[0].base, 0x10001000)
+        self.assertEqual(test.sauRegionsConfig.regions[0].limit, 0x10005000)
+        self.assertEqual(test.sauRegionsConfig.regions[0].access, pysvd.type.sauAccess.non_secure)
 
 
 class TestElementSauRegionsConfig(unittest.TestCase):
@@ -211,7 +211,7 @@ class TestElementSauRegionsConfig(unittest.TestCase):
         node = ET.fromstring(xml)
         test = pysvd.element.SauRegionConfig(None, node)
 
-        self.assertEqual(len(test.region), 0)
+        self.assertEqual(len(test.regions), 0)
 
     def test_attributes(self):
         xml = '''
@@ -233,19 +233,17 @@ class TestElementSauRegionsConfig(unittest.TestCase):
         self.assertTrue(test.enabled)
         self.assertEqual(test.protectionWhenDisabled, pysvd.type.protection.non_secure)
 
-        self.assertEqual(len(test.region), 2)
-
-        self.assertTrue(test.region[0].enabled)
-        self.assertEqual(test.region[0].name, 'SAU1')
-        self.assertEqual(test.region[0].base, 0x10001000)
-        self.assertEqual(test.region[0].limit, 0x10005000)
-        self.assertEqual(test.region[0].access, pysvd.type.sauAccess.non_secure)
-
-        self.assertFalse(test.region[1].enabled)
-        self.assertEqual(test.region[1].name, 'SAU2')
-        self.assertEqual(test.region[1].base, 0x10006000)
-        self.assertEqual(test.region[1].limit, 0x10008000)
-        self.assertEqual(test.region[1].access, pysvd.type.sauAccess.non_secure_callable_secure)
+        self.assertEqual(len(test.regions), 2)
+        self.assertTrue(test.regions[0].enabled)
+        self.assertEqual(test.regions[0].name, 'SAU1')
+        self.assertEqual(test.regions[0].base, 0x10001000)
+        self.assertEqual(test.regions[0].limit, 0x10005000)
+        self.assertEqual(test.regions[0].access, pysvd.type.sauAccess.non_secure)
+        self.assertFalse(test.regions[1].enabled)
+        self.assertEqual(test.regions[1].name, 'SAU2')
+        self.assertEqual(test.regions[1].base, 0x10006000)
+        self.assertEqual(test.regions[1].limit, 0x10008000)
+        self.assertEqual(test.regions[1].access, pysvd.type.sauAccess.non_secure_callable_secure)
 
 
 class TestElementSauRegionsConfigRegion(unittest.TestCase):
@@ -356,46 +354,46 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.description, "Timer 1 is a standard timer ...")
         self.assertEqual(test.baseAddress, 0x40002000)
 
-        self.assertEqual(len(test.addressBlock), 2)
-        self.assertEqual(test.addressBlock[0].offset, 0)
-        self.assertEqual(test.addressBlock[0].size, 0x400)
-        self.assertEqual(test.addressBlock[0].usage, pysvd.type.addressBlockUsage.registers)
-        self.assertEqual(test.addressBlock[0].protection, pysvd.type.protection.secure)
-        self.assertEqual(test.addressBlock[1].offset, 0x400)
-        self.assertEqual(test.addressBlock[1].size, 0x800)
-        self.assertEqual(test.addressBlock[1].usage, pysvd.type.addressBlockUsage.registers)
+        self.assertEqual(len(test.addressBlocks), 2)
+        self.assertEqual(test.addressBlocks[0].offset, 0)
+        self.assertEqual(test.addressBlocks[0].size, 0x400)
+        self.assertEqual(test.addressBlocks[0].usage, pysvd.type.addressBlockUsage.registers)
+        self.assertEqual(test.addressBlocks[0].protection, pysvd.type.protection.secure)
+        self.assertEqual(test.addressBlocks[1].offset, 0x400)
+        self.assertEqual(test.addressBlocks[1].size, 0x800)
+        self.assertEqual(test.addressBlocks[1].usage, pysvd.type.addressBlockUsage.registers)
 
-        self.assertEqual(len(test.interrupt), 2)
-        self.assertEqual(test.interrupt[0].name, "TIM0_INT")
-        self.assertEqual(test.interrupt[0].value, 34)
-        self.assertEqual(test.interrupt[1].name, "TIM1_INT")
-        self.assertEqual(test.interrupt[1].value, 35)
+        self.assertEqual(len(test.interrupts), 2)
+        self.assertEqual(test.interrupts[0].name, "TIM0_INT")
+        self.assertEqual(test.interrupts[0].value, 34)
+        self.assertEqual(test.interrupts[1].name, "TIM1_INT")
+        self.assertEqual(test.interrupts[1].value, 35)
 
-        self.assertEqual(len(test.register), 4)
-        self.assertEqual(test.register[0].name, "TimerCtrl0")
-        self.assertEqual(test.register[0].description, "Timer Control Register")
-        self.assertEqual(test.register[0].addressOffset, 0)
-        self.assertEqual(test.register[0].access, pysvd.type.access.read_write)
-        self.assertEqual(test.register[0].resetValue, 0x00008001)
-        self.assertEqual(test.register[0].resetMask, 0x0000ffff)
-        self.assertEqual(test.register[0].size, 32)
-        self.assertEqual(test.register[1].name, "TimerCtrl1")
-        self.assertEqual(test.register[1].description, "Derived Timer")
-        self.assertEqual(test.register[1].addressOffset, 4)
-        self.assertEqual(test.register[1].access, pysvd.type.access.read_write)
-        self.assertEqual(test.register[1].resetValue, 0x00008001)
-        self.assertEqual(test.register[1].resetMask, 0x0000ffff)
-        self.assertEqual(test.register[1].size, 32)
-        self.assertEqual(test.register[2].name, "Value0")
-        self.assertEqual(test.register[2].addressOffset, 8)
-        self.assertEqual(test.register[3].name, "Value1")
-        self.assertEqual(test.register[3].addressOffset, 12)
+        self.assertEqual(len(test.registers), 4)
+        self.assertEqual(test.registers[0].name, "TimerCtrl0")
+        self.assertEqual(test.registers[0].description, "Timer Control Register")
+        self.assertEqual(test.registers[0].addressOffset, 0)
+        self.assertEqual(test.registers[0].access, pysvd.type.access.read_write)
+        self.assertEqual(test.registers[0].resetValue, 0x00008001)
+        self.assertEqual(test.registers[0].resetMask, 0x0000ffff)
+        self.assertEqual(test.registers[0].size, 32)
+        self.assertEqual(test.registers[1].name, "TimerCtrl1")
+        self.assertEqual(test.registers[1].description, "Derived Timer")
+        self.assertEqual(test.registers[1].addressOffset, 4)
+        self.assertEqual(test.registers[1].access, pysvd.type.access.read_write)
+        self.assertEqual(test.registers[1].resetValue, 0x00008001)
+        self.assertEqual(test.registers[1].resetMask, 0x0000ffff)
+        self.assertEqual(test.registers[1].size, 32)
+        self.assertEqual(test.registers[2].name, "Value0")
+        self.assertEqual(test.registers[2].addressOffset, 8)
+        self.assertEqual(test.registers[3].name, "Value1")
+        self.assertEqual(test.registers[3].addressOffset, 12)
 
-        self.assertEqual(len(test.cluster), 2)
-        self.assertEqual(test.cluster[0].name, "Mode0")
-        self.assertEqual(test.cluster[0].addressOffset, 0x10)
-        self.assertEqual(test.cluster[1].name, "Mode1")
-        self.assertEqual(test.cluster[1].addressOffset, 0x18)
+        self.assertEqual(len(test.clusters), 2)
+        self.assertEqual(test.clusters[0].name, "Mode0")
+        self.assertEqual(test.clusters[0].addressOffset, 0x10)
+        self.assertEqual(test.clusters[1].name, "Mode1")
+        self.assertEqual(test.clusters[1].addressOffset, 0x18)
 
         self.assertIsNotNone(test.find("TimerCtrl0"))
         self.assertIsNotNone(test.find("TimerCtrl1"))
@@ -481,16 +479,16 @@ class TestElementCluster(unittest.TestCase):
         node = ET.fromstring(xml)
         test = pysvd.element.Cluster(None, node)
 
-        self.assertEqual(len(test.cluster), 1)
-        self.assertEqual(test.cluster[0].name, "MODE0")
-        self.assertEqual(test.cluster[0].addressOffset, 0)
+        self.assertEqual(len(test.clusters), 1)
+        self.assertEqual(test.clusters[0].name, "MODE0")
+        self.assertEqual(test.clusters[0].addressOffset, 0)
 
-        cluster = test.cluster[0]
-        self.assertEqual(len(cluster.register), 2)
-        self.assertEqual(cluster.register[0].name, "CTRL")
-        self.assertEqual(cluster.register[0].addressOffset, 0)
-        self.assertEqual(cluster.register[1].name, "READREQ")
-        self.assertEqual(cluster.register[1].addressOffset, 2)
+        cluster = test.clusters[0]
+        self.assertEqual(len(cluster.registers), 2)
+        self.assertEqual(cluster.registers[0].name, "CTRL")
+        self.assertEqual(cluster.registers[0].addressOffset, 0)
+        self.assertEqual(cluster.registers[1].name, "READREQ")
+        self.assertEqual(cluster.registers[1].addressOffset, 2)
 
 
 class TestElementRegister(unittest.TestCase):
@@ -551,13 +549,13 @@ class TestElementRegister(unittest.TestCase):
 
         self.assertIsNotNone(test.writeConstraint)
 
-        self.assertEqual(len(test.field), 2)
-        self.assertEqual(test.field[0].name, "BIT0")
-        self.assertEqual(test.field[0].bitOffset, 1)
-        self.assertEqual(test.field[0].bitWidth, 3)
-        self.assertEqual(test.field[1].name, "BIT1")
-        self.assertEqual(test.field[1].bitOffset, 4)
-        self.assertEqual(test.field[1].bitWidth, 3)
+        self.assertEqual(len(test.fields), 2)
+        self.assertEqual(test.fields[0].name, "BIT0")
+        self.assertEqual(test.fields[0].bitOffset, 1)
+        self.assertEqual(test.fields[0].bitWidth, 3)
+        self.assertEqual(test.fields[1].name, "BIT1")
+        self.assertEqual(test.fields[1].bitOffset, 4)
+        self.assertEqual(test.fields[1].bitWidth, 3)
 
         self.assertIsNotNone(test.find("BIT0"))
         self.assertIsNotNone(test.find("BIT1"))
@@ -703,6 +701,13 @@ class TestElementField(unittest.TestCase):
                     <maximum>5</maximum>
                 </range>
             </writeConstraint>
+            <enumeratedValues>
+                <name>TimerIntSelect</name>
+                <enumeratedValue>
+                    <name>disabled</name>
+                    <value>0</value>
+                </enumeratedValue>
+            </enumeratedValues>
             <readAction>clear</readAction>
         </field>'''
 
@@ -722,8 +727,11 @@ class TestElementField(unittest.TestCase):
         self.assertEqual(test.writeConstraint.rangeMinimum, 0)
         self.assertEqual(test.writeConstraint.rangeMaximum, 5)
 
-        with self.assertRaises(AttributeError):
-            self.assertIsNotNone(test.enumeratedValue)
+        self.assertIsNotNone(test.enumeratedValues)
+        self.assertEqual(len(test.enumeratedValues.enumeratedValues), 1)
+
+        self.assertIsNotNone(test.find("TimerIntSelect"))
+        self.assertIsNone(test.find("TimerMode"))
 
 
 class TestElementEnumberatedValues(unittest.TestCase):
@@ -746,9 +754,9 @@ class TestElementEnumberatedValues(unittest.TestCase):
         test = pysvd.element.EnumeratedValues(None, node)
 
         self.assertEqual(test.usage, pysvd.type.enumUsage.read_write)
-        self.assertEqual(len(test.enumeratedValue), 1)
 
-        self.assertEqual(test.enumeratedValue[0].value, 0)
+        self.assertEqual(len(test.enumeratedValues), 1)
+        self.assertEqual(test.enumeratedValues[0].value, 0)
 
     def test_attributes(self):
         xml = '''
@@ -779,19 +787,17 @@ class TestElementEnumberatedValues(unittest.TestCase):
         self.assertEqual(test.name, "TimerIntSelect")
         self.assertEqual(test.headerEnumName, "TimerIntSelectEnum")
         self.assertEqual(test.usage, pysvd.type.enumUsage.read_write)
-        self.assertEqual(len(test.enumeratedValue), 3)
 
-        self.assertEqual(test.enumeratedValue[0].name, "disabled")
-        self.assertEqual(test.enumeratedValue[0].description, "The clock source clk0 is turned off.")
-        self.assertEqual(test.enumeratedValue[0].value, 0)
-
-        self.assertEqual(test.enumeratedValue[1].name, "enabled")
-        self.assertEqual(test.enumeratedValue[1].description, "The clock source clk1 is running.")
-        self.assertEqual(test.enumeratedValue[1].value, 1)
-
-        self.assertEqual(test.enumeratedValue[2].name, "reserved")
-        self.assertEqual(test.enumeratedValue[2].description, "Reserved values. Do not use.")
-        self.assertTrue(test.enumeratedValue[2].isDefault)
+        self.assertEqual(len(test.enumeratedValues), 3)
+        self.assertEqual(test.enumeratedValues[0].name, "disabled")
+        self.assertEqual(test.enumeratedValues[0].description, "The clock source clk0 is turned off.")
+        self.assertEqual(test.enumeratedValues[0].value, 0)
+        self.assertEqual(test.enumeratedValues[1].name, "enabled")
+        self.assertEqual(test.enumeratedValues[1].description, "The clock source clk1 is running.")
+        self.assertEqual(test.enumeratedValues[1].value, 1)
+        self.assertEqual(test.enumeratedValues[2].name, "reserved")
+        self.assertEqual(test.enumeratedValues[2].description, "Reserved values. Do not use.")
+        self.assertTrue(test.enumeratedValues[2].isDefault)
 
 
 class TestElementEnumberatedValue(unittest.TestCase):
@@ -878,12 +884,10 @@ class TestElementDimArrayIndex(unittest.TestCase):
         test = pysvd.element.DimArrayIndex(None, node)
 
         self.assertEqual(test.headerEnumName, "FSMC_EnumArray")
-        self.assertEqual(len(test.enumeratedValue), 2)
-
-        self.assertEqual(test.enumeratedValue[0].name, "UART0")
-        self.assertEqual(test.enumeratedValue[0].description, "UART0 Peripheral")
-        self.assertEqual(test.enumeratedValue[0].value, 0)
-
-        self.assertEqual(test.enumeratedValue[1].name, "TIMER0")
-        self.assertEqual(test.enumeratedValue[1].description, "TIMER0 Peripheral")
-        self.assertEqual(test.enumeratedValue[1].value, 1)
+        self.assertEqual(len(test.enumeratedValues), 2)
+        self.assertEqual(test.enumeratedValues[0].name, "UART0")
+        self.assertEqual(test.enumeratedValues[0].description, "UART0 Peripheral")
+        self.assertEqual(test.enumeratedValues[0].value, 0)
+        self.assertEqual(test.enumeratedValues[1].name, "TIMER0")
+        self.assertEqual(test.enumeratedValues[1].description, "TIMER0 Peripheral")
+        self.assertEqual(test.enumeratedValues[1].value, 1)
