@@ -13,7 +13,8 @@ class TestElementDevice(unittest.TestCase):
             pysvd.element.Device(node)
 
     def test_peripherals_exception(self):
-        xml = '''<device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
+        xml = '''
+        <device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
             <name>ARM_Cortex_M4</name>
             <version>0.1</version>
             <description>Arm Cortex-M4 based Microcontroller demonstration device</description>
@@ -25,7 +26,8 @@ class TestElementDevice(unittest.TestCase):
             pysvd.element.Device(node)
 
     def test_peripheral_minimal_exception(self):
-        xml = '''<device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
+        xml = '''
+        <device schemaVersion="1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
             <name>ARM_Cortex_M4</name>
             <version>0.1</version>
             <description>Arm Cortex-M4 based Microcontroller demonstration device</description>

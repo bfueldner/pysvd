@@ -68,7 +68,7 @@ class Group(Parent):
             while parent is not None:
                 try:
                     return parent.__getattribute__(attr)
-                except:
+                except AttributeError:
                     parent = parent.parent
 
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, attr))
