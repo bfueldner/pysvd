@@ -219,7 +219,11 @@ class Peripheral(pysvd.classes.Dim):
                 raise SyntaxError("At least one element of 'register' or 'cluster' is mandatory in 'registers'")
 
     def find(self, name):
-        """Find register by name."""
+        """Find cluster and register by name."""
+        for cluster in self.clusters:
+            if cluster.name == name:
+                return cluster
+
         for register in self.registers:
             if register.name == name:
                 return register
@@ -311,6 +315,17 @@ class Cluster(pysvd.classes.Dim):
 
         Register.add_elements(self, self.registers, node, 'register')
         Cluster.add_elements(self, self.clusters, node, 'cluster')
+
+    def find(self, name):
+        """Find cluster and register by name."""
+        for cluster in self.clusters:
+            if cluster.name == name:
+                return cluster
+
+        for register in self.registers:
+            if register.name == name:
+                return register
+        return None
 
 
 # /device/peripherals/peripheral/registers/.../register
