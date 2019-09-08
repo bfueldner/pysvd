@@ -395,6 +395,8 @@ class TestElementPeripheral(unittest.TestCase):
         self.assertEqual(test.clusters[1].name, "Mode1")
         self.assertEqual(test.clusters[1].addressOffset, 0x18)
 
+        self.assertIsNotNone(test.find("Mode0"))
+        self.assertIsNotNone(test.find("Mode1"))
         self.assertIsNotNone(test.find("TimerCtrl0"))
         self.assertIsNotNone(test.find("TimerCtrl1"))
         self.assertIsNone(test.find("TimerCtrl2"))
@@ -474,6 +476,10 @@ class TestElementCluster(unittest.TestCase):
                     <name>READREQ</name>
                     <addressOffset>0x02</addressOffset>
                 </register>
+                <cluster>
+                    <name>SUBMODE</name>
+                    <addressOffset>0x10</addressOffset>
+                </cluster>
             </cluster>
         </registers>'''
         node = ET.fromstring(xml)
@@ -489,6 +495,15 @@ class TestElementCluster(unittest.TestCase):
         self.assertEqual(cluster.registers[0].addressOffset, 0)
         self.assertEqual(cluster.registers[1].name, "READREQ")
         self.assertEqual(cluster.registers[1].addressOffset, 2)
+
+        self.assertEqual(len(cluster.clusters), 1)
+        self.assertEqual(cluster.clusters[0].name, "SUBMODE")
+        self.assertEqual(cluster.clusters[0].addressOffset, 16)
+
+        self.assertIsNotNone(cluster.find('CTRL'))
+        self.assertIsNotNone(cluster.find('READREQ'))
+        self.assertIsNotNone(cluster.find('SUBMODE'))
+        self.assertIsNone(cluster.find('VALUE'))
 
 
 class TestElementRegister(unittest.TestCase):
