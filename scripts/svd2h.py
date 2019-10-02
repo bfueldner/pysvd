@@ -152,7 +152,7 @@ def main():
     parser.add_argument('--version', action='version', version=pysvd.__version__)
     args = parser.parse_args()
     with open(args.output, 'w') as out:
-        with open(args.svd, 'rb') as svd:
+        with open(args.svd, 'r') as svd:
             out.write(get_string(svd.read(), args.type_header, args.is_system, args.type_prefix, args.type_suffix))
 
 
