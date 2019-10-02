@@ -248,3 +248,51 @@ Running ``svd2rst`` on a Cortex-M3 core definition would generate this output::
           Reference clock is not available
 
     ...
+
+You can also use the ``svd2h`` tool to generate a C header defining the memory-mapped registers::
+
+    $ svd2h --help
+    usage: svd2h [-h] --svd FILE --output FILE [--type_header FILE] [-is_system]
+                 [--type_prefix PREFIX] [--type_suffix SUFFIX] [--version]
+
+    SVD to C header converter
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --svd FILE            System view description (SVD) file
+      --output FILE, -o FILE
+                            C header output file
+      --type_header FILE    C header file containing standard type definitions
+                            (e.g. stdint.h)
+      -is_system            if provided, the "type_header" will be included as
+                            system header (e.g. #include <...>)
+      --type_prefix PREFIX  prefix in register type name (e.g. "uint" in
+                            "uint32_t")
+      --type_suffix SUFFIX  prefix in register type name (e.g. "_t" in "uint32_t")
+      --version             show program's version number and exit
+
+Running ``svd2h`` on a Cortex-M3 core definition would generate this output::
+
+    #ifndef ARMCM3_H
+    #define ARMCM3_H
+    #define SYSTICK_BASE_ADDRESS (0xE000E010u)
+    #define SYSTICK_CSR (*(volatile uint32_t *)(SYSTICK_BASE_ADDRESS + 0x00u))
+    #define SYSTICK_RVR (*(volatile uint32_t *)(SYSTICK_BASE_ADDRESS + 0x04u))
+    #define SYSTICK_CVR (*(volatile uint32_t *)(SYSTICK_BASE_ADDRESS + 0x08u))
+    #define SYSTICK_CALIB (*(volatile uint32_t *)(SYSTICK_BASE_ADDRESS + 0x0Cu))
+    #define NVIC_BASE_ADDRESS (0xE000E100u)
+    #define NVIC_ISER ((volatile uint32_t *)(NVIC_BASE_ADDRESS + 0x000u))
+    #define NVIC_ISER_0 (*(volatile uint32_t *)(NVIC_BASE_ADDRESS + 0x000 + (0u)))
+    #define NVIC_ISER_1 (*(volatile uint32_t *)(NVIC_BASE_ADDRESS + 0x000 + (32u)))
+    #define NVIC_ISER_2 (*(volatile uint32_t *)(NVIC_BASE_ADDRESS + 0x000 + (64u)))
+    #define NVIC_ISER_3 (*(volatile uint32_t *)(NVIC_BASE_ADDRESS + 0x000 + (96u)))
+    ...
+    #define SCB_MMFSR (*(volatile uint8_t *)(SCB_BASE_ADDRESS + 0x28u))
+    #define SCB_BFSR (*(volatile uint8_t *)(SCB_BASE_ADDRESS + 0x29u))
+    #define SCB_UFSR (*(volatile uint16_t *)(SCB_BASE_ADDRESS + 0x2Au))
+    #define SCB_HFSR (*(volatile uint32_t *)(SCB_BASE_ADDRESS + 0x2Cu))
+    #define SCB_DFSR (*(volatile uint32_t *)(SCB_BASE_ADDRESS + 0x30u))
+    #define SCB_MMFAR (*(volatile uint32_t *)(SCB_BASE_ADDRESS + 0x34u))
+    #define SCB_BFAR (*(volatile uint32_t *)(SCB_BASE_ADDRESS + 0x38u))
+    #define SCB_AFSR (*(volatile uint32_t *)(SCB_BASE_ADDRESS + 0x3Cu))
+    #endif /* #ifndef ARMCM3_H */
