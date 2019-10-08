@@ -39,6 +39,7 @@ setuptools.setup(
     entry_points={
         'console_scripts': [
             'svd2rst = scripts.svd2rst:main',
+            'svd2h = scripts.svd2h:main'
         ],
     },
     setup_requires=["pytest-runner"],
