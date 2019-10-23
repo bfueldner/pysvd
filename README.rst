@@ -35,9 +35,9 @@ registers, bitfields and enumeration values to access every part on a device. Fo
 Motivation
 ----------
 
-SVD is a greate format to develop embedded systems on. Existing parser out in the field did not support all features (derive, dimension) supported by the format.
+SVD is a great format to develop embedded systems on. Existing parser out in the field did not support all features (derive, dimension) supported by the format.
 
-With the parsed system view tree, you can several cool things:
+With the parsed system view tree, you can do several cool things:
 
 * Automatic register generation (BSP skeleton)
 * Linker file generation
