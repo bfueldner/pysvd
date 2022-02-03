@@ -8,7 +8,7 @@ import argparse
 import xml.etree.ElementTree as ET
 from enum import IntEnum
 import itertools
-from natsort import natsort
+from natsort import natsorted
 from colorama import Fore, Back, Style
 
 import pysvd
@@ -114,7 +114,7 @@ def compare_registers(level, peripheral, registers):
 
     return (registers_base, registers_none_derivable)
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Read SVD file, order elements, check for' \
         'valid elements to generate register access structs and displays possible substitutions.')
     parser.add_argument('--svd', metavar='FILE', type=str, help='System view description (SVD) file', required=True)
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
     print('Sort peripherals by name')
     for peripherals in xml.findall('.//peripherals'):
-        peripherals[:] = natsort(peripherals, key=lambda x: x.find('name').text)
+        peripherals[:] = natsorted(peripherals, key=lambda x: x.find('name').text)
 
     print('Sort registers by addressOffset')
     for registers in xml.findall('.//registers'):
@@ -161,6 +161,9 @@ if __name__ == '__main__':
 
     (peripherals_base, peripherals_none_derivable) = compare_peripherals(level, device.peripherals)
     if depth >= Depth.registers:
-        peripherals = natsort(peripherals_base + peripherals_none_derivable, key=lambda peripheral: peripheral.name)
+        peripherals = natsorted(peripherals_base + peripherals_none_derivable, key=lambda peripheral: peripheral.name)
         for peripheral in peripherals:
             compare_registers(level, peripheral, peripheral.registers)
+
+if __name__ == '__main__':
+    main()
