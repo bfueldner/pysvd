@@ -3,3 +3,5 @@ pytest-codestyle
 pytest-flakes
 pytest-cov
 coveralls
+naturalsort
+colorama

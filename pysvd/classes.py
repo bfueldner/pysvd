@@ -116,6 +116,9 @@ class Dim(Derive):
         super().parse(node)
 
         self.name = pysvd.parser.Text(pysvd.node.Element(node, 'name', True))
+        displayName = pysvd.parser.Text(pysvd.node.Element(node, 'displayName'))
+        if displayName is not None:
+            self.displayName = displayName
         description = pysvd.parser.Text(pysvd.node.Element(node, 'description'))
         if description is not None:
             self.description = description
@@ -125,6 +128,8 @@ class Dim(Derive):
     def set_index(self, value):
         value = str(value)
         self.name = self.name.replace('%s', value)
+        if hasattr(self, 'displayName') and self.displayName is not None:
+            self.displayName = self.displayName.replace('%s', value)
         if hasattr(self, 'description') and self.description is not None:
             self.description = self.description.replace('%s', value)
 
