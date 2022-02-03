@@ -4,6 +4,17 @@ import re
 import pysvd
 
 
+def compare_attribute(lhs, rhs, attibute):
+    """Compare attibute of objects.
+    """
+    if hasattr(lhs, attibute) != hasattr(rhs, attibute):
+        return False
+
+    if hasattr(lhs, attibute):
+        return getattr(lhs, attibute) == getattr(rhs, attibute)
+
+    return True
+
 # /device
 # http://www.keil.com/pack/doc/cmsis/svd/html/elem_device.html
 class Device(pysvd.classes.Base):
@@ -190,6 +201,49 @@ class Peripheral(pysvd.classes.Dim):
 
         super().__init__(parent, node)
 
+    def __eq__(self, other):
+        """Compare element and all attributes.
+        """
+        if not isinstance(other, Peripheral):
+            return NotImplemented
+
+        if not self.equal_struct(other):
+            return False
+
+        return compare_attribute(self, other, 'name') and \
+            compare_attribute(self, other, 'description') and \
+            compare_attribute(self, other, 'version') and \
+            compare_attribute(self, other, 'alternatePeripheral') and \
+            compare_attribute(self, other, 'groupName') and \
+            compare_attribute(self, other, 'prependToName') and \
+            compare_attribute(self, other, 'appendToName') and \
+            compare_attribute(self, other, 'headerStructName') and \
+            compare_attribute(self, other, 'disableCondition') and \
+            compare_attribute(self, other, 'baseAddress') and \
+            compare_attribute(self, other, 'addressBlock') and \
+            compare_attribute(self, other, 'interrupt')
+
+    def equal_struct(self, other):
+        """Compare only child elements.
+        """
+        if not isinstance(other, Peripheral):
+            return NotImplemented
+
+        if len(self.registers) != len(other.registers):
+            return False
+
+        for (lhs, rhs) in zip(self.registers, other.registers):
+            if lhs != rhs:
+                return False
+
+        if len(self.clusters) != len(other.clusters):
+            return False
+
+        for (lhs, rhs) in zip(self.clusters, other.clusters):
+            if lhs != rhs:
+                return False
+        return True
+
     def set_offset(self, value):
         self.baseAddress += value
 
@@ -348,6 +402,44 @@ class Register(pysvd.classes.Dim):
 
         super().__init__(parent, node)
 
+    def __eq__(self, other):
+        """Compare element and all attributes.
+        """
+        if not isinstance(other, Register):
+            return NotImplemented
+
+        if not self.equal_struct(other):
+            return False
+
+        return compare_attribute(self, other, 'name') and \
+            compare_attribute(self, other, 'displayName') and \
+            compare_attribute(self, other, 'description') and \
+            compare_attribute(self, other, 'alternateGroup') and \
+            compare_attribute(self, other, 'alternateRegister') and \
+            compare_attribute(self, other, 'addressOffset') and \
+            compare_attribute(self, other, 'size') and \
+            compare_attribute(self, other, 'access') and \
+            compare_attribute(self, other, 'protection') and \
+            compare_attribute(self, other, 'resetValue') and \
+            compare_attribute(self, other, 'resetMask') and \
+            compare_attribute(self, other, 'dataType') and \
+            compare_attribute(self, other, 'modifiedWriteValues') and \
+            compare_attribute(self, other, 'readAction')
+
+    def equal_struct(self, other):
+        """Compare only child elements.
+        """
+        if not isinstance(other, Register):
+            return NotImplemented
+
+        if len(self.fields) != len(other.fields):
+            return False
+
+        for (lhs, rhs) in zip(self.fields, other.fields):
+            if lhs != rhs:
+                return False
+        return True
+
     def set_offset(self, value):
         self.addressOffset += value
 
@@ -447,6 +539,41 @@ class Field(pysvd.classes.Dim):
     def __init__(self, parent, node):
         super().__init__(parent, node)
 
+    def __eq__(self, other):
+        if not isinstance(other, Field):
+            return NotImplemented
+
+        if not self.equal_struct(other):
+            return False
+
+        return compare_attribute(self, other, 'name') and \
+            compare_attribute(self, other, 'description') and \
+            compare_attribute(self, other, 'bitOffset') and \
+            compare_attribute(self, other, 'bitWidth') and \
+            compare_attribute(self, other, 'access') and \
+            compare_attribute(self, other, 'modifiedWriteValues') and \
+            compare_attribute(self, other, 'readAction') and \
+            compare_attribute(self, other, 'writeConstraint')
+
+    def equal_struct(self, other):
+        """Check structure elements, but not overridable attributes.
+        """
+        if not isinstance(other, Field):
+            return NotImplemented
+
+        return compare_attribute(self, other, 'enumeratedValues')
+
+        x = """
+        if len(self.enumeratedValues) != len(other.enumeratedValues):
+            return False
+
+        for (lhs, rhs) in zip(self.enumeratedValues, other.enumeratedValues):
+            if lhs != rhs:
+                return False
+        return True
+        """
+
+
     def set_offset(self, value):
         self.bitOffset += value
 
@@ -521,6 +648,29 @@ class EnumeratedValues(pysvd.classes.Derive):
 
         super().__init__(parent, node)
 
+    def __eq__(self, other):
+        if not isinstance(other, EnumeratedValues):
+            return NotImplemented
+
+        if not self.equal_struct(other):
+            return False
+
+        return compare_attribute(self, other, 'name') and \
+            compare_attribute(self, other, 'headerEnumName') and \
+            compare_attribute(self, other, 'usage')
+
+    def equal_struct(self, other):
+        if not isinstance(other, EnumeratedValues):
+            return NotImplemented
+
+        if len(self.enumeratedValues) != len(other.enumeratedValues):
+            return False
+
+        for (lhs, rhs) in zip(self.enumeratedValues, other.enumeratedValues):
+            if lhs != rhs:
+                return False
+        return True
+
     def parse(self, node):
         super().parse(node)
 
@@ -544,6 +694,15 @@ class EnumeratedValue(pysvd.classes.Parent):
 
     def __init__(self, parent, node):
         super().__init__(parent, node)
+
+    def __eq__(self, other):
+        if not isinstance(other, EnumeratedValue):
+            return NotImplemented
+
+        return compare_attribute(self, other, 'name') and \
+            compare_attribute(self, other, 'value') and \
+            compare_attribute(self, other, 'description') and \
+            compare_attribute(self, other, 'isDefault')
 
     def parse(self, node):
         super().parse(node)
