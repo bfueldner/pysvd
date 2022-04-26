@@ -3,7 +3,7 @@ import unittest
 
 exec(open('pysvd/version.py').read())
 
-with open("README.rst", "r") as file:
+with open("README.md", "r") as file:
     long_description = file.read()
 
 setuptools.setup(
@@ -11,6 +11,7 @@ setuptools.setup(
     version=__version__,
     description="System View Description parser",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     keywords="SVD CMSIS ARM",
     license="MIT",
     author="Benjamin Füldner",
