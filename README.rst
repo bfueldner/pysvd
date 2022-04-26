@@ -74,10 +74,38 @@ If you want to be able to change the code while using it, clone it and install t
 .. _GitHub: https://github.com/bfueldner/pysvd
 
 
+Script
+------
+
+On example of the parser is the script ``svd_duplicates`` to check a SVD file for possible duplicate peripherals, registers, fields and enumeratedValues::
+
+    $ svd_duplicate --help
+    usage: svd_duplicates [-h] --svd FILE [--output FILE] [--level {all,hint,warning}] [--depth {peripherals,registers,fields,enumeratedValues}] [--sort]
+
+    Read SVD file, order elements, check forvalid elements to generate register access structs and displays possible substitutions.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --svd FILE            System view description (SVD) file
+      --output FILE, -o FILE
+                            Save ordered SVD output file
+      --level {all,hint,warning}, -l {all,hint,warning}
+                            Select level of output messages
+      --depth {peripherals,registers,fields,enumeratedValues}, -d {peripherals,registers,fields,enumeratedValues}
+                            Select depth of analysis
+      --sort                Sort elements before comparing
+
+
+Running ``svd_duplicates`` on a STM32F407 definition would generate this output (cut)::
+
+.. image:: doc/images/svd_duplicates_console.png
+    :alt: svd_duplicates console output
+
+
 Example
 -------
 
-As an example of the parser, a "SVD to ReST" converter ``svd2rst`` is included as a command line tool::
+As another example of the parser, a "SVD to ReST" converter ``svd2rst`` is included as a command line tool::
 
     $ svd2rst --help
     usage: svd2rst [-h] --svd FILE --output FILE

@@ -121,27 +121,29 @@ def main():
     parser.add_argument('--output', '-o', metavar='FILE', type=str, help='Save ordered SVD output file')
     parser.add_argument('--level', '-l', choices=['all', 'hint', 'warning'], help='Select level of output messages', default='all')
     parser.add_argument('--depth', '-d', choices=['peripherals', 'registers', 'fields', 'enumeratedValues'], help='Select depth of analysis', default='enumeratedValues')
+    parser.add_argument('--sort', action='store_true', help='Sort elements before comparing')
     args = parser.parse_args()
     level = Level[args.level]
     depth = Depth[args.depth]
 
     xml = ET.parse(args.svd)
 
-    print('Sort peripherals by name')
-    for peripherals in xml.findall('.//peripherals'):
-        peripherals[:] = natsorted(peripherals, key=lambda x: x.find('name').text)
+    if args.sort:
+      print('Sort peripherals by name')
+      for peripherals in xml.findall('.//peripherals'):
+          peripherals[:] = natsorted(peripherals, key=lambda x: x.find('name').text)
 
-    print('Sort registers by addressOffset')
-    for registers in xml.findall('.//registers'):
-        registers[:] = sorted(registers, key=lambda x: integer(x.find('addressOffset').text))
+      print('Sort registers by addressOffset')
+      for registers in xml.findall('.//registers'):
+          registers[:] = sorted(registers, key=lambda x: integer(x.find('addressOffset').text))
 
-    print('Sort fields by bitOffset')
-    for fields in xml.findall('.//fields'):
-        fields[:] = sorted(fields, key=lambda x: integer(x.find('bitOffset').text))
+      print('Sort fields by bitOffset')
+      for fields in xml.findall('.//fields'):
+          fields[:] = sorted(fields, key=lambda x: integer(x.find('bitOffset').text))
 
-    print('Sort enumeratedValues by value')
-    for enumeratedValues in xml.findall('.//enumeratedValues'):
-        enumeratedValues[:] = sorted(enumeratedValues, key=lambda x: integer(x.find('value').text) if x.tag == 'enumeratedValue' else -1)
+      print('Sort enumeratedValues by value')
+      for enumeratedValues in xml.findall('.//enumeratedValues'):
+          enumeratedValues[:] = sorted(enumeratedValues, key=lambda x: integer(x.find('value').text) if x.tag == 'enumeratedValue' else -1)
 
     print('Remove linebreaks from description tags')
     for item in xml.findall('.//description'):
@@ -152,7 +154,7 @@ def main():
         xml.write(args.output, encoding="utf-8", xml_declaration=True, method="xml", short_empty_elements=True)
     print()
 
-    # Load ordered SVD file
+    # Load cleaned-up SVD file
     try:
         device = pysvd.element.Device(xml.getroot())
     except Exception as e:
