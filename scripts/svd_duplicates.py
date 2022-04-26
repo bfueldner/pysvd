@@ -141,7 +141,7 @@ def main():
 
     print('Sort enumeratedValues by value')
     for enumeratedValues in xml.findall('.//enumeratedValues'):
-        enumeratedValues[:] = sorted(enumeratedValues, key=lambda x: integer(x.find('value').text))
+        enumeratedValues[:] = sorted(enumeratedValues, key=lambda x: integer(x.find('value').text) if x.tag == 'enumeratedValue' else -1)
 
     print('Remove linebreaks from description tags')
     for item in xml.findall('.//description'):
