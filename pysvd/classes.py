@@ -154,7 +154,7 @@ class Dim(Derive):
                 if dimIndex is None:
                     dimName = pysvd.parser.Text(pysvd.node.Element(subnode, 'dimName'))
                     name = pysvd.parser.Text(pysvd.node.Element(subnode, 'name'))
-                    if dimName is not None and '[%s]' not in dimName or name is not None and '[%s]' not in name:
+                    if dimName is not None and '[%s]' in dimName or name is not None and '[%s]' in name:
                         dimIndices = range(dim)
                     else:
                         dimIndices = [dim]
